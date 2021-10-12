@@ -24,8 +24,10 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
+import { useHistory } from "react-router";
 
 function Games() {
+  const history = useHistory();
   const [games, setGames] = useState([]);
   const getGames = () => {
     fetch("http://localhost:8000/game/all").then(async (response) => {
@@ -34,12 +36,16 @@ function Games() {
   };
   useEffect(() => {
     getGames();
-  }, []);
+  });
+  const navToUser = () => {
+    history.push('/admin/Users')
+  } 
   return (
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
         <AddGameModal></AddGameModal>
+        <Button onClick={navToUser}>Users Table</Button>
       </HStack>
 
       <Table variant="striped" colorScheme="teal">
@@ -113,7 +119,7 @@ function AddGameModal() {
         <ModalOverlay />
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader>Create User</ModalHeader>
+            <ModalHeader>Create Game</ModalHeader>
             <ModalCloseButton />
             <ModalBody pb={6}>
               <FormControl>
@@ -132,6 +138,10 @@ function AddGameModal() {
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
                 <Input type="datetime-local" {...register("startTime")} />
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Winner</FormLabel>
+                <Input placeholder="" {...register("winner")} />
               </FormControl>
             </ModalBody>
 

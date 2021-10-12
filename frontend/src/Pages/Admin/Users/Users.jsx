@@ -22,8 +22,10 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
+import { useHistory } from "react-router";
 
 function Users() {
+  const history = useHistory();
   const [users, setUsers] = useState([]);
   const getUsers = () => {
     fetch("http://localhost:8000/users/all").then(async (response) => {
@@ -33,11 +35,15 @@ function Users() {
   useEffect(() => {
     getUsers()
   });
+  const navToGame = () => {
+    history.push('/admin/Games')
+  } 
   return (
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="flex-end">
         <Heading size="2xl">Users</Heading>
         <AddUserModal></AddUserModal>
+        <Button onClick={navToGame}>Games Table</Button>
       </HStack>
 
       <Table variant="striped" colorScheme="teal">
