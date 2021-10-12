@@ -97,10 +97,10 @@ exports.addGame = async (req, res) => {
 
 		
 
-		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2) {
+		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
 			return res
 				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-				.send("Winner must be from one of the teams")
+				.send("Winner must be blank or from one of the teams playing the game")
 		}
 		
 		const gameData = new Game({
@@ -151,10 +151,10 @@ exports.updateGame = async (req, res) => {
 
 		
 
-		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2) {
+		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
 			return res
 				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-				.send("Winner must be from one of the teams")
+				.send("Winner must be blank or from one of the teams playing the game")
 		}
 
 		await Game.findByIdAndUpdate(
