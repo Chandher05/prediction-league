@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/button";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
-import { Container, GridItem, Heading, SimpleGrid, Text, VStack } from "@chakra-ui/layout";
+import { Container, GridItem, Heading, SimpleGrid, VStack } from "@chakra-ui/layout";
 import { useHistory } from "react-router";
 
 function Login() {

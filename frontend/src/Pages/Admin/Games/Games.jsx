@@ -1,4 +1,6 @@
 import { Heading, VStack, HStack } from "@chakra-ui/layout";
+import { useForm } from "react-hook-form";
+
 import {
   Table,
   Thead,
@@ -13,26 +15,37 @@ import {
   ModalBody,
   ModalOverlay,
   ModalContent,
-  ModalHeader, 
+  ModalHeader,
   ModalFooter,
   FormLabel,
   FormControl,
   ModalCloseButton,
   Input,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import DateTime from "luxon/src/datetime";
 
 function Games() {
+  const [games, setGames] = useState([]);
+  const getGames = () => {
+    fetch("http://localhost:8000/game/all").then(async (response) => {
+      if (response.ok) setGames(await response.json());
+    });
+  };
+  useEffect(() => {
+    getGames();
+  }, []);
   return (
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
-      <AddGameModal></AddGameModal>
+        <AddGameModal></AddGameModal>
       </HStack>
 
       <Table variant="striped" colorScheme="teal">
         <Thead>
           <Tr>
-            <Th isNumeric>Game Number</Th>
+            <Th>No.</Th>
             <Th>Team 1</Th>
             <Th>Team 2</Th>
             <Th>Start Time</Th>
@@ -41,15 +54,31 @@ function Games() {
           </Tr>
         </Thead>
         <Tbody>
-          <Tr>
-            <Td>inches</Td>
-            <Td>millimetres (mm)</Td>
-            <Td isNumeric>25.4</Td>
-          </Tr>
+          {games.map((game) => {
+            return (
+              <Tr>
+                <Td>{game.gameNumber}</Td>
+                <Td>{game.team1}</Td>
+                <Td>{game.team2}</Td>
+                <Td>
+                  {DateTime.fromISO(game.StartTime, { zone: "utc" })
+                    .toLocal()
+                    .toLocaleString(DateTime.DATETIME_SHORT)}
+                  {game.StartTime}
+                </Td>
+                <Td>{game.winner}</Td>
+                <Td>
+                  <Button mx={1}>View</Button>
+                  <Button mx={1}>Update</Button>
+                  <Button mx={1}>Del</Button>
+                </Td>
+              </Tr>
+            );
+          })}
         </Tbody>
         <Tfoot>
           <Tr>
-            <Th isNumeric>Game Number</Th>
+            <Th>No.</Th>
             <Th>Team 1</Th>
             <Th>Team 2</Th>
             <Th>Start Time</Th>
@@ -66,41 +95,53 @@ export default Games;
 
 function AddGameModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const { register, handleSubmit } = useForm();
+  const onSubmit = (data) => {
+    fetch("http://localhost:8000/game/add", {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    onClose();
+  };
   return (
     <>
       <Button onClick={onOpen}>Add Game</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Create User</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <FormControl>
-              <FormLabel>Game Number</FormLabel>
-              <Input placeholder="No." />
-            </FormControl>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <ModalHeader>Create User</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <FormControl>
+                <FormLabel>Game Number</FormLabel>
+                <Input placeholder="No." {...register("gameNumber")} />
+              </FormControl>
 
-            <FormControl mt={4}>
-              <FormLabel>Team 1</FormLabel>
-              <Input placeholder="RCB" />
-            </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Team 2</FormLabel>
-              <Input placeholder="DC" />
-            </FormControl>
-            <FormControl mt={4}>
-              <FormLabel>Start Time</FormLabel>
-              <Input type="datetime-local" />
-            </FormControl>
-          </ModalBody>
+              <FormControl mt={4}>
+                <FormLabel>Team 1</FormLabel>
+                <Input placeholder="RCB" {...register("team1")} />
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Team 2</FormLabel>
+                <Input placeholder="DC" {...register("team2")} />
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Start Time</FormLabel>
+                <Input type="datetime-local" {...register("startTime")} />
+              </FormControl>
+            </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3}>
-              Create
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} type="submit">
+                Create
+              </Button>
+              <Button onClick={onClose}>Cancel</Button>
+            </ModalFooter>
+          </form>
         </ModalContent>
       </Modal>
     </>
