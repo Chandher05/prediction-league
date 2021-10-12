@@ -1,4 +1,5 @@
 import Game from '../../../models/mongoDB/game';
+import Prediction from '../../../models/mongoDB/prediction';
 import constants from '../../../utils/constants';
 import { Mongoose } from 'mongoose';
 
@@ -83,6 +84,24 @@ exports.scheduledGames = async (req, res) => {
 exports.addGame = async (req, res) => {
 	try {		
 
+
+		var existingGame = await Game.find({
+			gameNumber: req.body.gameNumber
+		})
+
+		if (existingGame.length > 0) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Game number already exists")
+		}
+
+		
+
+		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Winner must be from one of the teams")
+		}
 		
 		const gameData = new Game({
 			gameNumber: req.body.gameNumber,
@@ -114,7 +133,29 @@ exports.addGame = async (req, res) => {
  * @param  {Object} res response object
  */
 exports.updateGame = async (req, res) => {
-	try {
+	try {	
+
+
+		var existingGame = await Game.find({
+			_id: {
+				$ne: req.body.gameId
+			},
+			gameNumber: req.body.gameNumber
+		})
+
+		if (existingGame.length > 0) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Game number already exists")
+		}
+
+		
+
+		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Winner must be from one of the teams")
+		}
 
 		await Game.findByIdAndUpdate(
 			req.body.gameId,
@@ -168,6 +209,13 @@ exports.deleteGame = async (req, res) => {
 		game = await Game.findByIdAndDelete(
 			req.params.gameId
 		)
+
+
+		if (!game) {
+			return res
+				.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+				.send("Invalid game ID")
+		}
 
 		return res
 			.status(constants.STATUS_CODE.ACCEPTED_STATUS)

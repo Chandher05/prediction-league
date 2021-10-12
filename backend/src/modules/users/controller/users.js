@@ -9,6 +9,28 @@ import constants from '../../../utils/constants';
 exports.addUser = async (req, res) => {
 	try {
 
+		var existingUser
+		
+		existingUser = await Users.find({
+			uniqueCode: req.body.uniqueCode
+		})
+
+		if (existingUser.length > 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Unique code already exists")
+		}
+
+		existingUser = await Users.find({
+			username: req.body.username
+		})
+
+		if (existingUser.length > 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Username already exists")
+		}
+
 		const userData = new Users({
 			username: req.body.username,
 			uniqueCode: req.body.uniqueCode
@@ -68,6 +90,34 @@ exports.allUsers = async (req, res) => {
  */
 exports.updateUser = async (req, res) => {
 	try {
+
+		var existingUser
+		
+		existingUser = await Users.find({
+			_id: {
+				$ne: req.body.userId
+			},
+			uniqueCode: req.body.uniqueCode
+		})
+
+		if (existingUser.length > 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Unique code already exists")
+		}
+
+		existingUser = await Users.find({
+			_id: {
+				$ne: req.body.userId
+			},
+			username: req.body.username
+		})
+
+		if (existingUser.length > 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Username already exists")
+		}
 		
 		await Users.findByIdAndUpdate(
 			req.body.userId,
