@@ -1,10 +1,11 @@
+import { Container } from "@chakra-ui/layout";
 import Routes from "./Providers/Routes";
 
 
 
 function App() {
   return (
-    <div className="App">
+    <div >
       <Routes></Routes>
     </div>
   );
