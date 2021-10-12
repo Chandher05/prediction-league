@@ -16,11 +16,47 @@ exports.addPrediction = async (req, res) => {
 			uniqueCode: req.body.uniqueCode
 		})
 
+		let game = await Game.findById(req.body.gameId)
+
 		if (!user) {
 			return res
-			.status(constants.STATUS_CODE.NO_CONTENT_STATUS)
-			.send(null)
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("User not found")
 		}
+
+		if (!game) {
+			return res
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("Game not found")
+		}
+
+		var gameStartTime = new Date(game.startTime)
+		var predictionTime = new Date()
+		if (gameStartTime < predictionTime) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Game already started")
+		}
+
+		if (req.body.predictedTeam === "L") {
+			return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send("No prediction for game")
+		}
+
+		if (req.body.predictedTeam != game.team1 && req.body.predictedTeam != game.team2) {
+			return res
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("Predicted team must be one of the teams playing the game ")
+		}
+
+		var confidenceRegex = new RegExp('^(5[1-9]|[6-9][0-9]|100|FH)$')
+		if (!confidenceRegex.test(req.body.confidence)) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Invalid confidence")
+		}
+
 
 		let userId = user._id
 
@@ -40,7 +76,6 @@ exports.addPrediction = async (req, res) => {
 			predictedTeam: req.body.predictedTeam,
 			userId: userId,
 			gameId: req.body.gameId,
-			predictionTime: req.body.predictionTime,
 		})
 
 		await predictionData.save()
@@ -72,7 +107,6 @@ exports.getPredictionByGame = async (req, res) => {
 			gameId: req.params.gameId
 		})
 
-		console.log(allPredictions)
 
 		let allPlayers = {}
 		for (var prediction of allPredictions) {
@@ -95,7 +129,6 @@ exports.getPredictionByGame = async (req, res) => {
 			}
 		}
 
-		console.log(allPlayers)
 
 		let userData
 		let returnData = []
@@ -107,8 +140,6 @@ exports.getPredictionByGame = async (req, res) => {
 				prediction: allPlayers[userId]
 			})
 		}
-
-		console.log(returnData)
 
 
 		return res

@@ -22,6 +22,18 @@ const Users = new mongoose.Schema({
 		required: true,
 		default: 0
 	},
+	freeHitsRemaining: {
+		type: Number,
+		required: true,
+		default: 2,
+		min: 0
+	},
+	leavesRemaining: {
+		type: Number,
+		required: true,
+		default: 5,
+		min: 0
+	},
     isActive: {
         type: Boolean,
         required: true,
