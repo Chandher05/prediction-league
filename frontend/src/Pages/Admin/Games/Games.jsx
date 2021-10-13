@@ -67,7 +67,7 @@ function Games() {
                 <Td>{game.team1}</Td>
                 <Td>{game.team2}</Td>
                 <Td>
-                  {DateTime.fromISO(game.StartTime, { zone: "utc" })
+                  {DateTime.fromISO(game.startTime, { zone: "utc" })
                     .toLocal()
                     .toLocaleString(DateTime.DATETIME_SHORT)}
                   {game.StartTime}
