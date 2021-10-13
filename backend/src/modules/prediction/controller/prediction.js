@@ -12,7 +12,7 @@ import { Mongoose } from 'mongoose';
 exports.addPrediction = async (req, res) => {
 	try {
 
-		let user = await Users.findOne({
+		var user = await Users.findOne({
 			uniqueCode: req.body.uniqueCode
 		})
 
@@ -50,8 +50,9 @@ exports.addPrediction = async (req, res) => {
 			.send("Predicted team must be one of the teams playing the game ")
 		}
 
+		var confidence = req.body.confidence
 		var confidenceRegex = new RegExp('^(5[1-9]|[6-9][0-9]|100|FH)$')
-		if (!confidenceRegex.test(req.body.confidence)) {
+		if (!confidenceRegex.test(confidence)) {
 			return res
 			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
 			.send("Invalid confidence")
@@ -60,6 +61,32 @@ exports.addPrediction = async (req, res) => {
 
 		let userId = user._id
 
+		let previousPrediction = await Prediction.findOne({
+			userId: userId,
+			gameId: req.body.gameId,
+			isConsidered: true
+		})
+
+		if (previousPrediction && previousPrediction.confidence == "FH") {
+			await Users.findByIdAndUpdate(
+				user._id,
+				{
+					$inc: {
+						freeHitsRemaining: 1
+					}
+				})
+		}
+		if (user.freeHitsRemaining == 0 && confidence == "FH") {
+			confidence = 100
+		} else if (confidence == "FH") {
+			await Users.findByIdAndUpdate(
+				user._id,
+				{
+					$inc: {
+						freeHitsRemaining: -1
+					}
+				})
+		}
 
 		await Prediction.updateMany(
 			{
@@ -72,7 +99,7 @@ exports.addPrediction = async (req, res) => {
 		)
 		
 		const predictionData = new Prediction({
-			confidence: req.body.confidence,
+			confidence: confidence,
 			predictedTeam: req.body.predictedTeam,
 			userId: userId,
 			gameId: req.body.gameId,
@@ -250,6 +277,203 @@ exports.deleteGame = async (req, res) => {
 		return res
 			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
 			.send(game)
+
+	} catch (error) {
+		console.log(`Error game/startGame ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+
+/**
+ * Get leaderboard.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getLeaderboard = async (req, res) => {
+	try {
+
+		let allUsers = await Users.find({
+			isActive: true
+		})
+
+		allUsers.sort(function(a, b) {
+			return a.totalScore - b.totalScore
+		})
+
+		let leaderboardData = []
+		for (var obj of allUsers) {
+			leaderboardData.push({
+				username: obj.username,
+				score: obj.totalScore,
+				freeHitsRemaining: obj.freeHitsRemaining,
+				leavesRemaining: obj.leavesRemaining,
+			})
+		}
+
+		return res
+			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
+			.send(leaderboardData)
+
+	} catch (error) {
+		console.log(`Error game/startGame ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+
+/**
+ * Get predictions of user.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getPredictionsOfUser = async (req, res) => {
+	try {
+
+		let userData = await Users.findOne({
+			uniqueCode: req.params.userId
+		})
+
+		if (!userData) {
+			return res
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("Invalid unique code")
+		}
+
+		let allPredictions = await Prediction.find({
+			userId: userData._id,
+			isConsidered: true
+		})
+
+		let predictionByGame = {}
+		for (var prediction of allPredictions) {
+			predictionByGame[prediction.gameId] = {
+				confidence: prediction.confidence,
+				predictedTeam: prediction.predictedTeam
+			}
+		}
+		
+		let allGames = await Game.find()
+
+		let returnData = []
+		let confidence, predictedTeam, gameStartTime, currentTime = new Date()
+		for (var game of allGames) {
+			gameStartTime = new Date(game.startTime)
+
+			if (game._id in predictionByGame) {
+				confidence = predictionByGame[game._id].confidence
+				predictedTeam = predictionByGame[game._id].predictedTeam
+			} else if (gameStartTime < currentTime) {
+				confidence = "L"
+				predictedTeam = "-"
+			} else {
+				confidence = "-"
+				predictedTeam = "-"	
+			}
+
+			
+			returnData.push({
+				gameNumber: game.gameNumber,
+				teams: game.team1 + " VS " + game.team2,
+				confidence: confidence,
+				predictedTeam: predictedTeam,
+				winner: game.winner
+			})
+		}
+
+
+		return res
+			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
+			.send({
+				username: userData.username,
+				positionOnLeaderoard: userData.positionOnLeaderoard,
+				// freeHitsRemaining: userData.freeHitsRemaining,
+				// leavesRemaining: userData.leavesRemaining,
+				score: userData.totalScore,
+				predictions: returnData
+			})
+
+	} catch (error) {
+		console.log(`Error game/startGame ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+
+/**
+ * update prediction.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.updatePrediction = async (req, res) => {
+	try {
+		
+		await Prediction.updateMany(
+			{
+				userId: req.body.userId,
+				gameId: req.body.gameId
+			},
+			{
+				isConsidered: false
+			}
+		)
+
+		await Prediction.findByIdAndUpdate(
+			req.body.newConsidered,
+			{
+				isConsidered: true
+			}
+		)
+
+
+		let allPredictions
+		allPredictions = await Prediction.find({
+			gameId: req.params.gameId
+		})
+
+
+		let allPlayers = {}
+		for (var prediction of allPredictions) {
+			if (prediction.userId in allPlayers) {
+				allPlayers[prediction.userId].push({
+					predictionId: prediction._id,
+					confidence: prediction.confidence,
+					predictedTeam: prediction.predictedTeam,
+					predictionTime: prediction.predictionTime,
+					isConsidered: prediction.isConsidered,
+				})
+			} else {
+				allPlayers[prediction.userId] = [{
+					predictionId: prediction._id,
+					confidence: prediction.confidence,
+					predictedTeam: prediction.predictedTeam,
+					predictionTime: prediction.predictionTime,
+					isConsidered: prediction.isConsidered,
+				}]
+			}
+		}
+
+
+		let userData
+		let returnData = []
+		for (var userId in allPlayers) {
+			userData = await Users.findById(userId)
+			returnData.push({
+				userId: userId,
+				username: userData.username,
+				prediction: allPlayers[userId]
+			})
+		}
+
+		return res
+			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
+			.send(returnData)
 
 	} catch (error) {
 		console.log(`Error game/startGame ${error}`)

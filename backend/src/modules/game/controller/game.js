@@ -1,7 +1,7 @@
 import Game from '../../../models/mongoDB/game';
 import Prediction from '../../../models/mongoDB/prediction';
 import constants from '../../../utils/constants';
-import { Mongoose } from 'mongoose';
+import updateLeaderboard from '../../../utils/updateLeaderboard';
 
 /**
  * Get all games in database.
@@ -109,6 +109,44 @@ exports.scheduledGames = async (req, res) => {
 }
 
 /**
+ * Get list of games that have started/completed in database.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.completedGames = async (req, res) => {
+	try {
+
+		let allGames
+		allGames = await Game.find({
+			startTime: {
+				$lte: new Date()
+			}
+		})
+
+		let gameData = []
+		for (var game of allGames) {
+			gameData.push({
+				gameId: game._id,
+				gameNumber: game.gameNumber,
+				team1: game.team1,
+				team2: game.team2,
+				startTime: game.startTime
+			})
+		}
+
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(gameData)
+	} catch (error) {
+		console.log(`Error while getting scheduled game ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+/**
  * Add a game.
  * @param  {Object} req request object
  * @param  {Object} res response object
@@ -189,6 +227,32 @@ exports.updateGame = async (req, res) => {
 				.send("Winner must be blank or from one of the teams playing the game")
 		}
 
+		var oldValues = await Game.findById(req.body.gameId)
+
+		if (oldValues.team1 != req.body.team1) {
+			await Prediction.updateMany(
+				{
+					gameId: req.body.gameId,
+					predictedTeam: oldValues.team1
+				},
+				{
+					predictedTeam: req.body.team1
+				}
+			)
+		}
+		if (oldValues.team2 != req.body.team2) {
+			await Prediction.updateMany(
+				{
+					gameId: req.body.gameId,
+					predictedTeam: oldValues.team2
+				},
+				{
+					predictedTeam: req.body.team2
+				}
+			)
+		}
+
+
 		await Game.findByIdAndUpdate(
 			req.body.gameId,
 			{
@@ -214,6 +278,8 @@ exports.updateGame = async (req, res) => {
 				winner: game.winner
 			})
 		}
+
+		updateLeaderboard()
 
 
 		return res
