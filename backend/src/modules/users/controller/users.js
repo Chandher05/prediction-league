@@ -84,6 +84,34 @@ exports.allUsers = async (req, res) => {
 }
 
 /**
+ * View user by id.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getUserById = async (req, res) => {
+	try {
+
+		let user = await Users.findById(req.params.userId)
+		
+		let userData = {
+				userId: user._id,
+				username: user.username,
+				uniqueCode: user.uniqueCode,
+				isActive: user.isActive
+			}
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(userData)
+	} catch (error) {
+		console.log(`Error while viewing all users ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+/**
  * Update user.
  * @param  {Object} req request object
  * @param  {Object} res response object

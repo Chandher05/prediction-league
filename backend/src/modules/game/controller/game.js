@@ -38,6 +38,38 @@ exports.getAllGames = async (req, res) => {
 	}
 }
 
+
+/**
+ * Get game ny id from database.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+ exports.getGameById = async (req, res) => {
+	try {
+
+		let game = await Game.findById(req.params.gameId)
+
+		let gameData = {
+				gameId: game._id,
+				gameNumber: game.gameNumber,
+				team1: game.team1,
+				team2: game.team2,
+				startTime: game.startTime,
+				winner: game.winner
+			}
+
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(gameData)
+	} catch (error) {
+		console.log(`Error while getting all games ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
 /**
  * Get list of games that have not started in database.
  * @param  {Object} req request object
