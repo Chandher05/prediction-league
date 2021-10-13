@@ -11,6 +11,7 @@ import Games from "../Pages/Admin/Games/Games";
 import Login from "../Pages/Admin/Login/Login";
 import User from "../Pages/Admin/Users/Users";
 import Home from "../Pages/User/Home"
+import Predict from "../Pages/User/Predict/Predict";
 
 function Routes() {
   return (
@@ -24,6 +25,16 @@ function Routes() {
         </Route>
         <Route path="/admin">
           <Login></Login>
+        </Route>
+        {/* User screens */}
+        <Route path="/predict">
+          <Predict />
+        </Route>
+        <Route path="/leaderboard">
+          <Predict />
+        </Route>
+        <Route path="/history">
+          <Predict />
         </Route>
         <Route path="/">
           <Home />
