@@ -12,6 +12,7 @@ import Login from "../Pages/Admin/Login/Login";
 import User from "../Pages/Admin/Users/Users";
 import Home from "../Pages/User/Home"
 import Leaderboard from "../Pages/User/Leaderboard/Leaderboard";
+import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";
 
 function Routes() {
@@ -34,8 +35,8 @@ function Routes() {
         <Route path="/leaderboard">
           <Leaderboard />
         </Route>
-        <Route path="/history">
-          <Predict />
+        <Route path="/PastGames">
+          <PastGames />
         </Route>
         <Route path="/">
           <Home />

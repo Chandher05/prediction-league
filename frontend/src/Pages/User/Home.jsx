@@ -52,7 +52,7 @@ export default function Home() {
             colorScheme={"orange"}
             bg={"orange.400"}
             _hover={{ bg: "orange.500" }}
-            onClick={() => navTo("history")}
+            onClick={() => navTo("PastGames")}
           >
             History
           </Button>
