@@ -34,7 +34,7 @@ function Users() {
   };
   useEffect(() => {
     getUsers()
-  });
+  },[]);
   const navToGame = () => {
     history.push('/admin/Games')
   } 

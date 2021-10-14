@@ -46,6 +46,9 @@ export default function Home() {
           <Button rounded={"full"} px={6}  onClick={() => navTo("leaderboard")}>
             Leaderboard
           </Button>
+          <Button rounded={"full"} px={6}  onClick={() => navTo("predictions")}>
+            Predictions
+          </Button>
           <Button
             rounded={"full"}
             px={6}

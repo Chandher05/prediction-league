@@ -1,0 +1,86 @@
+import { Heading, VStack, HStack } from "@chakra-ui/layout";
+import { useForm } from "react-hook-form";
+
+import {
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  Button,
+  Input,
+} from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+import DateTime from "luxon/src/datetime";
+import { useHistory } from "react-router";
+
+function Predictions() {
+  const history = useHistory();
+  const [games, setGames] = useState([]);
+  const inputRef = useRef();
+  const getPredictions = () => {
+    const userCode = inputRef.current.value;
+    if(userCode) {
+      fetch(`http://localhost:8000/prediction/user/${userCode}`).then(async (response) => {
+        if (response.ok) {
+          const result = await response.json()
+          setGames(result.predictions)
+        };
+      });
+    }
+  };
+  const navToUser = () => {
+    history.push("/");
+  };
+  return (
+    <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
+      <HStack spacing={3} alignItems="justify-center">
+        <Heading size="2xl">Predictions</Heading>
+        <Button onClick={navToUser}>Home</Button>
+      </HStack>
+
+      <HStack spacing={3} alignItems="justify-center">
+        <Input border="solid"  ref={inputRef} ></Input>
+        <Button onClick={getPredictions} colorScheme="orange">Get</Button>
+      </HStack>
+
+      <Table variant="striped" colorScheme="teal">
+        <Thead>
+          <Tr>
+            <Th>No.</Th>
+            <Th>Teams</Th>
+            <Th>Confidence</Th>
+            <Th>Predicted Team</Th>
+            <Th>Actual Winner</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {games && games.length > 0  ? games.map((game) => {
+            return (
+              <Tr id={game.gameNumber}>
+                <Td>{game.gameNumber}</Td>
+                <Td>{game.teams}</Td>
+                <Td>{game.confidence}</Td>
+                <Td>{game.predictedTeam}</Td>
+                <Td>{game.winner}</Td>
+              </Tr>
+            );
+          }) : <Tr><Td>No results</Td></Tr>}
+        </Tbody>
+        <Tfoot>
+          <Tr>
+            <Th>No.</Th>
+            <Th>Team 1</Th>
+            <Th>Team 2</Th>
+            <Th>Start Time</Th>
+            <Th>Winner</Th>
+          </Tr>
+        </Tfoot>
+      </Table>
+    </VStack>
+  );
+}
+
+export default Predictions;

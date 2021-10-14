@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Flex,
@@ -8,9 +9,56 @@ import {
   Select,
   Stack,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { useHistory } from "react-router";
 
 export default function Predict() {
+  const history = useHistory();
+  const toast = useToast();
+
+  const [games, setGames] = useState([]);
+  const [selected, setSelected] = useState({});
+  const { register, handleSubmit } = useForm();
+
+  const getGames = () => {
+    fetch("http://localhost:8000/game/scheduled").then(async (response) => {
+      if (response.ok) setGames(await response.json());
+    });
+  };
+  useEffect(() => {
+    getGames();
+  }, []);
+  const onSubmit = (data) => {
+    data["gameId"] = selected.gameId;
+    fetch("http://localhost:8000/prediction/new", {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        toast({
+          title: "You have predicted the future",
+          description: "Hopefully it is the right future",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        })
+        history.push("/")
+      })
+      .catch((e) => {
+        toast({
+          title: "Something went wrong.",
+          description: "Please try again or contact us for help if the issue persists.",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      });
+  };
   return (
     <Flex
       minH={"100vh"}
@@ -31,45 +79,61 @@ export default function Predict() {
         <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
           Enter your prediction
         </Heading>
-        <FormControl id="email" isRequired>
-          <FormLabel>Game</FormLabel>
-          <Select placeholder="Select option">
-            <option value="Team 1">Team 1</option>
-            <option value="Team 2">Team 2</option>
-            <option value="Leave">Leave</option>
-          </Select>
-        </FormControl>
-        <FormControl id="email" isRequired>
-          <FormLabel>Unique Code</FormLabel>
-          <Input
-            placeholder="111-111"
-            _placeholder={{ color: "gray.500" }}
-            type="text"
-          />
-        </FormControl>
-        <FormControl id="password" isRequired>
-          <FormLabel>Team</FormLabel>
-          <Select placeholder="Select option">
-            <option value="Team 1">Team 1</option>
-            <option value="Team 2">Team 2</option>
-            <option value="Leave">Leave</option>
-          </Select>
-        </FormControl>
-        <FormControl id="password" isRequired>
-          <FormLabel>Confidence</FormLabel>
-          <Input type="number" />
-        </FormControl>
-        <Stack spacing={6}>
-          <Button
-            bg={"orange.400"}
-            color={"white"}
-            _hover={{
-              bg: "orange.500",
-            }}
-          >
-            Submit
-          </Button>
-        </Stack>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormControl isRequired>
+            <FormLabel>Game</FormLabel>
+            <Select
+              placeholder="Select option"
+              onChange={(e) => setSelected(JSON.parse(e.target.value))}
+            >
+              {games.map((game) => {
+                return (
+                  <option value={JSON.stringify(game)}>
+                    {game.team1} v {game.team2}{" "}
+                  </option>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Name</FormLabel>
+            <Input type="text" {...register("userName")} />
+          </FormControl>
+          <FormControl id="email" isRequired>
+            <FormLabel>Unique Code</FormLabel>
+            <Input
+              placeholder="111-111"
+              _placeholder={{ color: "gray.500" }}
+              type="text"
+              {...register("uniqueCode")}
+            />
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Team</FormLabel>
+            <Select placeholder="Select option" {...register("predictedTeam")}>
+              <option value={selected.team1}>{selected.team1}</option>
+              <option value={selected.team2}>{selected.team2}</option>
+              <option value="Leave">Leave</option>
+            </Select>
+          </FormControl>
+          <FormControl isRequired>
+            <FormLabel>Confidence</FormLabel>
+            <Input type="number" {...register("confidence")} />
+          </FormControl>
+
+          <Stack spacing={6} mt={5}>
+            <Button
+              bg={"orange.400"}
+              color={"white"}
+              _hover={{
+                bg: "orange.500",
+              }}
+              type="submit"
+            >
+              Submit
+            </Button>
+          </Stack>
+        </form>
       </Stack>
     </Flex>
   );

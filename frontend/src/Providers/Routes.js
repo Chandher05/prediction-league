@@ -14,6 +14,7 @@ import Home from "../Pages/User/Home"
 import Leaderboard from "../Pages/User/Leaderboard/Leaderboard";
 import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";
+import Predictions from "../Pages/User/Predictions/Predictions";
 
 function Routes() {
   return (
@@ -37,6 +38,9 @@ function Routes() {
         </Route>
         <Route path="/PastGames">
           <PastGames />
+        </Route>
+        <Route path="/predictions">
+          <Predictions />
         </Route>
         <Route path="/">
           <Home />
