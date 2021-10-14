@@ -26,6 +26,7 @@ import { useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
 import { useHistory } from "react-router";
 import { useToast } from "@chakra-ui/react";
+import ViewPredictions from "../../../common/ViewPredictions";
 
 function Games() {
   const history = useHistory();
@@ -94,7 +95,8 @@ function Games() {
                 <Td>{game.winner}</Td>
                 <Td>
                   <ViewPredictions gameId={game.gameId}></ViewPredictions>
-                  <Button mx={1}>Update</Button>
+                  <UpdateGameModal game={game}></UpdateGameModal>
+
                   <Button mx={1} onClick={() => delGame(game.gameId)}>
                     Del
                   </Button>
@@ -179,81 +181,30 @@ function AddGameModal() {
   );
 }
 
-function ViewPredictions({ gameId }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [predictions, setPredictions] = useState([]);
-
-  useEffect(() => {
-    if (!gameId || !isOpen) return;
-    fetch(`http://localhost:8000/prediction/game/${gameId}`).then(
-      async (response) => {
-        if (response.ok) setPredictions(await response.json());
-      }
-    );
-  }, [gameId, isOpen]);
-
-  return (
-    <>
-      <Button onClick={onOpen}>View</Button>
-
-      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Predictions</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Table variant="striped" colorScheme="teal">
-              <Thead>
-                <Tr>
-                  <Th>user id</Th>
-                  <Th>username</Th>
-                  <Th>Prediction</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {predictions.map((record) => {
-                  return (
-                    <Tr>
-                      <Td>{record.userId}</Td>
-                      <Td>{record.username}</Td>
-                      <Td>
-                        {" "}
-                        {record.prediction.map((rec) => (
-                          <p>{`${rec.predictedTeam} - ${rec.confidence} - ${
-                            rec.considered ? "Yes" : "No"
-                          }`}</p>
-                        ))}
-                      </Td>
-                    </Tr>
-                  );
-                })}
-              </Tbody>
-              <Tfoot>
-                <Tr>
-                  <Th>user id</Th>
-                  <Th>username</Th>
-                  <Th>Prediction</Th>
-                </Tr>
-              </Tfoot>
-            </Table>
-          </ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
-  );
+function toDatetimeLocal(d) {
+  const date = d;
+  const ten = function (i) {
+    return (i < 10 ? "0" : "") + i;
+  };
+  const YYYY = date.getFullYear();
+  const MM = ten(date.getMonth() + 1);
+  const DD = ten(date.getDate());
+  const HH = ten(date.getHours());
+  const II = ten(date.getMinutes());
+  const SS = ten(date.getSeconds());
+  return YYYY + "-" + MM + "-" + DD + "T" + HH + ":" + II + ":" + SS;
 }
 
-function UpdateGameModal({}) {
+function UpdateGameModal({ game }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm({
+    defaultValues: {
+      // startTime: toDatetimeLocal(game.startTime) || '',
+      ...game,
+    },
+  });
   const onSubmit = (data) => {
-    fetch("http://localhost:8000/game/add", {
+    fetch("http://localhost:8000/game/update", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -264,7 +215,9 @@ function UpdateGameModal({}) {
   };
   return (
     <>
-      <Button onClick={onOpen}>Add Game</Button>
+      <Button mx="1" onClick={onOpen}>
+        Update
+      </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -297,7 +250,7 @@ function UpdateGameModal({}) {
 
             <ModalFooter>
               <Button colorScheme="blue" mr={3} type="submit">
-                Create
+                Update
               </Button>
               <Button onClick={onClose}>Cancel</Button>
             </ModalFooter>

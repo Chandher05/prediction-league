@@ -1,5 +1,4 @@
 import { Heading, VStack, HStack } from "@chakra-ui/layout";
-import { useForm } from "react-hook-form";
 
 import {
   Table,
@@ -26,7 +25,7 @@ function PastGames() {
   };
   useEffect(() => {
     getGames();
-  });
+  },[]);
   const navToUser = () => {
     history.push("/");
   };
