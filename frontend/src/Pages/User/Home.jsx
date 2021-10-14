@@ -57,7 +57,7 @@ export default function Home() {
             _hover={{ bg: "orange.500" }}
             onClick={() => navTo("PastGames")}
           >
-            History
+            Games
           </Button>
         </Stack>
         <Flex w={"full"}>
