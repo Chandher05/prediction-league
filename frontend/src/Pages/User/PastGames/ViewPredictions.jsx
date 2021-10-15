@@ -9,7 +9,7 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/modal";
-import { Table, Tbody, Td, Tfoot, Th, Thead, Tr } from "@chakra-ui/table";
+import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
 import { useEffect, useState } from "react";
 
 function ViewPredictions({ gameId }) {
@@ -59,6 +59,9 @@ function ViewPredictions({ gameId }) {
                               <Td>{rec.confidence}</Td>
                             </Tr>
                           )
+                        }
+                        else {
+                          return ""
                         }
                     })
                   })

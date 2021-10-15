@@ -25,7 +25,7 @@ function Leaderboard() {
   };
   useEffect(() => {
     getLeaderboard();
-  });
+  }, []);
   const navToUser = () => {
     history.push("/");
   };
@@ -59,15 +59,6 @@ function Leaderboard() {
             );
           })}
         </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th>#</Th>
-            <Th>Name</Th>
-            <Th>Score</Th>
-            <Th>FH Remaining</Th>
-            <Th>Leaves Remaining</Th>
-          </Tr>
-        </Tfoot>
       </Table>
     </VStack>
   );

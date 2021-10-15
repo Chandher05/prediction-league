@@ -10,9 +10,11 @@ import {
   Stack,
   useColorModeValue,
   useToast,
+  HStack
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 export default function Predict() {
   const history = useHistory();
@@ -25,7 +27,7 @@ export default function Predict() {
   const getGames = () => {
     fetch("http://localhost:8000/game/scheduled").then(async (response) => {
       if (response.ok) {
-        const games = await response.json()
+        const games = await response.json();
         setGames(games);
         setSelected(games[0]);
       }
@@ -45,9 +47,9 @@ export default function Predict() {
     })
       .then((response) => {
         if (response.ok) {
-          return response
+          return response;
         }
-        throw response
+        throw response;
       })
       .then((data) => {
         toast({
@@ -56,14 +58,15 @@ export default function Predict() {
           status: "success",
           duration: 3000,
           isClosable: true,
-        })
-        history.push("/")
+        });
+        history.push("/");
       })
       .catch((e) => {
         toast({
           title: "Something went wrong.",
           // Custom error message from server
-          description: "Please try again or contact us for help if the issue persists.",
+          description:
+            "Please try again or contact us for help if the issue persists.",
           status: "error",
           duration: 2000,
           isClosable: true,
@@ -87,9 +90,14 @@ export default function Predict() {
         p={6}
         my={12}
       >
-        <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
-          Enter your prediction
-        </Heading>
+        <HStack>
+          <Button colorScheme="orange" borderRadius="10px" size="sm" onClick={() => history.push("/")}>
+            <ArrowBackIcon></ArrowBackIcon>
+          </Button>
+          <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
+            Enter your prediction
+          </Heading>
+        </HStack>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl isRequired>
             <FormLabel>Game</FormLabel>
@@ -130,7 +138,11 @@ export default function Predict() {
           </FormControl>
           <FormControl isRequired>
             <FormLabel>Confidence</FormLabel>
-            <Input pattern="^(5[1-9]|[6-9][0-9]|100|FH)$" {...register("confidence")}/>
+            <Input
+              pattern="^(5[1-9]|[6-9][0-9]|100|FH)$"
+              {...register("confidence")}
+              placeholder="51 - 100 or FH"
+            />
           </FormControl>
 
           <Stack spacing={6} mt={5}>
