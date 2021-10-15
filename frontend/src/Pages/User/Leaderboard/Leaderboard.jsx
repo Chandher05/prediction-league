@@ -39,18 +39,20 @@ function Leaderboard() {
       <Table variant="striped" colorScheme="teal">
         <Thead>
           <Tr>
+            <Th>#</Th>
             <Th>Name</Th>
             <Th>Score</Th>
-            <Th>FH</Th>
-            <Th>Leaves</Th>
+            <Th>FH Remaining</Th>
+            <Th>Leaves Remaining</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {games.map((row) => {
+          {games.map((row, index) => {
             return (
               <Tr>
+                <Td>{index + 1}</Td>
                 <Td>{row.username}</Td>
-                <Td>{row.score}</Td>
+                <Td>{row.score.toFixed(7)}</Td>
                 <Td>{row.freeHitsRemaining}</Td>
                 <Td>{row.leavesRemaining}</Td>
               </Tr>
@@ -59,10 +61,11 @@ function Leaderboard() {
         </Tbody>
         <Tfoot>
           <Tr>
+            <Th>#</Th>
             <Th>Name</Th>
             <Th>Score</Th>
-            <Th>FH</Th>
-            <Th>Leaves</Th>
+            <Th>FH Remaining</Th>
+            <Th>Leaves Remaining</Th>
           </Tr>
         </Tfoot>
       </Table>

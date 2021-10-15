@@ -40,7 +40,12 @@ function Games() {
   };
   const delGame = (gameId) => {
     if (!gameId) return;
-    fetch(`http://localhost:8000/game/delete/${gameId}`).then(
+    fetch(`http://localhost:8000/game/delete/${gameId}`, {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(
       async (response) => {
         if (response.ok) {
           toast({
@@ -205,7 +210,7 @@ function UpdateGameModal({ game }) {
   });
   const onSubmit = (data) => {
     fetch("http://localhost:8000/game/update", {
-      method: "POST", // or 'PUT'
+      method: "PUT", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
       },

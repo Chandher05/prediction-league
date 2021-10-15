@@ -24,7 +24,11 @@ export default function Predict() {
 
   const getGames = () => {
     fetch("http://localhost:8000/game/scheduled").then(async (response) => {
-      if (response.ok) setGames(await response.json());
+      if (response.ok) {
+        const games = await response.json()
+        setGames(games);
+        setSelected(games[0]);
+      }
     });
   };
   useEffect(() => {
@@ -40,11 +44,17 @@ export default function Predict() {
       body: JSON.stringify(data),
     })
       .then((response) => {
+        if (response.ok) {
+          return response
+        }
+        throw response
+      })
+      .then((data) => {
         toast({
           title: "You have predicted the future",
           description: "Hopefully it is the right future",
           status: "success",
-          duration: 9000,
+          duration: 3000,
           isClosable: true,
         })
         history.push("/")
@@ -52,9 +62,10 @@ export default function Predict() {
       .catch((e) => {
         toast({
           title: "Something went wrong.",
+          // Custom error message from server
           description: "Please try again or contact us for help if the issue persists.",
           status: "error",
-          duration: 9000,
+          duration: 2000,
           isClosable: true,
         });
       });
@@ -83,13 +94,14 @@ export default function Predict() {
           <FormControl isRequired>
             <FormLabel>Game</FormLabel>
             <Select
-              placeholder="Select option"
+              // placeholder="Select option"
+              selected={games[0]}
               onChange={(e) => setSelected(JSON.parse(e.target.value))}
             >
               {games.map((game) => {
                 return (
                   <option value={JSON.stringify(game)}>
-                    {game.team1} v {game.team2}{" "}
+                    Game {game.gameNumber} - {game.team1} v {game.team2}{" "}
                   </option>
                 );
               })}
@@ -110,7 +122,7 @@ export default function Predict() {
           </FormControl>
           <FormControl isRequired>
             <FormLabel>Team</FormLabel>
-            <Select placeholder="Select option" {...register("predictedTeam")}>
+            <Select placeholder="Select team" {...register("predictedTeam")}>
               <option value={selected.team1}>{selected.team1}</option>
               <option value={selected.team2}>{selected.team2}</option>
               <option value="Leave">Leave</option>
@@ -118,7 +130,7 @@ export default function Predict() {
           </FormControl>
           <FormControl isRequired>
             <FormLabel>Confidence</FormLabel>
-            <Input type="number" {...register("confidence")} />
+            <Input pattern="^(5[1-9]|[6-9][0-9]|100|FH)$" {...register("confidence")}/>
           </FormControl>
 
           <Stack spacing={6} mt={5}>

@@ -130,6 +130,7 @@ exports.completedGames = async (req, res) => {
 				gameNumber: game.gameNumber,
 				team1: game.team1,
 				team2: game.team2,
+				winner: game.winner,
 				startTime: game.startTime
 			})
 		}

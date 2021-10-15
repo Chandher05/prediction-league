@@ -21,7 +21,7 @@ exports.addPrediction = async (req, res) => {
 		if (!user) {
 			return res
 			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
-			.send("User not found")
+			.send("Invalid unique code")
 		}
 
 		if (!game) {
@@ -38,7 +38,7 @@ exports.addPrediction = async (req, res) => {
 			.send("Game already started")
 		}
 
-		if (req.body.predictedTeam === "L") {
+		if (req.body.predictedTeam === "Leave") {
 			return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send("No prediction for game")
@@ -47,7 +47,7 @@ exports.addPrediction = async (req, res) => {
 		if (req.body.predictedTeam != game.team1 && req.body.predictedTeam != game.team2) {
 			return res
 			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
-			.send("Predicted team must be one of the teams playing the game ")
+			.send("Predicted team must be one of the teams playing the game")
 		}
 
 		var confidence = req.body.confidence

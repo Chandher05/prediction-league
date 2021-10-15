@@ -11,6 +11,7 @@ import {
   Td,
   Button,
   Input,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import DateTime from "luxon/src/datetime";
@@ -18,6 +19,7 @@ import { useHistory } from "react-router";
 
 function Predictions() {
   const history = useHistory();
+  const toast = useToast();
   const [games, setGames] = useState([]);
   const inputRef = useRef();
   const getPredictions = () => {
@@ -27,7 +29,15 @@ function Predictions() {
         if (response.ok) {
           const result = await response.json()
           setGames(result.predictions)
-        };
+        } else {
+          toast({
+            title: "Please check your unique code and try again",
+            description: "Contact us for help if the issue persists.",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
+        }
       });
     }
   };
@@ -46,6 +56,8 @@ function Predictions() {
         <Button onClick={getPredictions} colorScheme="orange">Get</Button>
       </HStack>
 
+      {games && games.length > 0? 
+
       <Table variant="striped" colorScheme="teal">
         <Thead>
           <Tr>
@@ -57,7 +69,7 @@ function Predictions() {
           </Tr>
         </Thead>
         <Tbody>
-          {games && games.length > 0  ? games.map((game) => {
+          {  games.map((game) => {
             return (
               <Tr id={game.gameNumber}>
                 <Td>{game.gameNumber}</Td>
@@ -66,8 +78,9 @@ function Predictions() {
                 <Td>{game.predictedTeam}</Td>
                 <Td>{game.winner}</Td>
               </Tr>
-            );
-          }) : <Tr><Td>No results</Td></Tr>}
+            )
+          })
+        } 
         </Tbody>
         <Tfoot>
           <Tr>
@@ -79,6 +92,7 @@ function Predictions() {
           </Tr>
         </Tfoot>
       </Table>
+      : null }
     </VStack>
   );
 }

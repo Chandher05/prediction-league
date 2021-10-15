@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
 import { useHistory } from "react-router";
-import ViewPredictions from "../../../common/ViewPredictions";
+import ViewPredictions from "./ViewPredictions";
 
 function PastGames() {
   const history = useHistory();
@@ -42,9 +42,9 @@ function PastGames() {
             <Th>No.</Th>
             <Th>Team 1</Th>
             <Th>Team 2</Th>
-            <Th>Start Time</Th>
+            {/* <Th>Start Time</Th> */}
             <Th>Winner</Th>
-            <Th>Actions</Th>
+            <Th>Predictions</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -54,12 +54,12 @@ function PastGames() {
                 <Td>{game.gameNumber}</Td>
                 <Td>{game.team1}</Td>
                 <Td>{game.team2}</Td>
-                <Td>
+                {/* <Td>
                   {DateTime.fromISO(game.startTime, { zone: "utc" })
                     .toLocal()
                     .toLocaleString(DateTime.DATETIME_SHORT)}
                   {game.StartTime}
-                </Td>
+                </Td> */}
                 <Td>{game.winner}</Td>
                 <Td><ViewPredictions gameId={game.gameId}></ViewPredictions></Td>
               </Tr>
@@ -71,8 +71,9 @@ function PastGames() {
             <Th>No.</Th>
             <Th>Team 1</Th>
             <Th>Team 2</Th>
-            <Th>Start Time</Th>
+            {/* <Th>Start Time</Th> */}
             <Th>Winner</Th>
+            <Th>Predictions</Th>
           </Tr>
         </Tfoot>
       </Table>
