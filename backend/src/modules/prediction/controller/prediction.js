@@ -181,6 +181,104 @@ exports.getPredictionByGame = async (req, res) => {
 }
 
 /**
+ * Get list of games that have not started in database.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getPredictionByGameToShowUser = async (req, res) => {
+	try {
+
+		let allPredictions
+		allPredictions = await Prediction.find({
+			gameId: req.params.gameId
+		})
+
+
+		let allPlayers = {}
+		for (var prediction of allPredictions) {
+			if (prediction.isConsidered) {
+				allPlayers[prediction.userId] = {
+					predictionId: prediction._id,
+					confidence: prediction.confidence,
+					predictedTeam: prediction.predictedTeam,
+					predictionTime: prediction.predictionTime,
+					isConsidered: prediction.isConsidered,
+				}
+			}
+		}
+
+
+		let userData
+		let returnData = []
+
+		let team1 = []
+		let team2 = []
+		let team1FH = []
+		let team2FH = []
+		let constTeam = ""
+		for (var userId in allPlayers) {
+			userData = await Users.findById(userId)
+			if (constTeam == "") {
+				constTeam = allPlayers[userId].predictedTeam
+			}
+			if (constTeam == allPlayers[userId].predictedTeam) {
+				if (allPlayers[userId].confidence == "FH") {
+					team1FH.push({
+						userId: userId,
+						username: userData.username,
+						prediction: allPlayers[userId]
+					})
+				} else {
+					team1.push({
+						userId: userId,
+						username: userData.username,
+						prediction: allPlayers[userId]
+					})
+				}
+
+			} else {
+				if (allPlayers[userId].confidence == "FH") {
+					team2FH.push({
+						userId: userId,
+						username: userData.username,
+						prediction: allPlayers[userId]
+					})
+				} else {
+					team2.push({
+						userId: userId,
+						username: userData.username,
+						prediction: allPlayers[userId]
+					})
+				}
+			}
+		}
+
+		team1.sort(function (a, b) {
+			return a.prediction.confidence - b.prediction.confidence
+		})
+
+		team2.sort(function (a, b) {
+			return b.prediction.confidence - a.prediction.confidence
+		})
+
+		returnData = team1FH.concat(team1)
+		returnData = returnData.concat(team2)
+		returnData = returnData.concat(team2FH)
+
+
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(returnData)
+	} catch (error) {
+		console.log(`Error while getting scheduled game ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+/**
  * Add a game.
  * @param  {Object} req request object
  * @param  {Object} res response object
