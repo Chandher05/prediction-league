@@ -38,7 +38,7 @@ function ViewPredictions({ gameId }) {
             <Table variant="striped" colorScheme="teal">
               <Thead>
                 <Tr>
-                  <Th>user id</Th>
+                  {/* <Th>user id</Th> */}
                   <Th>username</Th>
                   <Th>Prediction</Th>
                 </Tr>
@@ -47,7 +47,7 @@ function ViewPredictions({ gameId }) {
                 {predictions.map((record) => {
                   return (
                     <Tr>
-                      <Td>{record.userId}</Td>
+                      {/* <Td>{record.userId}</Td> */}
                       <Td>{record.username}</Td>
                       <Td>
                         {" "}
@@ -63,7 +63,7 @@ function ViewPredictions({ gameId }) {
               </Tbody>
               <Tfoot>
                 <Tr>
-                  <Th>user id</Th>
+                  {/* <Th>user id</Th> */}
                   <Th>username</Th>
                   <Th>Prediction</Th>
                 </Tr>

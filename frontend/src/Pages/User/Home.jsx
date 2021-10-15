@@ -19,8 +19,8 @@ export default function Home() {
       <Stack
         textAlign={"center"}
         align={"center"}
-        spacing={{ base: 8, md: 10 }}
-        py={{ base: 20, md: 24 }}
+        spacing={{ base: 8, md: 8 }}
+        py={{ base: 20, md: 20 }}
       >
         <Heading
           fontWeight={600}
@@ -32,7 +32,7 @@ export default function Home() {
             ICC WORLD CUP
           </Text>
         </Heading>
-        <Stack spacing={6} direction={"row"}>
+        <Stack spacing={6}  direction={{sm:"column",md:"row"}}>
           <Button
             rounded={"full"}
             px={6}

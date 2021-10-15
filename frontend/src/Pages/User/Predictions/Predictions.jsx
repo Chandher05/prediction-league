@@ -1,5 +1,4 @@
 import { Heading, VStack, HStack } from "@chakra-ui/layout";
-import { useForm } from "react-hook-form";
 
 import {
   Table,
@@ -13,8 +12,7 @@ import {
   Input,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
-import DateTime from "luxon/src/datetime";
+import { useRef, useState } from "react";
 import { useHistory } from "react-router";
 
 function Predictions() {
@@ -82,15 +80,6 @@ function Predictions() {
           })
         } 
         </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th>No.</Th>
-            <Th>Team 1</Th>
-            <Th>Team 2</Th>
-            <Th>Start Time</Th>
-            <Th>Winner</Th>
-          </Tr>
-        </Tfoot>
       </Table>
       : null }
     </VStack>
