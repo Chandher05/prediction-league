@@ -69,11 +69,11 @@ function Games() {
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
-        <AddGameModal></AddGameModal>
+        <AddGameModal onCloseCall={getGames} ></AddGameModal>
         <Button onClick={navToUser}>Users Table</Button>
       </HStack>
 
-      <Table variant="striped" colorScheme="teal">
+      <Table variant="striped" size="sm" colorScheme="teal">
         <Thead>
           <Tr>
             <Th>No.</Th>
@@ -127,9 +127,9 @@ function Games() {
 
 export default Games;
 
-function AddGameModal() {
+function AddGameModal({onCloseCall}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
     fetch("http://declaregame.in:7500/game/add", {
       method: "POST", // or 'PUT'
@@ -139,6 +139,8 @@ function AddGameModal() {
       body: JSON.stringify(data),
     });
     onClose();
+    reset();
+    onCloseCall();
   };
   return (
     <>
@@ -202,7 +204,7 @@ function toDatetimeLocal(d) {
 
 function UpdateGameModal({ game }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       // startTime: toDatetimeLocal(game.startTime) || '',
       ...game,
@@ -217,6 +219,7 @@ function UpdateGameModal({ game }) {
       body: JSON.stringify(data),
     });
     onClose();
+    reset();
   };
   return (
     <>
