@@ -1,5 +1,6 @@
 import Users from '../../../models/mongoDB/users';
 import constants from '../../../utils/constants';
+import UpdateLeaderboard from '../../../utils/updateLeaderboard';
 
 /**
  * Add an user in database.
@@ -37,6 +38,8 @@ exports.addUser = async (req, res) => {
 		})
 
 		await userData.save()
+
+		UpdateLeaderboard()
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)

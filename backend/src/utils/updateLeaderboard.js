@@ -5,8 +5,8 @@ import Prediction from '../models/mongoDB/prediction';
 var updateLeaderboard = async () => {
     
 
-		let maxLeavesAllowed = 3
-		let scoreForExtraLeaves = 0.5
+		let maxLeavesAllowed = 5
+		let scoreForExtraLeaves = 0.3
 		
 		let allUsersData = await Users.find({
 			isActive: true
