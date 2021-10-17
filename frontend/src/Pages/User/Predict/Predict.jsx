@@ -133,7 +133,7 @@ export default function Predict() {
             <Select placeholder="Select team" {...register("predictedTeam")}>
               <option value={selected.team1}>{selected.team1}</option>
               <option value={selected.team2}>{selected.team2}</option>
-              <option value="Leave">Leave</option>
+           
             </Select>
           </FormControl>
           <FormControl isRequired>

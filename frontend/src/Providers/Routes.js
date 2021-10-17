@@ -18,7 +18,7 @@ import Predictions from "../Pages/User/Predictions/Predictions";
 
 function Routes() {
   return (
-    <Router basename={process.env.REACT_APP_PUBLIC_URL}>
+    <Router basename={`${process.env.REACT_APP_PUBLIC_URL}`}>
       <Switch>
         <Route path="/admin/Users">
           <User></User>
