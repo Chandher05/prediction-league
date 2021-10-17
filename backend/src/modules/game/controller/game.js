@@ -84,6 +84,7 @@ exports.scheduledGames = async (req, res) => {
 				$gt: new Date()
 			}
 		})
+		.limit(2)
 
 		let gameData = []
 		for (var game of allGames) {
