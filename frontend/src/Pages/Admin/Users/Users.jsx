@@ -28,7 +28,7 @@ function Users() {
   const history = useHistory();
   const [users, setUsers] = useState([]);
   const getUsers = () => {
-    fetch("http://localhost:8000/users/all").then(async (response) => {
+    fetch("http://declaregame.in:7500/users/all").then(async (response) => {
       if (response.ok) setUsers(await response.json());
     });
   };
@@ -85,7 +85,7 @@ function AddUserModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit } = useForm();
   const onSubmit = (data) => {
-    fetch("http://localhost:8000/users/add", {
+    fetch("http://declaregame.in:7500/users/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

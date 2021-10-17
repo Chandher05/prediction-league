@@ -18,7 +18,7 @@ function ViewPredictions({ gameId }) {
 
   useEffect(() => {
     if (!gameId || !isOpen) return;
-    fetch(`http://localhost:8000/prediction/game/${gameId}`).then(
+    fetch(`http://declaregame.in:7500/prediction/game/${gameId}`).then(
       async (response) => {
         if (response.ok) setPredictions(await response.json());
       }

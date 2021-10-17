@@ -34,13 +34,13 @@ function Games() {
   const toast = useToast();
 
   const getGames = () => {
-    fetch("http://localhost:8000/game/all").then(async (response) => {
+    fetch("http://declaregame.in:7500/game/all").then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
   };
   const delGame = (gameId) => {
     if (!gameId) return;
-    fetch(`http://localhost:8000/game/delete/${gameId}`, {
+    fetch(`http://declaregame.in:7500/game/delete/${gameId}`, {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json",
@@ -131,7 +131,7 @@ function AddGameModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit } = useForm();
   const onSubmit = (data) => {
-    fetch("http://localhost:8000/game/add", {
+    fetch("http://declaregame.in:7500/game/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -209,7 +209,7 @@ function UpdateGameModal({ game }) {
     },
   });
   const onSubmit = (data) => {
-    fetch("http://localhost:8000/game/update", {
+    fetch("http://declaregame.in:7500/game/update", {
       method: "PUT", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

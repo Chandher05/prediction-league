@@ -19,7 +19,7 @@ function PastGames() {
   const history = useHistory();
   const [games, setGames] = useState([]);
   const getGames = () => {
-    fetch("http://localhost:8000/game/completed").then(async (response) => {
+    fetch("http://declaregame.in:7500/game/completed").then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
   };
