@@ -34,13 +34,13 @@ function Games() {
   const toast = useToast();
 
   const getGames = () => {
-    fetch("http://declaregame.in:7500/game/all").then(async (response) => {
+    fetch(process.env.REACT_APP_API+"/game/all").then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
   };
   const delGame = (gameId) => {
     if (!gameId) return;
-    fetch(`http://declaregame.in:7500/game/delete/${gameId}`, {
+    fetch(`${process.env.REACT_APP_API}/game/delete/${gameId}`, {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json",
@@ -131,7 +131,7 @@ function AddGameModal({onCloseCall}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
-    fetch("http://declaregame.in:7500/game/add", {
+    fetch(process.env.REACT_APP_API+"/game/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -211,7 +211,7 @@ function UpdateGameModal({ game }) {
     },
   });
   const onSubmit = (data) => {
-    fetch("http://declaregame.in:7500/game/update", {
+    fetch(process.env.REACT_APP_API+"/game/update", {
       method: "PUT", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

@@ -25,7 +25,7 @@ export default function Predict() {
   const { register, handleSubmit } = useForm();
 
   const getGames = () => {
-    fetch("http://declaregame.in:7500/game/scheduled").then(async (response) => {
+    fetch(process.env.REACT_APP_API+"/game/scheduled").then(async (response) => {
       if (response.ok) {
         const games = await response.json();
         setGames(games);
@@ -38,7 +38,7 @@ export default function Predict() {
   }, []);
   const onSubmit = (data) => {
     data["gameId"] = selected.gameId;
-    fetch("http://declaregame.in:7500/prediction/new", {
+    fetch(process.env.REACT_APP_API+"/prediction/new", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

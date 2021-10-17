@@ -17,7 +17,7 @@ function Leaderboard() {
   const history = useHistory();
   const [games, setGames] = useState([]);
   const getLeaderboard = () => {
-    fetch("http://declaregame.in:7500/prediction/leaderboard").then(
+    fetch(process.env.REACT_APP_API+"/prediction/leaderboard").then(
       async (response) => {
         if (response.ok) setGames(await response.json());
       }

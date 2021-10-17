@@ -27,7 +27,7 @@ function Users() {
   const history = useHistory();
   const [users, setUsers] = useState([]);
   const getUsers = () => {
-    fetch("http://declaregame.in:7500/users/all").then(async (response) => {
+    fetch(process.env.REACT_APP_API+"/users/all").then(async (response) => {
       if (response.ok) setUsers(await response.json());
     });
   };
@@ -81,7 +81,7 @@ function AddUserModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
-    fetch("http://declaregame.in:7500/users/add", {
+    fetch(process.env.REACT_APP_API+"/users/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
