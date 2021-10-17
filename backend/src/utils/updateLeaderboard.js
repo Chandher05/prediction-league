@@ -115,6 +115,9 @@ var updateLeaderboard = async () => {
 		var position, obj
 		for (position = 0; position < allPredictionsByUsers.length; position++) {
 			obj = allPredictionsByUsers[position]
+			if (isNaN(obj.score)) {
+				obj.score = 0
+			}
 			await Users.findByIdAndUpdate(
 				obj.userId,
 				{
