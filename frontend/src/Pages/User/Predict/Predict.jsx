@@ -25,11 +25,11 @@ export default function Predict() {
   const { register, handleSubmit } = useForm();
 
   const getGames = () => {
-    fetch("http://localhost:8000/game/scheduled").then(async (response) => {
+    fetch("http://declaregame.in:7500/game/scheduled").then(async (response) => {
       if (response.ok) {
         const games = await response.json();
         setGames(games);
-        setSelected(games[0]);
+        if(games[0])setSelected(games[0]);
       }
     });
   };
@@ -38,7 +38,7 @@ export default function Predict() {
   }, []);
   const onSubmit = (data) => {
     data["gameId"] = selected.gameId;
-    fetch("http://localhost:8000/prediction/new", {
+    fetch("http://declaregame.in:7500/prediction/new", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

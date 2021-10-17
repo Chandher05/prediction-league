@@ -23,7 +23,7 @@ function Predictions() {
   const getPredictions = () => {
     const userCode = inputRef.current.value;
     if(userCode) {
-      fetch(`http://localhost:8000/prediction/user/${userCode}`).then(async (response) => {
+      fetch(`http://declaregame.in:7500/prediction/user/${userCode}`).then(async (response) => {
         if (response.ok) {
           const result = await response.json()
           setGames(result.predictions)
