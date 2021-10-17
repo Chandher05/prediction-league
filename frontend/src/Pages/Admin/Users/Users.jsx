@@ -4,7 +4,6 @@ import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
@@ -35,6 +34,8 @@ function Users() {
   useEffect(() => {
     getUsers()
   },[]);
+
+
   const navToGame = () => {
     history.push('/admin/Games')
   } 
@@ -46,9 +47,10 @@ function Users() {
         <Button onClick={navToGame}>Games Table</Button>
       </HStack>
 
-      <Table variant="striped" colorScheme="teal">
+      <Table variant="striped" size="sm" colorScheme="teal">
         <Thead>
           <Tr>
+            <Th >No.</Th>
             <Th>User name</Th>
             <Th>Unique Code</Th>
             <Th>Active</Th>
@@ -56,9 +58,10 @@ function Users() {
           </Tr>
         </Thead>
         <Tbody>
-          {users.map((element) => {
+          {users.map((element, index) => {
             return (
               <Tr>
+                <Td >{index + 1}</Td>
                 <Td>{element.username}</Td>
                 <Td>{element.uniqueCode}</Td>
                 <Td>{element.isActive ? "Yes" : "No"}</Td>
@@ -67,13 +70,6 @@ function Users() {
             );
           })}
         </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th>User name</Th>
-            <Th>Unique Code</Th>
-            <Th>Active</Th>
-          </Tr>
-        </Tfoot>
       </Table>
     </VStack>
   );
@@ -83,7 +79,7 @@ export default Users;
 
 function AddUserModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
     fetch("http://declaregame.in:7500/users/add", {
       method: "POST", // or 'PUT'
@@ -93,8 +89,9 @@ function AddUserModal() {
       body: JSON.stringify(data),
     });
     onClose();
+    reset();
   };
-   
+  
   return (
     <>
       <Button onClick={onOpen}>Add User</Button>
