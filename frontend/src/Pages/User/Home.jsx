@@ -12,10 +12,10 @@ import { useHistory } from "react-router";
 export default function Home() {
   const history = useHistory();
   const navTo = (route) => {
-    history.push(`/${route}`)
-  } 
+    history.push(`/${route}`);
+  };
   return (
-    <Container maxW={"3xl"}>
+    <Container maxW={"2xl"}>
       <Stack
         textAlign={"center"}
         align={"center"}
@@ -32,32 +32,41 @@ export default function Home() {
             ICC WORLD CUP
           </Text>
         </Heading>
-        <Stack spacing={6}  direction={{sm:"column",md:"row"}}>
+        <Button
+          rounded={"full"}
+          px={6}
+          colorScheme={"orange"}
+          bg={"orange.400"}
+          _hover={{ bg: "orange.500" }}
+          onClick={() => navTo("predict")}
+          size="lg"
+        >
+          Predict Now
+        </Button>
+        <Stack spacing={6} direction={ "column" }>
           <Button
             rounded={"full"}
+            colorScheme={"red"}
             px={6}
-            colorScheme={"orange"}
-            bg={"orange.400"}
-            _hover={{ bg: "orange.500" }}
-            onClick={() => navTo("predict")}
+            onClick={() => navTo("leaderboard")}
           >
-            Predict
-          </Button>
-          <Button rounded={"full"} px={6}  onClick={() => navTo("leaderboard")}>
             Leaderboard
           </Button>
-          <Button rounded={"full"} px={6}  onClick={() => navTo("predictions")}>
-            Predictions
+          <Button
+            rounded={"full"}
+            colorScheme={"red"}
+            px={6}
+            onClick={() => navTo("predictions")}
+          >
+            Your Predictions
           </Button>
           <Button
             rounded={"full"}
             px={6}
-            colorScheme={"orange"}
-            bg={"orange.400"}
-            _hover={{ bg: "orange.500" }}
+            colorScheme={"red"}
             onClick={() => navTo("PastGames")}
           >
-            Games
+            Completed Games
           </Button>
         </Stack>
         <Flex w={"full"}>
