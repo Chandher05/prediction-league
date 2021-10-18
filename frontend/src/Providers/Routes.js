@@ -1,11 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  // Link,
-  // useRouteMatch,
-  // useParams
+  Redirect
 } from "react-router-dom";
 import Games from "../Pages/Admin/Games/Games";
 import Login from "../Pages/Admin/Login/Login";
@@ -17,17 +15,22 @@ import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
 
 function Routes() {
+  const [authenticated, setAuth] = useState(false);
+  const handleAuth = (value) => {
+    setAuth(value)
+  }
+
   return (
     <Router basename={`${process.env.REACT_APP_PUBLIC_URL}`}>
       <Switch>
-        <Route path="/admin/Users">
+        <PrivateRoute authenticated={authenticated} path="/admin/Users">
           <User></User>
-        </Route>
-        <Route path="/admin/Games">
+        </PrivateRoute>
+        <PrivateRoute authenticated={authenticated} path="/admin/Games">
           <Games></Games>
-        </Route>
+        </PrivateRoute>
         <Route path="/admin">
-          <Login></Login>
+          <Login handleAuth={handleAuth}></Login>
         </Route>
         {/* User screens */}
         <Route path="/predict">
@@ -51,3 +54,26 @@ function Routes() {
 }
 
 export default Routes;
+
+function PrivateRoute ({ authenticated, children, ...rest }) {
+
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+       authenticated
+          ? (
+            children
+          )
+          : (
+            <Redirect
+              to={{
+                pathname: "/admin/",
+                state: { from: location }
+              }}
+            />
+          )
+      }
+    />
+  );
+}

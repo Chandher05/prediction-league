@@ -1,18 +1,18 @@
-import { Heading, VStack, HStack } from "@chakra-ui/layout";
+import { Heading, VStack, HStack, Flex } from "@chakra-ui/layout";
 
 import {
   Table,
   Thead,
   Tbody,
-  Tfoot,
   Tr,
   Th,
   Td,
   Button,
-  Container,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 
 function Leaderboard() {
   const history = useHistory();
@@ -27,25 +27,36 @@ function Leaderboard() {
   useEffect(() => {
     getLeaderboard();
   }, []);
-  const navToUser = () => {
-    history.push("/");
-  };
   return (
-    <Container maxW="xl">
-      <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
+    <Flex
+      minH={"100vh"}
+      
+      justify={"center"}
+      bg={useColorModeValue("white", "gray.800")}
+    >
+      <VStack w="full" h="full"  p={4} spacing={10}>
         <HStack spacing={3} alignItems="justify-center">
-          <Heading size="2xl">Leaderboard</Heading>
-          <Button onClick={navToUser}>Home</Button>
+          <Button
+            colorScheme="orange"
+            borderRadius="10px"
+            size="sm"
+            onClick={() => history.push("/")}
+          >
+            <ArrowBackIcon></ArrowBackIcon>
+          </Button>
+          <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
+            Leaderboard
+          </Heading>
         </HStack>
 
-        <Table variant="striped" colorScheme="teal" size="sm">
+        <Table variant="striped" colorScheme="orange" size="sm">
           <Thead>
             <Tr>
               <Th>#</Th>
               <Th>Name</Th>
               <Th>Score</Th>
-              <Th>FH Remaining</Th>
-              <Th>Leaves Remaining</Th>
+              <Th>FH</Th>
+              <Th>L</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -63,7 +74,7 @@ function Leaderboard() {
           </Tbody>
         </Table>
       </VStack>
-    </Container>
+    </Flex>
   );
 }
 

@@ -18,7 +18,7 @@ function ViewPredictions({ gameId }) {
 
   useEffect(() => {
     if (!gameId || !isOpen) return;
-    fetch(`${process.env.REACT_APP_API}/prediction/game/${gameId}`).then(
+    fetch(`${process.env.REACT_APP_API}/prediction/sorted/game/${gameId}`).then(
       async (response) => {
         if (response.ok) setPredictions(await response.json());
       }
@@ -27,7 +27,7 @@ function ViewPredictions({ gameId }) {
 
   return (
     <>
-      <Button onClick={onOpen}>View</Button>
+      <Button onClick={onOpen} size="sm">View</Button>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
@@ -35,7 +35,7 @@ function ViewPredictions({ gameId }) {
           <ModalHeader>Predictions</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Table variant="striped" colorScheme="teal">
+            <Table colorScheme="teal" size="sm">
               <Thead>
                 <Tr>
                   <Th>name</Th>
@@ -43,30 +43,27 @@ function ViewPredictions({ gameId }) {
                   <Th>Prediction</Th>
                 </Tr>
               </Thead>
-              {
-                predictions && predictions.length > 0?
+              {predictions && predictions.length > 0 ? (
                 <Tbody>
-                  {
-                    predictions.map((record) => {
-
-                      return record.prediction.map((rec) => {
-
-                        if (rec.isConsidered) {
-                          return (
-                            <Tr>
-                              <Td>{record.username}</Td>
-                              <Td>{rec.predictedTeam}</Td>
-                              <Td>{rec.confidence}</Td>
-                            </Tr>
-                          )
+                  {predictions.map((record, index) => {
+                    return (
+                      <Tr
+                        key={record.index}
+                        bg={
+                          predictions[0].prediction.predictedTeam ===
+                          record.prediction.predictedTeam
+                            ? "blue.200"
+                            : "red.200"
                         }
-                        else {
-                          return ""
-                        }
-                    })
-                  })
-                  }
-                </Tbody>:
+                      >
+                        <Td>{record.username}</Td>
+                        <Td>{record.prediction.predictedTeam}</Td>
+                        <Td>{record.prediction.confidence}</Td>
+                      </Tr>
+                    );
+                  })}
+                </Tbody>
+              ) : (
                 <Tbody>
                   <Tr>
                     <Td>-</Td>
@@ -74,7 +71,7 @@ function ViewPredictions({ gameId }) {
                     <Td>-</Td>
                   </Tr>
                 </Tbody>
-              }
+              )}
             </Table>
           </ModalBody>
 
