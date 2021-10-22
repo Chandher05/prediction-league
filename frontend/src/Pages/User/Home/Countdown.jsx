@@ -1,10 +1,4 @@
-import {
-  Box,
-  Center,
-  Stack,
-  useColorModeValue,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Center, Stack, useColorModeValue, Text } from "@chakra-ui/react";
 
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
@@ -25,7 +19,7 @@ function Countdown() {
   }, []);
   useEffect(() => {
     const intervalTimeCountdownClock = () => {
-      if (!nextGame.startTime) return;
+      if (!nextGame?.startTime) return;
       setTimeLeft(
         DateTime.fromISO(nextGame.startTime, { zone: "utc" })
           .toLocal()
@@ -38,7 +32,12 @@ function Countdown() {
   }, [nextGame]);
   return (
     <Box p="2">
-      <CountDownClock timeLeft={timeLeft} nextGame={nextGame}></CountDownClock>
+      {nextGame && (
+        <CountDownClock
+          timeLeft={timeLeft}
+          nextGame={nextGame}
+        ></CountDownClock>
+      )}
     </Box>
   );
 }
@@ -49,7 +48,7 @@ function CountDownClock({ timeLeft, nextGame }) {
   return (
     <Center>
       <Box
-      minW={"350px"}
+        minW={"350px"}
         maxW={"500px"}
         w={"full"}
         bg={useColorModeValue("orange", "gray.800")}
@@ -72,21 +71,21 @@ function CountDownClock({ timeLeft, nextGame }) {
             color={"orange.500"}
             // rounded={"full"}
           >
-            No. {nextGame.gameNumber} : {`${nextGame.team1} vs ${nextGame.team2}`}
+            No. {nextGame?.gameNumber} :{" "}
+            {`${nextGame?.team1} vs ${nextGame?.team2}`}
           </Text>
           {timeLeft && (
             <Stack direction={"row"} align={"center"} justify={"center"}>
               <Text fontSize={"4xl"} fontWeight={600}>
-              {timeLeft.hours < 10
-                  ? `0${timeLeft.hours}`
-                  : timeLeft.hours}h :{" "}
+                {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}h :{" "}
                 {timeLeft.minutes < 10
                   ? `0${timeLeft.minutes}`
-                  : timeLeft.minutes}{"m "}
-                :{" "}
+                  : timeLeft.minutes}
+                {"m "}:{" "}
                 {timeLeft.seconds < 10
                   ? `0${timeLeft.seconds}`
-                  : timeLeft.seconds}s
+                  : timeLeft.seconds}
+                s
               </Text>
             </Stack>
           )}
