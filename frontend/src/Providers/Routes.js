@@ -8,7 +8,7 @@ import {
 import Games from "../Pages/Admin/Games/Games";
 import Login from "../Pages/Admin/Login/Login";
 import User from "../Pages/Admin/Users/Users";
-import Home from "../Pages/User/Home"
+import Home from "../Pages/User/Home/Home"
 import Leaderboard from "../Pages/User/Leaderboard/Leaderboard";
 import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";

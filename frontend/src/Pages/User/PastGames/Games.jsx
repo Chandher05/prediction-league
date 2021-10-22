@@ -15,6 +15,7 @@ import { useHistory } from "react-router";
 import ViewPredictions from "./ViewPredictions";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 
+
 function PastGames() {
   const history = useHistory();
   const [games, setGames] = useState([]);
@@ -53,7 +54,7 @@ function PastGames() {
           </Heading>
         </HStack>
 
-        <Table variant="striped" colorScheme="teal" size="sm">
+        <Table variant="striped" colorScheme="orange" size="sm">
           <Thead>
             <Tr>
               <Th>No.</Th>

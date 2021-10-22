@@ -60,7 +60,7 @@ function Users() {
         <Tbody>
           {users.map((element, index) => {
             return (
-              <Tr>
+              <Tr key={index}>
                 <Td >{index + 1}</Td>
                 <Td>{element.username}</Td>
                 <Td>{element.uniqueCode}</Td>

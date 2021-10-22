@@ -87,7 +87,7 @@ function Games() {
         <Tbody>
           {games.map((game) => {
             return (
-              <Tr>
+              <Tr key={game.gameNumber}>
                 <Td>{game.gameNumber}</Td>
                 <Td>{game.team1}</Td>
                 <Td>{game.team2}</Td>
@@ -95,7 +95,7 @@ function Games() {
                   {DateTime.fromISO(game.startTime, { zone: "utc" })
                     .toLocal()
                     .toLocaleString(DateTime.DATETIME_SHORT)}
-                  {game.StartTime}
+         
                 </Td>
                 <Td>{game.winner}</Td>
                 <Td>
@@ -131,6 +131,7 @@ function AddGameModal({onCloseCall}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
+    console.log(data)
     fetch(process.env.REACT_APP_API+"/game/add", {
       method: "POST", // or 'PUT'
       headers: {
@@ -188,19 +189,19 @@ function AddGameModal({onCloseCall}) {
   );
 }
 
-function toDatetimeLocal(d) {
-  const date = d;
-  const ten = function (i) {
-    return (i < 10 ? "0" : "") + i;
-  };
-  const YYYY = date.getFullYear();
-  const MM = ten(date.getMonth() + 1);
-  const DD = ten(date.getDate());
-  const HH = ten(date.getHours());
-  const II = ten(date.getMinutes());
-  const SS = ten(date.getSeconds());
-  return YYYY + "-" + MM + "-" + DD + "T" + HH + ":" + II + ":" + SS;
-}
+// function toDatetimeLocal(d) {
+//   const date = d;
+//   const ten = function (i) {
+//     return (i < 10 ? "0" : "") + i;
+//   };
+//   const YYYY = date.getFullYear();
+//   const MM = ten(date.getMonth() + 1);
+//   const DD = ten(date.getDate());
+//   const HH = ten(date.getHours());
+//   const II = ten(date.getMinutes());
+//   const SS = ten(date.getSeconds());
+//   return YYYY + "-" + MM + "-" + DD + "T" + HH + ":" + II + ":" + SS;
+// }
 
 function UpdateGameModal({ game }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
