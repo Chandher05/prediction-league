@@ -1,4 +1,11 @@
-import { Box, Center, Stack, useColorModeValue, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Stack,
+  useColorModeValue,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
@@ -15,7 +22,8 @@ function Countdown() {
           setNextGame(games[0]);
         }
       }
-    );
+    )
+    .catch((e) => console.log(e));
   }, []);
   useEffect(() => {
     const intervalTimeCountdownClock = () => {
@@ -43,6 +51,11 @@ function Countdown() {
 }
 
 export default Countdown;
+
+const checkTime = (timeLeft) => {
+  if(timeLeft) return true;
+   return false
+};
 
 function CountDownClock({ timeLeft, nextGame }) {
   return (
@@ -74,19 +87,30 @@ function CountDownClock({ timeLeft, nextGame }) {
             No. {nextGame?.gameNumber} :{" "}
             {`${nextGame?.team1} vs ${nextGame?.team2}`}
           </Text>
-          {timeLeft && (
-            <Stack direction={"row"} align={"center"} justify={"center"}>
-              <Text fontSize={"4xl"} fontWeight={600}>
-                {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}h :{" "}
-                {timeLeft.minutes < 10
-                  ? `0${timeLeft.minutes}`
-                  : timeLeft.minutes}
-                {"m "}:{" "}
-                {timeLeft.seconds < 10
-                  ? `0${timeLeft.seconds}`
-                  : timeLeft.seconds}
-                s
-              </Text>
+          {checkTime(timeLeft) && (
+            <Stack direction={"row"} align={"center"} justify={"center"} spacing={5 }>
+              <VStack spacing={0} p={0}>
+                <Text fontSize="4xl" fontWeight={700}>
+                  {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}
+                </Text>
+                <Text fontSize="md" fontWeight={500}>hours</Text>
+              </VStack>{" "}
+              <VStack spacing={0} p={0}>
+                <Text fontSize="4xl" fontWeight={700}>
+                  {timeLeft.minutes < 10
+                    ? `0${timeLeft.minutes}`
+                    : timeLeft.minutes}
+                </Text>
+                <Text fontSize="md" fontWeight={500}>minutes</Text>
+              </VStack>
+              <VStack spacing={0} p={0}>
+                <Text fontSize="4xl" fontWeight={700}>
+                  {timeLeft.seconds < 10
+                    ? `0${timeLeft.seconds}`
+                    : timeLeft.seconds}
+                </Text>
+                <Text fontSize="md" fontWeight={500}>seconds</Text>
+              </VStack>
             </Stack>
           )}
         </Stack>

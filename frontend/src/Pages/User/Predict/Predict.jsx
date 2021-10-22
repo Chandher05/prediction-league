@@ -10,35 +10,50 @@ import {
   Stack,
   useColorModeValue,
   useToast,
-  HStack
+  HStack,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { useHistory } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 
 export default function Predict() {
   const history = useHistory();
   const toast = useToast();
+  let { id } = useParams();
 
   const [games, setGames] = useState([]);
   const [selected, setSelected] = useState({});
   const { register, handleSubmit } = useForm();
 
-  const getGames = () => {
-    fetch(process.env.REACT_APP_API+"/game/scheduled").then(async (response) => {
-      if (response.ok) {
-        const games = await response.json();
-        setGames(games);
-        if(games[0])setSelected(games[0]);
-      }
-    });
-  };
   useEffect(() => {
+    const getGames = () => {
+      if (id) {
+        fetch(process.env.REACT_APP_API + `/game/id/${id}`).then(
+          async (response) => {
+            if (response.ok) {
+              const res = await response.json();
+              setGames([res]);
+              if (res) setSelected(res);
+            }
+          }
+        );
+      } else {
+        fetch(process.env.REACT_APP_API + "/game/scheduled").then(
+          async (response) => {
+            if (response.ok) {
+              const games = await response.json();
+              setGames(games);
+              if (games[0]) setSelected(games[0]);
+            }
+          }
+        );
+      }
+    };
     getGames();
-  }, []);
+  }, [id]);
   const onSubmit = (data) => {
     data["gameId"] = selected.gameId;
-    fetch(process.env.REACT_APP_API+"/prediction/new", {
+    fetch(process.env.REACT_APP_API + "/prediction/new", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -62,6 +77,7 @@ export default function Predict() {
         history.push("/");
       })
       .catch((e) => {
+        alert(JSON.stringify(e))
         toast({
           title: "Something went wrong.",
           // Custom error message from server
@@ -91,7 +107,12 @@ export default function Predict() {
         my={12}
       >
         <HStack>
-          <Button colorScheme="orange" borderRadius="10px" size="sm" onClick={() => history.push("/")}>
+          <Button
+            colorScheme="orange"
+            borderRadius="10px"
+            size="sm"
+            onClick={() => history.push("/")}
+          >
             <ArrowBackIcon></ArrowBackIcon>
           </Button>
           <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
@@ -133,7 +154,6 @@ export default function Predict() {
             <Select placeholder="Select team" {...register("predictedTeam")}>
               <option value={selected.team1}>{selected.team1}</option>
               <option value={selected.team2}>{selected.team2}</option>
-           
             </Select>
           </FormControl>
           <FormControl isRequired>

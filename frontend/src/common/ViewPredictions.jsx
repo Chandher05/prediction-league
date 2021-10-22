@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
+import { ViewIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalBody,
@@ -27,7 +28,7 @@ function ViewPredictions({ gameId }) {
 
   return (
     <>
-      <Button onClick={onOpen}>View</Button>
+      <Button m={1} variant="ghost" size="sm" onClick={onOpen}><ViewIcon></ViewIcon> </Button>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />

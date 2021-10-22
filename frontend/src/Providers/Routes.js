@@ -21,7 +21,7 @@ function Routes() {
   }
 
   return (
-    <Router basename={`${process.env.REACT_APP_PUBLIC_URL}`}>
+    <Router >
       <Switch>
         <PrivateRoute authenticated={authenticated} path="/admin/Users">
           <User></User>
@@ -33,7 +33,10 @@ function Routes() {
           <Login handleAuth={handleAuth}></Login>
         </Route>
         {/* User screens */}
-        <Route path="/predict">
+        <Route path="/predict/:id">
+          <Predict />
+        </Route>
+        <Route path="/predict/">
           <Predict />
         </Route>
         <Route path="/leaderboard">
