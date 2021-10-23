@@ -69,6 +69,7 @@ function Games() {
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
         <AddGameModal onCloseCall={getGames}></AddGameModal>
+        <Button onClick={getGames} >Refresh</Button>
         <Button onClick={navToUser}>Users Table</Button>
       </HStack>
 
@@ -129,10 +130,12 @@ function AddGameModal({ onCloseCall }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    });
+    })
+    .then(() => {
+      reset();
+      onCloseCall();
+    })
     onClose();
-    reset();
-    onCloseCall();
   };
   return (
     <>

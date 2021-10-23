@@ -22,6 +22,7 @@ export default function Predict() {
   let { id } = useParams();
 
   const [games, setGames] = useState([]);
+  const [showConfidence, setConfidence] = useState(true);
   const [selected, setSelected] = useState({});
   const { register, handleSubmit } = useForm();
 
@@ -88,6 +89,14 @@ export default function Predict() {
         });
       });
   };
+  const checkIfLeave = (e) => {
+    if(e.target.value === "Leave") {
+      setConfidence(false);
+    }
+    else {
+      setConfidence(true);
+    }
+  }
   return (
     <Flex
       minH={"100vh"}
@@ -126,9 +135,9 @@ export default function Predict() {
               selected={games[0]}
               onChange={(e) => setSelected(JSON.parse(e.target.value))}
             >
-              {games.map((game) => {
+              {games.map((game, index) => {
                 return (
-                  <option value={JSON.stringify(game)}>
+                  <option value={JSON.stringify(game)} key={index}>
                     Game {game.gameNumber} - {game.team1} v {game.team2}{" "}
                   </option>
                 );
@@ -150,13 +159,14 @@ export default function Predict() {
           </FormControl>
           <FormControl isRequired>
             <FormLabel>Team</FormLabel>
-            <Select placeholder="Select team" {...register("predictedTeam")}>
+            <Select placeholder="Select team" {...register("predictedTeam")} onChange={checkIfLeave}>
               <option value={selected.team1}>{selected.team1}</option>
               <option value={selected.team2}>{selected.team2}</option>
               <option value="Leave">Leave</option>
             </Select>
           </FormControl>
-          <FormControl isRequired>
+          {showConfidence && 
+          <FormControl>
             <FormLabel>Confidence</FormLabel>
             <Input
               pattern="^(5[1-9]|[6-9][0-9]|100|FH|L)$"
@@ -164,6 +174,7 @@ export default function Predict() {
               placeholder="51 - 100 or FH or L"
             />
           </FormControl>
+          }
 
           <Stack spacing={6} mt={5}>
             <Button
