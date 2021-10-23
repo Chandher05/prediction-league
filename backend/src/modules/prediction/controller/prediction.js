@@ -76,26 +76,26 @@ exports.addPrediction = async (req, res) => {
 			isConsidered: true
 		})
 
-		if (previousPrediction && previousPrediction.confidence == "FH") {
-			await Users.findByIdAndUpdate(
-				user._id,
-				{
-					$inc: {
-						freeHitsRemaining: 1
-					}
-				})
-		}
-		if (user.freeHitsRemaining == 0 && confidence == "FH") {
-			confidence = 100
-		} else if (confidence == "FH") {
-			await Users.findByIdAndUpdate(
-				user._id,
-				{
-					$inc: {
-						freeHitsRemaining: -1
-					}
-				})
-		}
+		// if (previousPrediction && previousPrediction.confidence == "FH") {
+		// 	await Users.findByIdAndUpdate(
+		// 		user._id,
+		// 		{
+		// 			$inc: {
+		// 				freeHitsRemaining: 1
+		// 			}
+		// 		})
+		// }
+		// if (user.freeHitsRemaining == 0 && confidence == "FH") {
+		// 	confidence = 100
+		// } else if (confidence == "FH") {
+		// 	await Users.findByIdAndUpdate(
+		// 		user._id,
+		// 		{
+		// 			$inc: {
+		// 				freeHitsRemaining: -1
+		// 			}
+		// 		})
+		// }
 
 		await Prediction.updateMany(
 			{
