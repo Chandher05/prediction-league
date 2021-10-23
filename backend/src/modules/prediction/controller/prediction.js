@@ -76,26 +76,26 @@ exports.addPrediction = async (req, res) => {
 			isConsidered: true
 		})
 
-		if (previousPrediction && previousPrediction.confidence == "FH") {
-			await Users.findByIdAndUpdate(
-				user._id,
-				{
-					$inc: {
-						freeHitsRemaining: 1
-					}
-				})
-		}
-		if (user.freeHitsRemaining == 0 && confidence == "FH") {
-			confidence = 100
-		} else if (confidence == "FH") {
-			await Users.findByIdAndUpdate(
-				user._id,
-				{
-					$inc: {
-						freeHitsRemaining: -1
-					}
-				})
-		}
+		// if (previousPrediction && previousPrediction.confidence == "FH") {
+		// 	await Users.findByIdAndUpdate(
+		// 		user._id,
+		// 		{
+		// 			$inc: {
+		// 				freeHitsRemaining: 1
+		// 			}
+		// 		})
+		// }
+		// if (user.freeHitsRemaining == 0 && confidence == "FH") {
+		// 	confidence = 100
+		// } else if (confidence == "FH") {
+		// 	await Users.findByIdAndUpdate(
+		// 		user._id,
+		// 		{
+		// 			$inc: {
+		// 				freeHitsRemaining: -1
+		// 			}
+		// 		})
+		// }
 
 		await Prediction.updateMany(
 			{
@@ -263,11 +263,11 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 		}
 
 		team1.sort(function (a, b) {
-			return a.prediction.confidence - b.prediction.confidence
+			return b.prediction.confidence - a.prediction.confidence
 		})
 
 		team2.sort(function (a, b) {
-			return b.prediction.confidence - a.prediction.confidence
+			return a.prediction.confidence - b.prediction.confidence
 		})
 
 		returnData = team1FH.concat(team1)

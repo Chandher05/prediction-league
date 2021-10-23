@@ -6,7 +6,7 @@ var updateLeaderboard = async () => {
     
 
 		let maxLeavesAllowed = 5
-		let scoreForExtraLeaves = 0.3
+		let scoreForExtraLeaves = 0.35
 		
 		let allUsersData = await Users.find({
 			isActive: true
@@ -41,7 +41,11 @@ var updateLeaderboard = async () => {
 		}
 
 		let allPredictionsByUsers = []
+		let freeHitsTakenByUser = {}
 		// let confidence, team
+		for (var user of allUsersData) {
+			freeHitsTakenByUser[user._id] = 0
+		}
 		let prediction, predictedTeam, winner, leavesRemaining, leavesTaken = 0, totalScore = 0, totalGames = 0, extraLeavesTaken = 0
 		for (var user of allUsersData) {
 			// confidence = []
@@ -67,10 +71,15 @@ var updateLeaderboard = async () => {
 					if (predictedTeam == winner) {
 						if (prediction == "FH") {
 							prediction = 100
+							freeHitsTakenByUser[user._id] += 1
 						}
 						prediction = 100 - prediction
-					} else if (prediction == "FH") {
+					} else if (prediction == "FH" && freeHitsTakenByUser[user._id] < 2) {
 						prediction = 50
+						freeHitsTakenByUser[user._id] += 1
+					} else if (prediction == "FH") {
+						prediction = 100
+						freeHitsTakenByUser[user._id] += 1
 					}
 					prediction = prediction / 100
 
@@ -111,19 +120,20 @@ var updateLeaderboard = async () => {
 		})
 
 
-
-		var position, obj
+		var position, obj, freeHitsRemainingForUser
 		for (position = 0; position < allPredictionsByUsers.length; position++) {
 			obj = allPredictionsByUsers[position]
 			if (isNaN(obj.score)) {
 				obj.score = 0
 			}
+			freeHitsRemainingForUser = Math.max(0, 2 - freeHitsTakenByUser[obj.userId])
 			await Users.findByIdAndUpdate(
 				obj.userId,
 				{
 					positionOnLeaderoard: position + 1,
 					totalScore: obj.score,
-					leavesRemaining: obj.leavesRemaining
+					leavesRemaining: obj.leavesRemaining,
+					freeHitsRemaining: freeHitsRemainingForUser
 				}
 			)
 		}
