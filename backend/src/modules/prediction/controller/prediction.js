@@ -263,11 +263,11 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 		}
 
 		team1.sort(function (a, b) {
-			return a.prediction.confidence - b.prediction.confidence
+			return b.prediction.confidence - a.prediction.confidence
 		})
 
 		team2.sort(function (a, b) {
-			return b.prediction.confidence - a.prediction.confidence
+			return a.prediction.confidence - b.prediction.confidence
 		})
 
 		returnData = team1FH.concat(team1)
