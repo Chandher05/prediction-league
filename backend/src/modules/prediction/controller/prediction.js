@@ -16,6 +16,9 @@ exports.addPrediction = async (req, res) => {
 			uniqueCode: req.body.uniqueCode
 		})
 
+
+		let userId = user._id
+
 		let game = await Game.findById(req.body.gameId)
 
 		if (!user) {
@@ -39,6 +42,15 @@ exports.addPrediction = async (req, res) => {
 		}
 
 		if (req.body.predictedTeam === "Leave") {
+			await Prediction.updateMany(
+				{
+					userId: userId,
+					gameId: req.body.gameId,
+				},
+				{
+					isConsidered: false
+				}
+			)
 			return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send("No prediction for game")
@@ -57,9 +69,6 @@ exports.addPrediction = async (req, res) => {
 			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
 			.send("Invalid confidence")
 		}
-
-
-		let userId = user._id
 
 		let previousPrediction = await Prediction.findOne({
 			userId: userId,

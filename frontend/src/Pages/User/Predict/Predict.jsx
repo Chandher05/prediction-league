@@ -77,7 +77,6 @@ export default function Predict() {
         history.push("/");
       })
       .catch((e) => {
-        alert(JSON.stringify(e))
         toast({
           title: "Something went wrong.",
           // Custom error message from server
@@ -154,14 +153,15 @@ export default function Predict() {
             <Select placeholder="Select team" {...register("predictedTeam")}>
               <option value={selected.team1}>{selected.team1}</option>
               <option value={selected.team2}>{selected.team2}</option>
+              <option value="Leave">Leave</option>
             </Select>
           </FormControl>
           <FormControl isRequired>
             <FormLabel>Confidence</FormLabel>
             <Input
-              pattern="^(5[1-9]|[6-9][0-9]|100|FH)$"
+              pattern="^(5[1-9]|[6-9][0-9]|100|FH|L)$"
               {...register("confidence")}
-              placeholder="51 - 100 or FH"
+              placeholder="51 - 100 or FH or L"
             />
           </FormControl>
 
