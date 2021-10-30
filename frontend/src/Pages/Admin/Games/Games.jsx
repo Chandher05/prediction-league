@@ -1,4 +1,4 @@
-import { Heading, VStack, HStack } from "@chakra-ui/layout";
+import { Heading, VStack, HStack, Text } from "@chakra-ui/layout";
 import { useForm } from "react-hook-form";
 
 import {
@@ -20,7 +20,7 @@ import {
   FormControl,
   ModalCloseButton,
   Input,
-  useClipboard
+  useClipboard,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
@@ -32,32 +32,13 @@ import { CheckIcon, CopyIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 function Games() {
   const history = useHistory();
   const [games, setGames] = useState([]);
-  const toast = useToast();
 
   const getGames = () => {
     fetch(process.env.REACT_APP_API + "/game/all").then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
   };
-  const delGame = (gameId) => {
-    if (!gameId) return;
-    fetch(`${process.env.REACT_APP_API}/game/delete/${gameId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(async (response) => {
-      if (response.ok) {
-        toast({
-          title: "Game Deleted.",
-          description: "We've deleted the game for you.",
-          status: "success",
-          duration: 9000,
-          isClosable: true,
-        });
-      }
-    });
-  };
+
   useEffect(() => {
     getGames();
   }, []);
@@ -69,7 +50,7 @@ function Games() {
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
         <AddGameModal onCloseCall={getGames}></AddGameModal>
-        <Button onClick={getGames} >Refresh</Button>
+        <Button onClick={getGames}>Refresh</Button>
         <Button onClick={navToUser}>Users Table</Button>
       </HStack>
 
@@ -104,9 +85,7 @@ function Games() {
                   <ViewPredictions gameId={game.gameId}></ViewPredictions>
                   <UpdateGameModal game={game}></UpdateGameModal>
 
-                  <Button size="sm" mx={1} onClick={() => delGame(game.gameId)}>
-                    <DeleteIcon></DeleteIcon>
-                  </Button>
+                  <DeleteConfirmModal gameId={game.gameId}></DeleteConfirmModal>
                 </Td>
               </Tr>
             );
@@ -130,11 +109,10 @@ function AddGameModal({ onCloseCall }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    })
-    .then(() => {
+    }).then(() => {
       reset();
       onCloseCall();
-    })
+    });
     onClose();
   };
   return (
@@ -267,14 +245,63 @@ function UpdateGameModal({ game }) {
 }
 
 function CopyLink({ id }) {
-  const [value, ] = useState(
-    `${process.env.REACT_APP_PUBLIC_URL}/predict/${id}`
-  );
+  const [value] = useState(`${process.env.REACT_APP_PUBLIC_URL}/predict/${id}`);
   const { hasCopied, onCopy } = useClipboard(value);
 
   return (
     <Button variant="ghost" onClick={onCopy} ml={2}>
       {hasCopied ? <CheckIcon></CheckIcon> : <CopyIcon></CopyIcon>}
     </Button>
+  );
+}
+
+function DeleteConfirmModal({ gameId }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+
+  const delGame = () => {
+    if (!gameId) return;
+    fetch(`${process.env.REACT_APP_API}/game/delete/${gameId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(async (response) => {
+      if (response.ok) {
+        toast({
+          title: "Game Deleted.",
+          description: "Game has been deleted",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose();
+      }
+    });
+  };
+  return (
+    <>
+      <Button size="sm" mx="1" onClick={onOpen}>
+        <DeleteIcon></DeleteIcon>
+      </Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color="red">Delete Game</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Text fontSize="xl">Are you sure you want to delete this game?</Text>
+            <Text color="red" fontSize="sm">Note: This is not reversible</Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={delGame}>
+              Delete
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

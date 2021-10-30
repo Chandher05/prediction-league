@@ -53,7 +53,7 @@ function Countdown() {
 export default Countdown;
 
 const checkTime = (timeLeft) => {
-  if(timeLeft) return true;
+  if(timeLeft?.seconds > 0) return true;
    return false
 };
 
