@@ -589,3 +589,110 @@ exports.updatePrediction = async (req, res) => {
 			.send(error.message)
 	}
 }
+
+
+/**
+ * Get graph.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getGraph = async (req, res) => {
+	try {
+		
+		let allCompletedGames
+		allCompletedGames = await Game.find({
+			winner: {
+				$ne: ""
+			}
+		})
+		.sort('startTime')
+
+		let allUsers 
+		allUsers = await Users.find({
+			isActive: true
+		})
+
+		let allPredictions = {},
+			gamesPlayedByUser = {},
+			userTotals = {},
+			userScores = {},
+			userNames = {},
+			leavesRemaining = {},
+			freeHitsRemaining =  {},
+			gameNumbers = []
+
+		for (var userObj of allUsers) {
+			allPredictions[userObj._id] = []
+			gamesPlayedByUser[userObj._id] = 0
+			userTotals[userObj._id] = 0
+			userScores[userObj._id] = {
+				username: userObj.username,
+				scores: []
+			}
+			userNames[userObj._id] = userObj.username
+			leavesRemaining[userObj._id] = 5
+			freeHitsRemaining[userObj._id] = 2
+		}
+
+		let gameWinner = "",
+			predictionsForGame,
+			predictionByUser
+
+		for (var gameObj of allCompletedGames) {
+			gameNumbers.push(gameObj.gameNumber)
+			gameWinner = gameObj.winner
+			predictionByUser = {}
+
+			predictionsForGame = await Prediction.find({
+				gameId: gameObj._id,
+				isConsidered: true
+			})
+			for (var temp of predictionsForGame) {
+				if (temp.confidence == "FH" && temp.predictedTeam == gameWinner) {
+					predictionByUser[temp.userId] = 0
+					freeHitsRemaining[temp.userId] -= 1
+				} else if (temp.confidence == "FH" && freeHitsRemaining[temp.userId] > 0) {
+					predictionByUser[temp.userId] = 0.5
+					freeHitsRemaining[temp.userId] -= 1
+				} else if (temp.confidence == "FH") {
+					predictionByUser[temp.userId] = 1
+				} else if (temp.confidence != "FH" && temp.predictedTeam == gameWinner) {
+					predictionByUser[temp.userId] = ((100 - temp.confidence) * (100 - temp.confidence)) / 10000
+				} else {
+					predictionByUser[temp.userId] = (temp.confidence * temp.confidence) / 10000
+				}
+			}
+
+			for (var userId in allPredictions) {
+				if (userId in predictionByUser) {
+					allPredictions[userId].push(predictionByUser[userId])
+					userTotals[userId] += predictionByUser[userId]
+					gamesPlayedByUser[userId] += 1
+				} else if (leavesRemaining[userId] > 0) {
+					allPredictions[userId].push("L")
+					leavesRemaining[userId] -= 1
+				} else {
+					allPredictions[userId].push(0.35)
+					userTotals[userId] += 0.35
+					gamesPlayedByUser[userId] += 1
+				}
+				if (gamesPlayedByUser[userId] == 0) {
+					userScores[userId].scores.push(0)
+				} else {
+					userScores[userId].scores.push((userTotals[userId] / gamesPlayedByUser[userId]).toFixed(7))
+				}
+			}
+		}
+
+
+		return res
+			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
+			.send(userScores)
+
+	} catch (error) {
+		console.log(`Error game/startGame ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
