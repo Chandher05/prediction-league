@@ -687,7 +687,10 @@ exports.getGraph = async (req, res) => {
 
 		return res
 			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
-			.send(userScores)
+			.send({
+				gameNumbers: gameNumbers,
+				userScores: userScores
+			})
 
 	} catch (error) {
 		console.log(`Error game/startGame ${error}`)
