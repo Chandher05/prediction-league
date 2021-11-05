@@ -12,7 +12,7 @@ exports.getAllGames = async (req, res) => {
 	try {
 
 		let allGames
-		allGames = await Game.find()
+		allGames = await Game.find().sort('startTime')
 
 		let gameData = []
 		for (var game of allGames) {
@@ -84,6 +84,7 @@ exports.scheduledGames = async (req, res) => {
 				$gt: new Date()
 			}
 		})
+		.sort('startTime')
 		.limit(2)
 
 		let gameData = []
@@ -123,6 +124,7 @@ exports.completedGames = async (req, res) => {
 				$lte: new Date()
 			}
 		})
+		.sort('startTime')
 
 		let gameData = []
 		for (var game of allGames) {

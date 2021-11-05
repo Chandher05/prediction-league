@@ -464,7 +464,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 			}
 		}
 		
-		let allGames = await Game.find()
+		let allGames = await Game.find().sort('startTime')
 
 		let returnData = []
 		let confidence, predictedTeam, gameStartTime, currentTime = new Date()
