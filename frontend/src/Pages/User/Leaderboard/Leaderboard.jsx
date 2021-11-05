@@ -10,10 +10,10 @@ import {
   Button,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Line } from "react-chartjs-2";
+
 
 function Leaderboard() {
   const history = useHistory();
@@ -73,7 +73,6 @@ function Leaderboard() {
             })}
           </Tbody>
         </Table>
-        <GraphOfLeaderboard></GraphOfLeaderboard>
       </VStack>
     </Flex>
   );
@@ -81,59 +80,3 @@ function Leaderboard() {
 
 export default Leaderboard;
 
-function GraphOfLeaderboard() {
-  const [graphData, setGraphData] = useState({});
-  const [loaded, setLoaded] = useState(false);
-
-  function getRandomColor() {
-    var letters = "0123456789ABCDEF".split("");
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
-  const getLeaderboard = () => {
-    fetch(process.env.REACT_APP_API + "/prediction/graph").then(
-      async (response) => {
-        if (response.ok) {
-          const res = await response.json();
-          const datasets = [];
-          for (let key in res.userScores) {
-            let randomCol = getRandomColor();
-            datasets.push({
-              label: res.userScores[key].username,
-              data: res.userScores[key].scores,
-              pointBorderColor: randomCol,
-              pointBackgroundColor: randomCol,
-              backgroundColor: randomCol,
-              borderColor: randomCol,
-            });
-          }
-          console.log(datasets);
-          setGraphData({
-            labels: res.gameNumbers,
-            datasets: datasets,
-          });
-          setLoaded(true);
-        }
-      }
-    );
-  };
-  const options = {
-   
-      scales: {
-       
-        y: {
-          position: 'left',
-          reverse: true
-        }
-      }
-   
-  }
-  useEffect(() => {
-    getLeaderboard();
-  }, []);
-
-  return loaded && <Line data={graphData} options={options} />;
-}

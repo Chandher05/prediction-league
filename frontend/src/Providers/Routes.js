@@ -13,6 +13,7 @@ import Leaderboard from "../Pages/User/Leaderboard/Leaderboard";
 import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
+import Trends from "../Pages/User/Trends/Trends";
 
 function Routes() {
   const [authenticated, setAuth] = useState(false);
@@ -47,6 +48,9 @@ function Routes() {
         </Route>
         <Route path="/predictions">
           <Predictions />
+        </Route>
+        <Route path="/trends">
+          <Trends />
         </Route>
         <Route path="/">
           <Home />

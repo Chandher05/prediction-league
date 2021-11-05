@@ -73,6 +73,14 @@ export default function Home() {
           >
             Completed Games
           </Button>
+          <Button
+            rounded={"full"}
+            px={6}
+            colorScheme={"red"}
+            onClick={() => navTo("trends")}
+          >
+            Trends
+          </Button>
         </Stack>
         <Flex w={"full"}>
           <Illustration
