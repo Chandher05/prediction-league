@@ -103,7 +103,7 @@ function GraphOfLeaderboard() {
             let randomCol = getRandomColor();
             datasets.push({
               label: res.userScores[key].username,
-              data: res.userScores[key].scores.slice(7),
+              data: res.userScores[key].scores,
               pointBorderColor: randomCol,
               pointBackgroundColor: randomCol,
               backgroundColor: randomCol,
@@ -112,7 +112,7 @@ function GraphOfLeaderboard() {
           }
           console.log(datasets);
           setGraphData({
-            labels: res.gameNumbers.slice(7),
+            labels: res.gameNumbers,
             datasets: datasets,
           });
           setLoaded(true);

@@ -2,7 +2,7 @@ import Game from '../../../models/mongoDB/game';
 import Users from '../../../models/mongoDB/users';
 import Prediction from '../../../models/mongoDB/prediction';
 import constants from '../../../utils/constants';
-import { Mongoose } from 'mongoose';
+import updateLeaderboard from '../../../utils/updateLeaderboard';
 
 /**
  * Get all games in database.
@@ -613,6 +613,10 @@ exports.getGraph = async (req, res) => {
 		})
 
 		let allPredictions = {},
+			rawPredictions = {},
+			rawScoreForGame = {},
+			rawTotals = {},
+			leaderboardPositions = {},
 			gamesPlayedByUser = {},
 			userTotals = {},
 			userScores = {},
@@ -623,6 +627,13 @@ exports.getGraph = async (req, res) => {
 
 		for (var userObj of allUsers) {
 			allPredictions[userObj._id] = []
+			rawPredictions[userObj._id] = []
+			rawScoreForGame[userObj._id] = []
+			rawTotals[userObj._id] = []
+			leaderboardPositions[userObj._id] =  {
+				username: userObj.username,
+				scores: []
+			}
 			gamesPlayedByUser[userObj._id] = 0
 			userTotals[userObj._id] = 0
 			userScores[userObj._id] = {
@@ -636,7 +647,8 @@ exports.getGraph = async (req, res) => {
 
 		let gameWinner = "",
 			predictionsForGame,
-			predictionByUser
+			predictionByUser,
+			leaderboardForGame = []
 
 		for (var gameObj of allCompletedGames) {
 			gameNumbers.push(gameObj.gameNumber)
@@ -652,7 +664,7 @@ exports.getGraph = async (req, res) => {
 					predictionByUser[temp.userId] = 0
 					freeHitsRemaining[temp.userId] -= 1
 				} else if (temp.confidence == "FH" && freeHitsRemaining[temp.userId] > 0) {
-					predictionByUser[temp.userId] = 0.5
+					predictionByUser[temp.userId] = 0.25
 					freeHitsRemaining[temp.userId] -= 1
 				} else if (temp.confidence == "FH") {
 					predictionByUser[temp.userId] = 1
@@ -661,8 +673,10 @@ exports.getGraph = async (req, res) => {
 				} else {
 					predictionByUser[temp.userId] = (temp.confidence * temp.confidence) / 10000
 				}
+				rawScoreForGame[temp.userId].push(predictionByUser[temp.userId])
 			}
 
+			leaderboardForGame = []
 			for (var userId in allPredictions) {
 				if (userId in predictionByUser) {
 					allPredictions[userId].push(predictionByUser[userId])
@@ -678,10 +692,27 @@ exports.getGraph = async (req, res) => {
 				}
 				if (gamesPlayedByUser[userId] == 0) {
 					userScores[userId].scores.push(0)
+					leaderboardForGame.push({
+						userId: userId,
+						score: 0
+					})
 				} else {
 					userScores[userId].scores.push((userTotals[userId] / gamesPlayedByUser[userId]).toFixed(7))
+					leaderboardForGame.push({
+						userId: userId,
+						score: (userTotals[userId] / gamesPlayedByUser[userId]).toFixed(7)
+					})
 				}
+				rawTotals[userId].push(userTotals[userId])
 			}
+
+			leaderboardForGame.sort(function (a, b) {
+				return a.score - b.score
+			})
+			for (var position = 1; position <= leaderboardForGame.length; position++) {
+				leaderboardPositions[leaderboardForGame[position - 1].userId].scores.push(position)
+			}
+
 		}
 
 
@@ -689,7 +720,7 @@ exports.getGraph = async (req, res) => {
 			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
 			.send({
 				gameNumbers: gameNumbers,
-				userScores: userScores
+				userScores: leaderboardPositions
 			})
 
 	} catch (error) {
