@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -8,12 +8,15 @@ import {
 import Games from "../Pages/Admin/Games/Games";
 import Login from "../Pages/Admin/Login/Login";
 import User from "../Pages/Admin/Users/Users";
-import Home from "../Pages/User/Home/Home"
+import Home from "../Pages/User/Home/Home";
+import GoogleLogin from "../Pages/User/Login/Login";
 import Leaderboard from "../Pages/User/Leaderboard/Leaderboard";
 import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
 import Trends from "../Pages/User/Trends/Trends";
+import { auth } from "../Firebase/config";
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function Routes() {
   const [authenticated, setAuth] = useState(false);
@@ -30,31 +33,34 @@ function Routes() {
         <PrivateRoute authenticated={authenticated} path="/admin/Games">
           <Games></Games>
         </PrivateRoute>
-        <Route path="/admin">
+        <PrivateGoogleRoute path="/admin">
           <Login handleAuth={handleAuth}></Login>
-        </Route>
+        </PrivateGoogleRoute>
         {/* User screens */}
-        <Route path="/predict/:id">
+        <PrivateGoogleRoute path="/predict/:id">
           <Predict />
-        </Route>
-        <Route path="/predict/">
+        </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/predict/">
           <Predict />
-        </Route>
-        <Route path="/leaderboard">
+        </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/leaderboard">
           <Leaderboard />
-        </Route>
-        <Route path="/PastGames">
+        </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/PastGames">
           <PastGames />
-        </Route>
-        <Route path="/predictions">
+        </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/predictions">
           <Predictions />
-        </Route>
-        <Route path="/trends">
+        </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/trends">
           <Trends />
+        </PrivateGoogleRoute>
+        <Route path="/login">
+          <GoogleLogin />
         </Route>
-        <Route path="/">
+        <PrivateGoogleRoute path="/">
           <Home />
-        </Route>
+        </PrivateGoogleRoute>
       </Switch>
     </Router>
   )
@@ -62,13 +68,13 @@ function Routes() {
 
 export default Routes;
 
-function PrivateRoute ({ authenticated, children, ...rest }) {
+function PrivateRoute({ authenticated, children, ...rest }) {
 
   return (
     <Route
       {...rest}
       render={({ location }) =>
-       authenticated
+        authenticated
           ? (
             children
           )
@@ -84,3 +90,52 @@ function PrivateRoute ({ authenticated, children, ...rest }) {
     />
   );
 }
+
+function PrivateGoogleRoute({ children, ...rest }) {
+  const [user, loading, error] = useAuthState(auth);
+  console.log(`Autheticated - ${auth}`)
+  // console.log(`User - ${user.getIdToken()}`)
+
+  useEffect(() => {
+
+    const idToken = async () => {
+      // console.log(await user.getIdToken())
+      if (user) {
+        await user.getIdToken().then(function (idToken) {  // <------ Check this line
+          console.log(idToken); // It shows the Firebase token now
+          return idToken;
+        });
+      }
+    }
+    idToken()
+  }, [user])
+
+
+  if (loading) {
+    return 'loading'
+  }
+  if (error) {
+    return 'Something has gone wrong'
+  }
+
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        user
+          ? (
+            children
+          )
+          : (
+            <Redirect
+              to={{
+                pathname: "/login",
+                state: { from: location }
+              }}
+            />
+          )
+      }
+    />
+  );
+}
+
