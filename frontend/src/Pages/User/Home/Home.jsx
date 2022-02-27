@@ -10,6 +10,8 @@ import { useHistory } from "react-router";
 import { Illustration } from "./Illustration";
 import Countdown from "./Countdown";
 
+import { logout } from "../../../Firebase/config";
+
 export default function Home() {
   const history = useHistory();
   const navTo = (route) => {
@@ -80,6 +82,17 @@ export default function Home() {
             onClick={() => navTo("trends")}
           >
             Trends
+          </Button>
+          <Button
+            rounded={"full"}
+            px={6}
+            colorScheme={"red"}
+            onClick={() => {
+              logout();
+              history.push('/login')
+            }}
+          >
+            Log out
           </Button>
         </Stack>
         <Flex w={"full"}>
