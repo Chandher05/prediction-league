@@ -8,7 +8,7 @@ const Prediction = new mongoose.Schema({
         required: true
     },
     predictedTeam: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     userId: {

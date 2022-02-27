@@ -18,8 +18,9 @@ module.exports = {
 		REGION: process.env.REGION
 	},
 	nodemailer: {
+		SERVICE: process.env.SERVICE,
 		EMAIL_ID: process.env.EMAIL_ID,
-		PASSWORD: process.env.PASSWORD
+		PASSWORD: process.env.APP_PASSWORD
 	},
 	frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000", // For now no use of frontend urls in backend, when security is tighetened, add expected urls to cors.
 }

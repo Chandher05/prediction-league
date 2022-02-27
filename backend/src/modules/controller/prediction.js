@@ -1,8 +1,8 @@
-import Game from '../../../models/mongoDB/game';
-import Users from '../../../models/mongoDB/users';
-import Prediction from '../../../models/mongoDB/prediction';
-import constants from '../../../utils/constants';
-import updateLeaderboard from '../../../utils/updateLeaderboard';
+import Game from '../../models/mongoDB/game';
+import Users from '../../models/mongoDB/users';
+import Prediction from '../../models/mongoDB/prediction';
+import constants from '../../utils/constants';
+import updateLeaderboard from '../../utils/updateLeaderboard';
 
 /**
  * Get all games in database.

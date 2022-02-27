@@ -3,21 +3,20 @@
 import mongoose from 'mongoose'
 
 const Users = new mongoose.Schema({
+	userId: {
+		type: String,
+		required: true,
+	},
 	username: {
 		type: String,
 		maxlength: 50,
 		required: true,
 	},
-	uniqueCode: {
+    email: {
 		type: String,
-		required: true,
-	},
+        required: true
+    },
 	totalScore: {
-		type: Number,
-		required: true,
-		default: 0
-	},
-	positionOnLeaderoard: {
 		type: Number,
 		required: true,
 		default: 0
@@ -33,6 +32,16 @@ const Users = new mongoose.Schema({
 		required: true,
 		default: 5,
 		min: 0
+	},
+    isAdmin: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+	sendEmail: {
+		type: Boolean,
+        required: true,
+        default: true	
 	},
     isActive: {
         type: Boolean,

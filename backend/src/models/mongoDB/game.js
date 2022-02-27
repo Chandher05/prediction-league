@@ -8,11 +8,11 @@ const Game = new mongoose.Schema({
         required: true
     },
     team1: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     team2: {
-        type: String,
+        type: mongoose.Types.ObjectId,
         required: true
     },
     startTime: {
@@ -20,7 +20,7 @@ const Game = new mongoose.Schema({
         required: true
     },
     winner: {
-        type: String,
+        type: mongoose.Types.ObjectId,
     }
 }, { versionKey: false })
 

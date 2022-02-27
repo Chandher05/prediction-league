@@ -9,9 +9,10 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 // router for modules
-const usersRouter = require('../src/modules/users/router/users');
-const gameRouter = require('../src/modules/game/router/game');
-const predictionRouter = require('../src/modules/prediction/router/prediction');
+const usersRouter = require('../src/modules/router/users');
+const gameRouter = require('../src/modules/router/game');
+const predictionRouter = require('../src/modules/router/prediction');
+const teamsRouter = require('../src/modules/router/teams');
 
 // database connections
 require('../src/models/mongoDB/index');
@@ -41,15 +42,43 @@ app.use((req, res, next) => {
 	next();
 });
 
+const admin = require('firebase-admin')
+var serviceAccount = require("../serviceAccountKey.json");
+
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount)
+});
+
+
+
+var checkAuth = async (req, res, next) => {
+	try {
+		let authHeader = req.headers.authorization
+		let authToken = authHeader.substring(7, authHeader.length)
+		let decodedToken = await admin.auth().verifyIdToken(authToken)
+		const uid = decodedToken.uid;
+		let userRecord = await admin.auth().getUser(uid)
+		req.body.userId = uid
+		req.body.email = userRecord.email
+		req.body.username = userRecord.displayName
+		next()
+	} catch (err) {
+		console.log(err)
+		res.status(403).send('Unauthorized')
+	}
+}
+
 // base routes for modules
+app.use('/', checkAuth)
 app.use('/users', usersRouter);
 app.use('/game', gameRouter);
 app.use('/prediction', predictionRouter);
+app.use('/teams', teamsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
 	next(createError(404));
-	
+
 });
 
 // error handler

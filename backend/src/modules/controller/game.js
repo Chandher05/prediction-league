@@ -1,7 +1,8 @@
-import Game from '../../../models/mongoDB/game';
-import Prediction from '../../../models/mongoDB/prediction';
-import constants from '../../../utils/constants';
-import updateLeaderboard from '../../../utils/updateLeaderboard';
+import Game from '../../models/mongoDB/game';
+import Team from '../../models/mongoDB/team';
+import Prediction from '../../models/mongoDB/prediction';
+import constants from '../../utils/constants';
+import updateLeaderboard from '../../utils/updateLeaderboard';
 
 /**
  * Get all games in database.
@@ -11,6 +12,16 @@ import updateLeaderboard from '../../../utils/updateLeaderboard';
 exports.getAllGames = async (req, res) => {
 	try {
 
+		console.log(req.body)
+
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
 		let allGames
 		allGames = await Game.find().sort('startTime')
 
@@ -19,10 +30,10 @@ exports.getAllGames = async (req, res) => {
 			gameData.push({
 				gameId: game._id,
 				gameNumber: game.gameNumber,
-				team1: game.team1,
-				team2: game.team2,
+				team1: teamObj[game.team1],
+				team2: teamObj[game.team2],
 				startTime: game.startTime,
-				winner: game.winner
+				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			})
 		}
 
@@ -47,15 +58,23 @@ exports.getAllGames = async (req, res) => {
  exports.getGameById = async (req, res) => {
 	try {
 
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
 		let game = await Game.findById(req.params.gameId)
 
 		let gameData = {
 				gameId: game._id,
 				gameNumber: game.gameNumber,
-				team1: game.team1,
-				team2: game.team2,
+				team1: teamObj[game.team1],
+				team2: teamObj[game.team2],
 				startTime: game.startTime,
-				winner: game.winner
+				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			}
 
 
@@ -78,6 +97,14 @@ exports.getAllGames = async (req, res) => {
 exports.scheduledGames = async (req, res) => {
 	try {
 
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
 		let allGames
 		allGames = await Game.find({
 			startTime: {
@@ -92,8 +119,8 @@ exports.scheduledGames = async (req, res) => {
 			gameData.push({
 				gameId: game._id,
 				gameNumber: game.gameNumber,
-				team1: game.team1,
-				team2: game.team2,
+				team1: teamObj[game.team1],
+				team2: teamObj[game.team2],
 				startTime: game.startTime
 			})
 		}
@@ -118,6 +145,14 @@ exports.scheduledGames = async (req, res) => {
 exports.completedGames = async (req, res) => {
 	try {
 
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
 		let allGames
 		allGames = await Game.find({
 			startTime: {
@@ -131,10 +166,10 @@ exports.completedGames = async (req, res) => {
 			gameData.push({
 				gameId: game._id,
 				gameNumber: game.gameNumber,
-				team1: game.team1,
-				team2: game.team2,
-				winner: game.winner,
-				startTime: game.startTime
+				team1: teamObj[game.team1],
+				team2: teamObj[game.team2],
+				startTime: game.startTime,
+				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			})
 		}
 
@@ -157,6 +192,7 @@ exports.completedGames = async (req, res) => {
  */
 exports.addGame = async (req, res) => {
 	try {		
+		console.log(req.body)
 
 
 		var existingGame = await Game.find({
@@ -169,20 +205,36 @@ exports.addGame = async (req, res) => {
 				.send("Game number already exists")
 		}
 
-		
-
 		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
 			return res
 				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
 				.send("Winner must be blank or from one of the teams playing the game")
 		}
-		
+
+		let teamInfo
+
+		teamInfo = await Team.findById(req.body.team1)
+
+		if (!teamInfo) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team 1 does not exist")
+		}
+
+		teamInfo = await Team.findById(req.body.team2)
+
+		if (!teamInfo) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team 2 does not exist")
+		}
+
 		const gameData = new Game({
 			gameNumber: req.body.gameNumber,
 			team1: req.body.team1,
 			team2: req.body.team2,
 			startTime: req.body.startTime,
-			winner: req.body.winner
+			winner: req.body.winner.length > 0? req.body.winner: null
 		})
 
 		await gameData.save()
@@ -231,6 +283,24 @@ exports.updateGame = async (req, res) => {
 				.send("Winner must be blank or from one of the teams playing the game")
 		}
 
+		let teamInfo
+
+		teamInfo = await Team.findById(req.body.team1)
+
+		if (!teamInfo) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team 1 does not exist")
+		}
+
+		teamInfo = await Team.findById(req.body.team2)
+
+		if (!teamInfo) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team 2 does not exist")
+		}
+
 		var oldValues = await Game.findById(req.body.gameId)
 
 		if (oldValues.team1 != req.body.team1) {
@@ -264,7 +334,7 @@ exports.updateGame = async (req, res) => {
 				team1: req.body.team1,
 				team2: req.body.team2,
 				startTime: req.body.startTime,
-				winner: req.body.winner
+				winner: req.body.winner.length > 0? req.body.winner: null
 			}
 		)
 
@@ -279,11 +349,11 @@ exports.updateGame = async (req, res) => {
 				team1: game.team1,
 				team2: game.team2,
 				startTime: game.startTime,
-				winner: game.winner
+				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			})
 		}
 
-		updateLeaderboard()
+		// updateLeaderboard()
 
 
 		return res

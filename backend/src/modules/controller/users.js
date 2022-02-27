@@ -1,6 +1,48 @@
-import Users from '../../../models/mongoDB/users';
-import constants from '../../../utils/constants';
-import UpdateLeaderboard from '../../../utils/updateLeaderboard';
+import Users from '../../models/mongoDB/users';
+import constants from '../../utils/constants';
+import UpdateLeaderboard from '../../utils/updateLeaderboard';
+
+/**
+ * Login user.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+ exports.loginUser = async (req, res) => {
+	try {
+
+		var existingUser
+		
+		existingUser = await Users.find({
+			userId: req.body.userId
+		})
+
+		if (existingUser.length > 0) {
+			return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send("User login success")
+		}
+
+
+		const userData = new Users({
+			userId: req.body.userId,
+			username: req.body.username,
+			email: req.body.email
+		})
+
+		await userData.save()
+
+		// UpdateLeaderboard()
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send("User created")
+	} catch (error) {
+		console.log(`Error while adding user ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
 
 /**
  * Add an user in database.
@@ -10,36 +52,16 @@ import UpdateLeaderboard from '../../../utils/updateLeaderboard';
 exports.addUser = async (req, res) => {
 	try {
 
-		var existingUser
-		
-		existingUser = await Users.find({
-			uniqueCode: req.body.uniqueCode
-		})
-
-		if (existingUser.length > 0) {
-			return res
-			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-			.send("Unique code already exists")
-		}
-
-		existingUser = await Users.find({
-			username: req.body.username
-		})
-
-		if (existingUser.length > 0) {
-			return res
-			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-			.send("Username already exists")
-		}
-
 		const userData = new Users({
-			username: req.body.username,
-			uniqueCode: req.body.uniqueCode
+			userId: req.body.userId + req.body.adminName,
+			username: req.body.adminName,
+			email: "admin@test.com",
+			isAdmin: true
 		})
 
 		await userData.save()
 
-		UpdateLeaderboard()
+		// UpdateLeaderboard()
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
@@ -68,9 +90,9 @@ exports.allUsers = async (req, res) => {
 		let userData = []
 		for (var user of allUserData) {
 			userData.push({
-				userId: user._id,
+				mongoId: user._id,
 				username: user.username,
-				uniqueCode: user.uniqueCode,
+				isAdmin: user.isAdmin,
 				isActive: user.isActive
 			})
 		}
@@ -91,28 +113,28 @@ exports.allUsers = async (req, res) => {
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
-exports.getUserById = async (req, res) => {
-	try {
+// exports.getUserById = async (req, res) => {
+// 	try {
 
-		let user = await Users.findById(req.params.userId)
+// 		let user = await Users.findById(req.params.userId)
 		
-		let userData = {
-				userId: user._id,
-				username: user.username,
-				uniqueCode: user.uniqueCode,
-				isActive: user.isActive
-			}
+// 		let userData = {
+// 				userId: user._id,
+// 				username: user.username,
+// 				uniqueCode: user.uniqueCode,
+// 				isActive: user.isActive
+// 			}
 
-		return res
-			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
-			.send(userData)
-	} catch (error) {
-		console.log(`Error while viewing all users ${error}`)
-		return res
-			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
-			.send(error.message)
-	}
-}
+// 		return res
+// 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+// 			.send(userData)
+// 	} catch (error) {
+// 		console.log(`Error while viewing all users ${error}`)
+// 		return res
+// 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+// 			.send(error.message)
+// 	}
+// }
 
 /**
  * Update user.
@@ -125,37 +147,21 @@ exports.updateUser = async (req, res) => {
 		var existingUser
 		
 		existingUser = await Users.find({
-			_id: {
-				$ne: req.body.userId
-			},
-			uniqueCode: req.body.uniqueCode
+			_id: req.body.mongoId,
+			isAdmin: false
 		})
 
 		if (existingUser.length > 0) {
 			return res
 			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-			.send("Unique code already exists")
+			.send("Cannot update non admin user info")
 		}
 
-		existingUser = await Users.find({
-			_id: {
-				$ne: req.body.userId
-			},
-			username: req.body.username
-		})
-
-		if (existingUser.length > 0) {
-			return res
-			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-			.send("Username already exists")
-		}
 		
 		await Users.findByIdAndUpdate(
-			req.body.userId,
+			req.body.mongoId,
 			{
-				username: req.body.username,
-				uniqueCode: req.body.uniqueCode,
-				isActive: req.body.isActive
+				username: req.body.adminName
 			}
 		)
 		
@@ -165,9 +171,9 @@ exports.updateUser = async (req, res) => {
 		let userData = []
 		for (var user of allUserData) {
 			userData.push({
-				userId: user._id,
+				mongoId: user._id,
 				username: user.username,
-				uniqueCode: user.uniqueCode,
+				isAdmin: user.isAdmin,
 				isActive: user.isActive
 			})
 		}
