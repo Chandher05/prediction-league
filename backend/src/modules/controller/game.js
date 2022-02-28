@@ -12,8 +12,6 @@ import updateLeaderboard from '../../utils/updateLeaderboard';
 exports.getAllGames = async (req, res) => {
 	try {
 
-		console.log(req.body)
-
 		let allTeams
 		allTeams = await Team.find()
 
@@ -33,6 +31,8 @@ exports.getAllGames = async (req, res) => {
 				team1: teamObj[game.team1],
 				team2: teamObj[game.team2],
 				startTime: game.startTime,
+				toss: game.toss in teamObj? teamObj[game.toss]: {},
+				battingFirst: game.battingFirst in teamObj? teamObj[game.battingFirst]: {},
 				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			})
 		}
@@ -74,6 +74,8 @@ exports.getAllGames = async (req, res) => {
 				team1: teamObj[game.team1],
 				team2: teamObj[game.team2],
 				startTime: game.startTime,
+				toss: game.toss in teamObj? teamObj[game.toss]: {},
+				battingFirst: game.battingFirst in teamObj? teamObj[game.battingFirst]: {},
 				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			}
 
@@ -169,6 +171,8 @@ exports.completedGames = async (req, res) => {
 				team1: teamObj[game.team1],
 				team2: teamObj[game.team2],
 				startTime: game.startTime,
+				toss: game.toss in teamObj? teamObj[game.toss]: {},
+				battingFirst: game.battingFirst in teamObj? teamObj[game.battingFirst]: {},
 				winner: game.winner in teamObj? teamObj[game.winner]: {}
 			})
 		}
@@ -192,8 +196,6 @@ exports.completedGames = async (req, res) => {
  */
 exports.addGame = async (req, res) => {
 	try {		
-		console.log(req.body)
-
 
 		var existingGame = await Game.find({
 			gameNumber: req.body.gameNumber
@@ -205,11 +207,31 @@ exports.addGame = async (req, res) => {
 				.send("Game number already exists")
 		}
 
-		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
-			return res
-				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-				.send("Winner must be blank or from one of the teams playing the game")
-		}
+		// if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
+		// 	return res
+		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+		// 		.send("Winner is required in request. Winner must be blank or from one of the teams playing the game")
+		// }
+
+
+		// if (req.body.battingFirst != req.body.team1 && req.body.battingFirst != req.body.team2 && req.body.battingFirst != "") {
+		// 	return res
+		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+		// 		.send("Team batting first is required in request. Team batting first must be blank or from one of the teams playing the game")
+		// }
+
+
+		// if (req.body.toss != req.body.team1 && req.body.toss != req.body.team2 && req.body.toss != "") {
+		// 	return res
+		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+		// 		.send("Team winning toss is required in request. Team winning toss must be blank or from one of the teams playing the game")
+		// }
+
+		// if (req.body.winner != "" && (req.body.battingFirst == "" || req.body.toss == "")) {
+		// 	return res
+		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+		// 		.send("Team winning toss and batting first must not be blank if winner is provided")
+		// }
 
 		let teamInfo
 
@@ -234,7 +256,9 @@ exports.addGame = async (req, res) => {
 			team1: req.body.team1,
 			team2: req.body.team2,
 			startTime: req.body.startTime,
-			winner: req.body.winner.length > 0? req.body.winner: null
+			battingFirst: null,
+			toss: null,
+			winner: null
 		})
 
 		await gameData.save()
@@ -280,7 +304,27 @@ exports.updateGame = async (req, res) => {
 		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
 			return res
 				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-				.send("Winner must be blank or from one of the teams playing the game")
+				.send("Winner is required in request. Winner must be blank or from one of the teams playing the game")
+		}
+
+
+		if (req.body.battingFirst != req.body.team1 && req.body.battingFirst != req.body.team2 && req.body.battingFirst != "") {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team batting first is required in request. Team batting first must be blank or from one of the teams playing the game")
+		}
+
+
+		if (req.body.toss != req.body.team1 && req.body.toss != req.body.team2 && req.body.toss != "") {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team winning toss is required in request. Team winning toss must be blank or from one of the teams playing the game")
+		}
+
+		if (req.body.winner != "" && (req.body.battingFirst == "" || req.body.toss == "")) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team winning toss and batting first must not be blank if winner is provided")
 		}
 
 		let teamInfo
@@ -334,6 +378,8 @@ exports.updateGame = async (req, res) => {
 				team1: req.body.team1,
 				team2: req.body.team2,
 				startTime: req.body.startTime,
+				battingFirst: req.body.battingFirst.length > 0? req.body.winbattingFirster: null,
+				toss: req.body.toss.length > 0? req.toss.toss: null,
 				winner: req.body.winner.length > 0? req.body.winner: null
 			}
 		)
@@ -349,7 +395,9 @@ exports.updateGame = async (req, res) => {
 				team1: game.team1,
 				team2: game.team2,
 				startTime: game.startTime,
-				winner: game.winner in teamObj? teamObj[game.winner]: {}
+				toss: game.toss,
+				battingFirst: game.battingFirst,
+				winner: game.winner,
 			})
 		}
 
@@ -361,7 +409,7 @@ exports.updateGame = async (req, res) => {
 			.send(gameData)
 
 	} catch (error) {
-		console.log(`Error game/resetGame ${error}`)
+		console.log(`Error game/update ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)

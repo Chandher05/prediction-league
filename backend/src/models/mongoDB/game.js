@@ -19,6 +19,12 @@ const Game = new mongoose.Schema({
         type : Date,
         required: true
     },
+    toss: {
+        type: mongoose.Types.ObjectId,
+    },
+    battingFirst: {
+        type: mongoose.Types.ObjectId,
+    },
     winner: {
         type: mongoose.Types.ObjectId,
     }

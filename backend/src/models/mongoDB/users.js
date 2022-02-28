@@ -1,9 +1,10 @@
 `use strict`
 
 import mongoose from 'mongoose'
+import constants from '../../utils/constants'
 
 const Users = new mongoose.Schema({
-	userId: {
+	userUID: {
 		type: String,
 		required: true,
 	},
@@ -24,14 +25,19 @@ const Users = new mongoose.Schema({
 	freeHitsRemaining: {
 		type: Number,
 		required: true,
-		default: 2,
+		default: constants.PREDICTION_INFO.MAX_FH_PER_PLAYER,
 		min: 0
 	},
 	leavesRemaining: {
 		type: Number,
 		required: true,
-		default: 5,
+		default: constants.PREDICTION_INFO.MAX_LEAVES_PER_PLAYER,
 		min: 0
+	},
+	positionOnLeaderoard:{
+		type: Number,
+		required: true,
+		default: 0
 	},
     isAdmin: {
         type: Boolean,

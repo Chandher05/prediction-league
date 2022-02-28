@@ -1,12 +1,13 @@
 import Game from '../models/mongoDB/game';
 import Users from '../models/mongoDB/users';
 import Prediction from '../models/mongoDB/prediction';
+import constants from './constants';
 
 var updateLeaderboard = async () => {
     
 
-		let maxLeavesAllowed = 5
-		let scoreForExtraLeaves = 0.35
+		let maxLeavesAllowed = constants.PREDICTION_INFO.MAX_LEAVES_PER_PLAYER
+		let scoreForExtraLeaves = constants.PREDICTION_INFO.EXTRA_LEAVES_SCORE
 		
 		let allUsersData = await Users.find({
 			isActive: true
@@ -26,30 +27,28 @@ var updateLeaderboard = async () => {
 			allWinners.push(game.winner)
 
 			allPredictions = await Prediction.find({
-				gameId: game._id
+				gameId: game._id,
+				isConsidered: true
 			})
 			predictionsByGame[game._id] = {}
+
 			for (let prediction of allPredictions) {
-				if (prediction.isConsidered == true) {
-					predictionsByGame[game._id][prediction.userId] = {
-						predictionId: prediction._id,
-						confidence: prediction.confidence,
-						predictedTeam: prediction.predictedTeam,
-					}
+				predictionsByGame[game._id][prediction.userUID] = {
+					predictionId: prediction._id,
+					confidence: prediction.confidence,
+					predictedTeam: prediction.predictedTeam,
 				}
 			}
 		}
 
 		let allPredictionsByUsers = []
 		let freeHitsTakenByUser = {}
-		// let confidence, team
+		
 		for (var user of allUsersData) {
-			freeHitsTakenByUser[user._id] = 0
+			freeHitsTakenByUser[user.userUID] = 0
 		}
 		let prediction, predictedTeam, winner, leavesRemaining, leavesTaken = 0, totalScore = 0, totalGames = 0, extraLeavesTaken = 0
 		for (var user of allUsersData) {
-			// confidence = []
-			// team = []
 			leavesTaken = 0
 			totalScore = 0
 			totalGames = 0
@@ -58,37 +57,31 @@ var updateLeaderboard = async () => {
 			for (game of allCompletedGames) {
 
 
-				if (user._id in predictionsByGame[game._id]) {
+				if (user.userUID in predictionsByGame[game._id]) {
 	
 					totalGames += 1
 
-					// confidence.push(predictionsByGame[game._id][user._id].confidence)
-					// team.push(predictionsByGame[game._id][user._id].predictedTeam)
-
-					prediction = predictionsByGame[game._id][user._id].confidence
-					predictedTeam = predictionsByGame[game._id][user._id].predictedTeam
+					prediction = predictionsByGame[game._id][user.userUID].confidence
+					predictedTeam = predictionsByGame[game._id][user.userUID].predictedTeam
 					winner = game.winner
-					if (predictedTeam == winner) {
-						if (prediction == "FH") {
-							prediction = 100
-							freeHitsTakenByUser[user._id] += 1
+					if (prediction == "FH" && freeHitsTakenByUser[user.userUID] < constants.PREDICTION_INFO.MAX_FH_PER_PLAYER) {
+						if (predictedTeam == winner) {
+							prediction = 0
+						} else {
+							prediction = 50
 						}
-						prediction = 100 - prediction
-					} else if (prediction == "FH" && freeHitsTakenByUser[user._id] < 2) {
-						prediction = 50
-						freeHitsTakenByUser[user._id] += 1
-					} else if (prediction == "FH") {
+						freeHitsTakenByUser[user.userUID] += 1
+					} else if (prediction == "FH") {			
 						prediction = 100
-						freeHitsTakenByUser[user._id] += 1
-					}
+						freeHitsTakenByUser[user.userUID] += 1
+					} else if (predictedTeam == winner) {
+						prediction = 100 - prediction
+					} 
+					
 					prediction = prediction / 100
-
 					totalScore = totalScore + (prediction * prediction)
 
 				} else {
-					// confidence.push("L")
-					// team.push("L")
-
 					leavesTaken += 1
 				}
 			}
@@ -103,13 +96,9 @@ var updateLeaderboard = async () => {
 
 
 			allPredictionsByUsers.push({
-				userId: user._id,
+				userUID: user.userUID,
 				username: user.username,
-				// confidence: confidence,
-				// team: team,
-				// winner: allWinners,
-				// total: totalScore,
-				// gamesPlayed: totalGames + extraLeavesTaken,
+				isAdmin: user.isAdmin,
 				score: (totalScore / (totalGames + extraLeavesTaken)).toFixed(7),
 				leavesRemaining: leavesRemaining
 			})
@@ -120,22 +109,36 @@ var updateLeaderboard = async () => {
 		})
 
 
-		var position, obj, freeHitsRemainingForUser
-		for (position = 0; position < allPredictionsByUsers.length; position++) {
-			obj = allPredictionsByUsers[position]
+		var position = 1, obj, freeHitsRemainingForUser
+
+		for (obj of allPredictionsByUsers) {
 			if (isNaN(obj.score)) {
 				obj.score = 0
 			}
-			freeHitsRemainingForUser = Math.max(0, 2 - freeHitsTakenByUser[obj.userId])
-			await Users.findByIdAndUpdate(
-				obj.userId,
-				{
-					positionOnLeaderoard: position + 1,
-					totalScore: obj.score,
-					leavesRemaining: obj.leavesRemaining,
-					freeHitsRemaining: freeHitsRemainingForUser
-				}
-			)
+			freeHitsRemainingForUser = Math.max(0, constants.PREDICTION_INFO.MAX_FH_PER_PLAYER - freeHitsTakenByUser[obj.userUID])
+			if (obj.isAdmin) {
+				await Users.findOneAndUpdate(
+					{
+						userUID: obj.userUID
+					}, 
+					{
+						totalScore: obj.score,
+					}
+				)
+			} else {
+				await Users.findOneAndUpdate(
+					{
+						userUID: obj.userUID
+					}, 
+					{
+						positionOnLeaderoard: position,
+						totalScore: obj.score,
+						leavesRemaining: obj.leavesRemaining,
+						freeHitsRemaining: freeHitsRemainingForUser
+					}
+				)
+				position += 1
+			}
 		}
 }
 

@@ -6,10 +6,10 @@ import userController from '../controller/users';
 const router = express.Router();
 
 router.post('/login', userController.loginUser);
-router.post('/add', userController.addUser);
+router.post('/add', userController.addAdmin);
 router.get('/all', userController.allUsers);
-// router.get('/id/:userId', userController.getUserById);
-router.put('/update', userController.updateUser);
+// router.get('/id/:userUID', userController.getUserById);
+router.put('/update', userController.updateAdmin);
 router.put('/unsubscribe', userController.unsubscribeUser);
 
 module.exports = router;

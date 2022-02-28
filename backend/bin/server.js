@@ -58,7 +58,7 @@ var checkAuth = async (req, res, next) => {
 		let decodedToken = await admin.auth().verifyIdToken(authToken)
 		const uid = decodedToken.uid;
 		let userRecord = await admin.auth().getUser(uid)
-		req.body.userId = uid
+		req.body.userUID = uid
 		req.body.email = userRecord.email
 		req.body.username = userRecord.displayName
 		next()

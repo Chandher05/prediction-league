@@ -20,5 +20,10 @@ module.exports = {
 		USER_ALREADY_EXISTS: 'Username is taken',
 		AUTHORIZATION_FAILED: 'Authorization failed',
 		USER_VALUES_MISSING: 'Email must be provided',
+	},
+	PREDICTION_INFO: {
+		MAX_LEAVES_PER_PLAYER: 7,
+		MAX_FH_PER_PLAYER: 2,
+		EXTRA_LEAVES_SCORE: 0.35
 	}
 }

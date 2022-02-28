@@ -3,9 +3,10 @@ import Users from '../../models/mongoDB/users';
 import Prediction from '../../models/mongoDB/prediction';
 import constants from '../../utils/constants';
 import updateLeaderboard from '../../utils/updateLeaderboard';
+import Team from '../../models/mongoDB/team';
 
 /**
- * Get all games in database.
+ * Add a prediction in database.
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
@@ -13,18 +14,19 @@ exports.addPrediction = async (req, res) => {
 	try {
 
 		var user = await Users.findOne({
-			uniqueCode: req.body.uniqueCode
+			userUID: req.body.userUID,
+			isActive: true
 		})
 
 
-		let userId = user._id
+		let userUID = req.body.userUID
 
 		let game = await Game.findById(req.body.gameId)
 
 		if (!user) {
 			return res
 			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
-			.send("Invalid unique code")
+			.send("User not active")
 		}
 
 		if (!game) {
@@ -41,10 +43,10 @@ exports.addPrediction = async (req, res) => {
 			.send("Game already started")
 		}
 
-		if (req.body.predictedTeam === "Leave") {
+		if (req.body.confidence === "L") {
 			await Prediction.updateMany(
 				{
-					userId: userId,
+					userUID: userUID,
 					gameId: req.body.gameId,
 				},
 				{
@@ -56,7 +58,7 @@ exports.addPrediction = async (req, res) => {
 			.send("No prediction for game")
 		}
 
-		if (req.body.predictedTeam != game.team1 && req.body.predictedTeam != game.team2) {
+		if (req.body.predictedTeamId != game.team1 && req.body.predictedTeamId != game.team2) {
 			return res
 			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
 			.send("Predicted team must be one of the teams playing the game")
@@ -70,36 +72,9 @@ exports.addPrediction = async (req, res) => {
 			.send("Invalid confidence")
 		}
 
-		let previousPrediction = await Prediction.findOne({
-			userId: userId,
-			gameId: req.body.gameId,
-			isConsidered: true
-		})
-
-		// if (previousPrediction && previousPrediction.confidence == "FH") {
-		// 	await Users.findByIdAndUpdate(
-		// 		user._id,
-		// 		{
-		// 			$inc: {
-		// 				freeHitsRemaining: 1
-		// 			}
-		// 		})
-		// }
-		// if (user.freeHitsRemaining == 0 && confidence == "FH") {
-		// 	confidence = 100
-		// } else if (confidence == "FH") {
-		// 	await Users.findByIdAndUpdate(
-		// 		user._id,
-		// 		{
-		// 			$inc: {
-		// 				freeHitsRemaining: -1
-		// 			}
-		// 		})
-		// }
-
 		await Prediction.updateMany(
 			{
-				userId: userId,
+				userUID: userUID,
 				gameId: req.body.gameId,
 			},
 			{
@@ -109,8 +84,8 @@ exports.addPrediction = async (req, res) => {
 		
 		const predictionData = new Prediction({
 			confidence: confidence,
-			predictedTeam: req.body.predictedTeam,
-			userId: userId,
+			predictedTeamId: req.body.predictedTeamId,
+			userUID: userUID,
 			gameId: req.body.gameId,
 		})
 
@@ -123,7 +98,7 @@ exports.addPrediction = async (req, res) => {
 			})
 
 	} catch (error) {
-		console.log(`Error while getting all games ${error}`)
+		console.log(`Error while adding a prediction ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)
@@ -131,7 +106,7 @@ exports.addPrediction = async (req, res) => {
 }
 
 /**
- * Get list of games that have not started in database.
+ * Get list of predictions done by all users for a game.
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
@@ -143,22 +118,28 @@ exports.getPredictionByGame = async (req, res) => {
 			gameId: req.params.gameId
 		})
 
+		let gameData = await Game.findById(req.params.gameId)
+
+		let team1Obj = await Team.findById(gameData.team1)
+
+		let team2Obj = await Team.findById(gameData.team2)
+
 
 		let allPlayers = {}
 		for (var prediction of allPredictions) {
-			if (prediction.userId in allPlayers) {
-				allPlayers[prediction.userId].push({
+			if (prediction.userUID in allPlayers) {
+				allPlayers[prediction.userUID].push({
 					predictionId: prediction._id,
 					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeam,
+					predictedTeam: prediction.predictedTeamId == gameData.team1? team1Obj: team2Obj,
 					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered,
 				})
 			} else {
-				allPlayers[prediction.userId] = [{
+				allPlayers[prediction.userUID] = [{
 					predictionId: prediction._id,
 					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeam,
+					predictedTeam: prediction.predictedTeamId == gameData.team1? team1Obj: team2Obj,
 					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered,
 				}]
@@ -168,12 +149,14 @@ exports.getPredictionByGame = async (req, res) => {
 
 		let userData
 		let returnData = []
-		for (var userId in allPlayers) {
-			userData = await Users.findById(userId)
+		for (var userUID in allPlayers) {
+			userData = await Users.findOne({
+				userUID: userUID
+			})
 			returnData.push({
-				userId: userId,
+				mongoId: userData._id,
 				username: userData.username,
-				prediction: allPlayers[userId]
+				prediction: allPlayers[userUID]
 			})
 		}
 
@@ -182,7 +165,7 @@ exports.getPredictionByGame = async (req, res) => {
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send(returnData)
 	} catch (error) {
-		console.log(`Error while getting scheduled game ${error}`)
+		console.log(`Error while getPredictionByGame ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)
@@ -190,7 +173,7 @@ exports.getPredictionByGame = async (req, res) => {
 }
 
 /**
- * Get list of games that have not started in database.
+ * Get list of active predictions done by users for a game.
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
@@ -199,20 +182,25 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 
 		let allPredictions
 		allPredictions = await Prediction.find({
-			gameId: req.params.gameId
+			gameId: req.params.gameId,
+			isConsidered: true
 		})
+
+		let gameData = await Game.findById(req.params.gameId)
+
+		let team1Obj = await Team.findById(gameData.team1)
+
+		let team2Obj = await Team.findById(gameData.team2)
 
 
 		let allPlayers = {}
 		for (var prediction of allPredictions) {
-			if (prediction.isConsidered) {
-				allPlayers[prediction.userId] = {
-					predictionId: prediction._id,
-					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeam,
-					predictionTime: prediction.predictionTime,
-					isConsidered: prediction.isConsidered,
-				}
+			allPlayers[prediction.userUID] = {
+				predictionId: prediction._id,
+				confidence: prediction.confidence,
+				predictedTeam: prediction.predictedTeamId == gameData.team1? team1Obj: team2Obj,
+				predictionTime: prediction.predictionTime,
+				isConsidered: prediction.isConsidered,
 			}
 		}
 
@@ -225,38 +213,36 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 		let team1FH = []
 		let team2FH = []
 		let constTeam = ""
-		for (var userId in allPlayers) {
-			userData = await Users.findById(userId)
+		for (var userUID in allPlayers) {
+			userData = await Users.findOne({
+				userUID: userUID
+			})
 			if (constTeam == "") {
-				constTeam = allPlayers[userId].predictedTeam
+				constTeam = allPlayers[userUID].predictedTeam._id
 			}
-			if (constTeam == allPlayers[userId].predictedTeam) {
-				if (allPlayers[userId].confidence == "FH") {
+			if (constTeam == allPlayers[userUID].predictedTeam._id) {
+				if (allPlayers[userUID].confidence == "FH") {
 					team1FH.push({
-						userId: userId,
 						username: userData.username,
-						prediction: allPlayers[userId]
+						prediction: allPlayers[userUID]
 					})
 				} else {
 					team1.push({
-						userId: userId,
 						username: userData.username,
-						prediction: allPlayers[userId]
+						prediction: allPlayers[userUID]
 					})
 				}
 
 			} else {
-				if (allPlayers[userId].confidence == "FH") {
+				if (allPlayers[userUID].confidence == "FH") {
 					team2FH.push({
-						userId: userId,
 						username: userData.username,
-						prediction: allPlayers[userId]
+						prediction: allPlayers[userUID]
 					})
 				} else {
 					team2.push({
-						userId: userId,
 						username: userData.username,
-						prediction: allPlayers[userId]
+						prediction: allPlayers[userUID]
 					})
 				}
 			}
@@ -287,112 +273,6 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 	}
 }
 
-/**
- * Add a game.
- * @param  {Object} req request object
- * @param  {Object} res response object
- */
-exports.addGame = async (req, res) => {
-	try {		
-
-		
-		const gameData = new Game({
-			gameNumber: req.body.gameNumber,
-			team1: req.body.team1,
-			team2: req.body.team2,
-			startTime: req.body.startTime,
-			winner: req.body.winner
-		})
-
-		await gameData.save()
-
-		return res
-			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
-			.send({
-				createdGame: gameData._id
-			})
-
-	} catch (error) {
-		console.log(`Error in adding a game ${error}`)
-		return res
-			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
-			.send(error.message)
-	}
-}
-
-/**
- * Update a game.
- * @param  {Object} req request object
- * @param  {Object} res response object
- */
-exports.updateGame = async (req, res) => {
-	try {
-
-		await Game.findByIdAndUpdate(
-			req.body.gameId,
-			{
-				gameNumber: req.body.gameNumber,
-				team1: req.body.team1,
-				team2: req.body.team2,
-				startTime: req.body.startTime,
-				winner: req.body.winner
-			}
-		)
-
-		let allGames
-		allGames = await Game.find()
-
-		let gameData = []
-		for (var game of allGames) {
-			gameData.push({
-				gameId: game._id,
-				gameNumber: game.gameNumber,
-				team1: game.team1,
-				team2: game.team2,
-				startTime: game.startTime,
-				winner: game.winner
-			})
-		}
-
-
-		return res
-			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
-			.send(gameData)
-
-	} catch (error) {
-		console.log(`Error game/resetGame ${error}`)
-		return res
-			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
-			.send(error.message)
-	}
-}
-
-
-/**
- * Delete a game.
- * @param  {Object} req request object
- * @param  {Object} res response object
- */
-exports.deleteGame = async (req, res) => {
-	try {
-
-		let game
-		game = await Game.findByIdAndDelete(
-			req.params.gameId
-		)
-
-		return res
-			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
-			.send(game)
-
-	} catch (error) {
-		console.log(`Error game/startGame ${error}`)
-		return res
-			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
-			.send(error.message)
-	}
-}
-
 
 /**
  * Get leaderboard.
@@ -411,13 +291,28 @@ exports.getLeaderboard = async (req, res) => {
 		})
 
 		let leaderboardData = []
+		let playerPosition = 1
 		for (var obj of allUsers) {
-			leaderboardData.push({
-				username: obj.username,
-				score: obj.totalScore,
-				freeHitsRemaining: obj.freeHitsRemaining,
-				leavesRemaining: obj.leavesRemaining,
-			})
+			if (obj.isAdmin) {
+				leaderboardData.push({
+					position: null,
+					username: obj.username,
+					score: obj.totalScore,
+					freeHitsRemaining: null,
+					leavesRemaining: null,
+					isAdmin: true
+				})
+			} else {
+				leaderboardData.push({
+					position: playerPosition,
+					username: obj.username,
+					score: obj.totalScore,
+					freeHitsRemaining: obj.freeHitsRemaining,
+					leavesRemaining: obj.leavesRemaining,
+					isAdmin: false
+				})
+				playerPosition += 1
+			}
 		}
 
 		return res
@@ -442,17 +337,11 @@ exports.getPredictionsOfUser = async (req, res) => {
 	try {
 
 		let userData = await Users.findOne({
-			uniqueCode: req.params.userId
+			userUID: req.body.userUID
 		})
 
-		if (!userData) {
-			return res
-			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
-			.send("Invalid unique code")
-		}
-
 		let allPredictions = await Prediction.find({
-			userId: userData._id,
+			userUID: req.body.userUID,
 			isConsidered: true
 		})
 
@@ -465,6 +354,11 @@ exports.getPredictionsOfUser = async (req, res) => {
 		}
 		
 		let allGames = await Game.find().sort('startTime')
+		let allTeams = await Team.find()
+		let teamById = {}
+		for (var teamObj of allTeams) {
+			teamById[teamObj._id] = teamObj
+		}
 
 		let returnData = []
 		let confidence, predictedTeam, gameStartTime, currentTime = new Date()
@@ -473,7 +367,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 
 			if (game._id in predictionByGame) {
 				confidence = predictionByGame[game._id].confidence
-				predictedTeam = predictionByGame[game._id].predictedTeam
+				predictedTeam = teamById[predictionByGame[game._id].predictedTeam]
 			} else if (gameStartTime < currentTime) {
 				confidence = "L"
 				predictedTeam = "-"
@@ -485,10 +379,11 @@ exports.getPredictionsOfUser = async (req, res) => {
 			
 			returnData.push({
 				gameNumber: game.gameNumber,
-				teams: game.team1 + " VS " + game.team2,
+				team1: teamById[game.team1],
+				team2: teamById[game.team2],
 				confidence: confidence,
 				predictedTeam: predictedTeam,
-				winner: game.winner
+				winner: game.winner == null? {} : teamById[game.winner]
 			})
 		}
 
@@ -497,7 +392,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
 			.send({
 				username: userData.username,
-				positionOnLeaderoard: userData.positionOnLeaderoard,
+				// positionOnLeaderoard: userData.positionOnLeaderoard,
 				// freeHitsRemaining: userData.freeHitsRemaining,
 				// leavesRemaining: userData.leavesRemaining,
 				score: userData.totalScore,
@@ -505,7 +400,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 			})
 
 	} catch (error) {
-		console.log(`Error game/startGame ${error}`)
+		console.log(`Error getPredictionsOfUser ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)
@@ -518,77 +413,77 @@ exports.getPredictionsOfUser = async (req, res) => {
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
-exports.updatePrediction = async (req, res) => {
-	try {
+// exports.updatePrediction = async (req, res) => {
+// 	try {
 		
-		await Prediction.updateMany(
-			{
-				userId: req.body.userId,
-				gameId: req.body.gameId
-			},
-			{
-				isConsidered: false
-			}
-		)
+// 		await Prediction.updateMany(
+// 			{
+// 				userUID: req.body.userUID,
+// 				gameId: req.body.gameId
+// 			},
+// 			{
+// 				isConsidered: false
+// 			}
+// 		)
 
-		await Prediction.findByIdAndUpdate(
-			req.body.newConsidered,
-			{
-				isConsidered: true
-			}
-		)
-
-
-		let allPredictions
-		allPredictions = await Prediction.find({
-			gameId: req.params.gameId
-		})
+// 		await Prediction.findByIdAndUpdate(
+// 			req.body.newConsidered,
+// 			{
+// 				isConsidered: true
+// 			}
+// 		)
 
 
-		let allPlayers = {}
-		for (var prediction of allPredictions) {
-			if (prediction.userId in allPlayers) {
-				allPlayers[prediction.userId].push({
-					predictionId: prediction._id,
-					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeam,
-					predictionTime: prediction.predictionTime,
-					isConsidered: prediction.isConsidered,
-				})
-			} else {
-				allPlayers[prediction.userId] = [{
-					predictionId: prediction._id,
-					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeam,
-					predictionTime: prediction.predictionTime,
-					isConsidered: prediction.isConsidered,
-				}]
-			}
-		}
+// 		let allPredictions
+// 		allPredictions = await Prediction.find({
+// 			gameId: req.params.gameId
+// 		})
 
 
-		let userData
-		let returnData = []
-		for (var userId in allPlayers) {
-			userData = await Users.findById(userId)
-			returnData.push({
-				userId: userId,
-				username: userData.username,
-				prediction: allPlayers[userId]
-			})
-		}
+// 		let allPlayers = {}
+// 		for (var prediction of allPredictions) {
+// 			if (prediction.userUID in allPlayers) {
+// 				allPlayers[prediction.userUID].push({
+// 					predictionId: prediction._id,
+// 					confidence: prediction.confidence,
+// 					predictedTeam: prediction.predictedTeam,
+// 					predictionTime: prediction.predictionTime,
+// 					isConsidered: prediction.isConsidered,
+// 				})
+// 			} else {
+// 				allPlayers[prediction.userUID] = [{
+// 					predictionId: prediction._id,
+// 					confidence: prediction.confidence,
+// 					predictedTeam: prediction.predictedTeam,
+// 					predictionTime: prediction.predictionTime,
+// 					isConsidered: prediction.isConsidered,
+// 				}]
+// 			}
+// 		}
 
-		return res
-			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
-			.send(returnData)
 
-	} catch (error) {
-		console.log(`Error game/startGame ${error}`)
-		return res
-			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
-			.send(error.message)
-	}
-}
+// 		let userData
+// 		let returnData = []
+// 		for (var userUID in allPlayers) {
+// 			userData = await Users.findById(userUID)
+// 			returnData.push({
+// 				userUID: userUID,
+// 				username: userData.username,
+// 				prediction: allPlayers[userUID]
+// 			})
+// 		}
+
+// 		return res
+// 			.status(constants.STATUS_CODE.ACCEPTED_STATUS)
+// 			.send(returnData)
+
+// 	} catch (error) {
+// 		console.log(`Error game/startGame ${error}`)
+// 		return res
+// 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+// 			.send(error.message)
+// 	}
+// }
 
 
 /**
@@ -599,16 +494,17 @@ exports.updatePrediction = async (req, res) => {
 exports.getGraph = async (req, res) => {
 	try {
 		
-		let allCompletedGames
-		allCompletedGames = await Game.find({
+		let allGamesWithResult
+		allGamesWithResult = await Game.find({
 			winner: {
-				$ne: ""
+				$ne: null
 			}
 		})
 		.sort('startTime')
 
 		let allUsers 
 		allUsers = await Users.find({
+			isAdmin: false,
 			isActive: true
 		})
 
@@ -626,33 +522,33 @@ exports.getGraph = async (req, res) => {
 			gameNumbers = []
 
 		for (var userObj of allUsers) {
-			allPredictions[userObj._id] = []
-			rawPredictions[userObj._id] = []
-			rawScoreForGame[userObj._id] = []
-			rawTotals[userObj._id] = []
-			leaderboardPositions[userObj._id] =  {
+			allPredictions[userObj.userUID] = []
+			rawPredictions[userObj.userUID] = []
+			rawScoreForGame[userObj.userUID] = []
+			rawTotals[userObj.userUID] = []
+			leaderboardPositions[userObj.userUID] =  {
 				username: userObj.username,
 				scores: []
 			}
-			gamesPlayedByUser[userObj._id] = 0
-			userTotals[userObj._id] = 0
-			userScores[userObj._id] = {
+			gamesPlayedByUser[userObj.userUID] = 0
+			userTotals[userObj.userUID] = 0
+			userScores[userObj.userUID] = {
 				username: userObj.username,
 				scores: []
 			}
-			userNames[userObj._id] = userObj.username
-			leavesRemaining[userObj._id] = 5
-			freeHitsRemaining[userObj._id] = 2
+			userNames[userObj.userUID] = userObj.username
+			leavesRemaining[userObj.userUID] = constants.PREDICTION_INFO.MAX_LEAVES_PER_PLAYER
+			freeHitsRemaining[userObj.userUID] = constants.PREDICTION_INFO.MAX_FH_PER_PLAYER
 		}
 
-		let gameWinner = "",
+		let gameWinnerId = "",
 			predictionsForGame,
 			predictionByUser,
 			leaderboardForGame = []
 
-		for (var gameObj of allCompletedGames) {
+		for (var gameObj of allGamesWithResult) {
 			gameNumbers.push(gameObj.gameNumber)
-			gameWinner = gameObj.winner
+			gameWinnerId = gameObj.winner
 			predictionByUser = {}
 
 			predictionsForGame = await Prediction.find({
@@ -660,57 +556,57 @@ exports.getGraph = async (req, res) => {
 				isConsidered: true
 			})
 			for (var temp of predictionsForGame) {
-				if (temp.confidence == "FH" && temp.predictedTeam == gameWinner) {
-					predictionByUser[temp.userId] = 0
-					freeHitsRemaining[temp.userId] -= 1
-				} else if (temp.confidence == "FH" && freeHitsRemaining[temp.userId] > 0) {
-					predictionByUser[temp.userId] = 0.25
-					freeHitsRemaining[temp.userId] -= 1
+				if (temp.confidence == "FH" && temp.predictedTeamId == gameWinnerId) {
+					predictionByUser[temp.userUID] = 0
+					freeHitsRemaining[temp.userUID] -= 1
+				} else if (temp.confidence == "FH" && freeHitsRemaining[temp.userUID] > 0) {
+					predictionByUser[temp.userUID] = 0.25
+					freeHitsRemaining[temp.userUID] -= 1
 				} else if (temp.confidence == "FH") {
-					predictionByUser[temp.userId] = 1
-				} else if (temp.confidence != "FH" && temp.predictedTeam == gameWinner) {
-					predictionByUser[temp.userId] = ((100 - temp.confidence) * (100 - temp.confidence)) / 10000
+					predictionByUser[temp.userUID] = 1
+				} else if (temp.confidence != "FH" && temp.predictedTeam == gameWinnerId) {
+					predictionByUser[temp.userUID] = ((100 - temp.confidence) * (100 - temp.confidence)) / 10000
 				} else {
-					predictionByUser[temp.userId] = (temp.confidence * temp.confidence) / 10000
+					predictionByUser[temp.userUID] = (temp.confidence * temp.confidence) / 10000
 				}
-				rawScoreForGame[temp.userId].push(predictionByUser[temp.userId])
+				rawScoreForGame[temp.userUID].push(predictionByUser[temp.userUID])
 			}
 
 			leaderboardForGame = []
-			for (var userId in allPredictions) {
-				if (userId in predictionByUser) {
-					allPredictions[userId].push(predictionByUser[userId])
-					userTotals[userId] += predictionByUser[userId]
-					gamesPlayedByUser[userId] += 1
-				} else if (leavesRemaining[userId] > 0) {
-					allPredictions[userId].push("L")
-					leavesRemaining[userId] -= 1
+			for (var userUID in allPredictions) {
+				if (userUID in predictionByUser) {
+					allPredictions[userUID].push(predictionByUser[userUID])
+					userTotals[userUID] += predictionByUser[userUID]
+					gamesPlayedByUser[userUID] += 1
+				} else if (leavesRemaining[userUID] > 0) {
+					allPredictions[userUID].push("L")
+					leavesRemaining[userUID] -= 1
 				} else {
-					allPredictions[userId].push(0.35)
-					userTotals[userId] += 0.35
-					gamesPlayedByUser[userId] += 1
+					allPredictions[userUID].push(constants.PREDICTION_INFO.EXTRA_LEAVES_SCORE)
+					userTotals[userUID] += constants.PREDICTION_INFO.EXTRA_LEAVES_SCORE
+					gamesPlayedByUser[userUID] += 1
 				}
-				if (gamesPlayedByUser[userId] == 0) {
-					userScores[userId].scores.push(0)
+				if (gamesPlayedByUser[userUID] == 0) {
+					userScores[userUID].scores.push(0)
 					leaderboardForGame.push({
-						userId: userId,
+						userUID: userUID,
 						score: 0
 					})
 				} else {
-					userScores[userId].scores.push((userTotals[userId] / gamesPlayedByUser[userId]).toFixed(7))
+					userScores[userUID].scores.push((userTotals[userUID] / gamesPlayedByUser[userUID]).toFixed(7))
 					leaderboardForGame.push({
-						userId: userId,
-						score: (userTotals[userId] / gamesPlayedByUser[userId]).toFixed(7)
+						userUID: userUID,
+						score: (userTotals[userUID] / gamesPlayedByUser[userUID]).toFixed(7)
 					})
 				}
-				rawTotals[userId].push(userTotals[userId])
+				rawTotals[userUID].push(userTotals[userUID])
 			}
 
 			leaderboardForGame.sort(function (a, b) {
 				return a.score - b.score
 			})
 			for (var position = 1; position <= leaderboardForGame.length; position++) {
-				leaderboardPositions[leaderboardForGame[position - 1].userId].scores.push(position)
+				leaderboardPositions[leaderboardForGame[position - 1].userUID].scores.push(position)
 			}
 
 		}
@@ -724,7 +620,7 @@ exports.getGraph = async (req, res) => {
 			})
 
 	} catch (error) {
-		console.log(`Error game/startGame ${error}`)
+		console.log(`Error game/getGraph ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)

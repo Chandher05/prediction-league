@@ -13,7 +13,7 @@ import UpdateLeaderboard from '../../utils/updateLeaderboard';
 		var existingUser
 		
 		existingUser = await Users.find({
-			userId: req.body.userId
+			userUID: req.body.userUID
 		})
 
 		if (existingUser.length > 0) {
@@ -24,7 +24,7 @@ import UpdateLeaderboard from '../../utils/updateLeaderboard';
 
 
 		const userData = new Users({
-			userId: req.body.userId,
+			userUID: req.body.userUID,
 			username: req.body.username,
 			email: req.body.email
 		})
@@ -45,23 +45,22 @@ import UpdateLeaderboard from '../../utils/updateLeaderboard';
 }
 
 /**
- * Add an user in database.
+ * Add an admin in database.
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
-exports.addUser = async (req, res) => {
+exports.addAdmin = async (req, res) => {
 	try {
 
 		const userData = new Users({
-			userId: req.body.userId + req.body.adminName,
+			userUID: req.body.adminId,
 			username: req.body.adminName,
-			email: "admin@test.com",
-			isAdmin: true
+			email: "admin",
+			isAdmin: true,
+			sendEmail: false
 		})
 
 		await userData.save()
-
-		// UpdateLeaderboard()
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
@@ -116,10 +115,10 @@ exports.allUsers = async (req, res) => {
 // exports.getUserById = async (req, res) => {
 // 	try {
 
-// 		let user = await Users.findById(req.params.userId)
+// 		let user = await Users.findById(req.params.userUID)
 		
 // 		let userData = {
-// 				userId: user._id,
+// 				userUID: user._id,
 // 				username: user.username,
 // 				uniqueCode: user.uniqueCode,
 // 				isActive: user.isActive
@@ -141,7 +140,7 @@ exports.allUsers = async (req, res) => {
  * @param  {Object} req request object
  * @param  {Object} res response object
  */
-exports.updateUser = async (req, res) => {
+exports.updateAdmin = async (req, res) => {
 	try {
 
 		var existingUser
@@ -161,6 +160,7 @@ exports.updateUser = async (req, res) => {
 		await Users.findByIdAndUpdate(
 			req.body.mongoId,
 			{
+				userUID: req.body.adminId,
 				username: req.body.adminName
 			}
 		)
@@ -201,7 +201,7 @@ exports.updateUser = async (req, res) => {
 
 		await Users.findOneAndUpdate(
 			{
-				userId: req.body.userId
+				userUID: req.body.userUID
 			},
 			{
 				sendEmail: false

@@ -7,12 +7,13 @@ const Prediction = new mongoose.Schema({
         type: String,
         required: true
     },
-    predictedTeam: {
+    predictedTeamId: {
         type: mongoose.Types.ObjectId,
         required: true
     },
-    userId: {
-        type: mongoose.Types.ObjectId,
+    userUID: {
+        type: String,
+        required: true
     },
     gameId: {
         type: mongoose.Types.ObjectId,

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer"
 import Game from '../models/mongoDB/game';
 import Team from '../models/mongoDB/team';
+import Users from '../models/mongoDB/users';
 import config from '../../config'
 
 var sendEmail = async () => {
@@ -51,13 +52,16 @@ var sendEmail = async () => {
         }
     }
 
-    let mailerList = ['jayasurya.pinaki@sjsu.edu', 'cheatan.r@gmail.com', 'chandher0596@gmail.com']
-    
     var month = currentTime.getMonth() + 1
-    for (var email of mailerList) {
+    
+    let subscribedUsers = await Users.find({
+        sendEmail: true
+    })
+    for (var obj of subscribedUsers) {
+
         var mailOptions = {
             from: 'jayasurya1796@gmail.com',
-            to: email,
+            to: obj.email,
             subject: 'IPL Prediction league reminder ' + currentTime.getDate() + "/" + month,
             html: htmlBody + '<hr><a href="https://prediction-league.netlify.app/leaderboard">View Leaderboard</a> | <a href="https://prediction-league.netlify.app/predictions">Predict other games</a> | <a href="google.com">Unsubscribe from reminder email</a>',
             attachments: imgAttachments,
