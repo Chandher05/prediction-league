@@ -3,6 +3,7 @@ import Team from '../../models/mongoDB/team';
 import Prediction from '../../models/mongoDB/prediction';
 import constants from '../../utils/constants';
 import updateLeaderboard from '../../utils/updateLeaderboard';
+import updateStrategies from '../../utils/updateStrategies';
 
 /**
  * Get all games in database.
@@ -378,8 +379,8 @@ exports.updateGame = async (req, res) => {
 				team1: req.body.team1,
 				team2: req.body.team2,
 				startTime: req.body.startTime,
-				battingFirst: req.body.battingFirst.length > 0? req.body.winbattingFirster: null,
-				toss: req.body.toss.length > 0? req.toss.toss: null,
+				battingFirst: req.body.battingFirst.length > 0? req.body.battingFirst: null,
+				toss: req.body.toss.length > 0? req.body.toss: null,
 				winner: req.body.winner.length > 0? req.body.winner: null
 			}
 		)
@@ -401,7 +402,10 @@ exports.updateGame = async (req, res) => {
 			})
 		}
 
-		// updateLeaderboard()
+		await updateStrategy("621b0d349ffb1e239445aa87")
+
+
+		updateLeaderboard()
 
 
 		return res

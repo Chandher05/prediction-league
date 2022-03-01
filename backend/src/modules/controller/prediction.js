@@ -115,7 +115,8 @@ exports.getPredictionByGame = async (req, res) => {
 
 		let allPredictions
 		allPredictions = await Prediction.find({
-			gameId: req.params.gameId
+			gameId: req.params.gameId,
+			isStrategy: false
 		})
 
 		let gameData = await Game.findById(req.params.gameId)
@@ -183,7 +184,8 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 		let allPredictions
 		allPredictions = await Prediction.find({
 			gameId: req.params.gameId,
-			isConsidered: true
+			isConsidered: true,
+			isStrategy: false
 		})
 
 		let gameData = await Game.findById(req.params.gameId)

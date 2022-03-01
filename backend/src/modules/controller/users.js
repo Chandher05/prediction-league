@@ -1,3 +1,4 @@
+import Strategy from '../../models/mongoDB/strategy';
 import Users from '../../models/mongoDB/users';
 import constants from '../../utils/constants';
 import UpdateLeaderboard from '../../utils/updateLeaderboard';
@@ -31,7 +32,7 @@ import UpdateLeaderboard from '../../utils/updateLeaderboard';
 
 		await userData.save()
 
-		// UpdateLeaderboard()
+		UpdateLeaderboard()
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
@@ -52,6 +53,23 @@ import UpdateLeaderboard from '../../utils/updateLeaderboard';
 exports.addAdmin = async (req, res) => {
 	try {
 
+
+		var confidence = req.body.confidence
+		var confidenceRegex = new RegExp('^(5[1-9]|[6-9][0-9]|100)$')
+		if (!confidenceRegex.test(confidence)) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Confidence has to be a between 51-100")
+		}
+
+		var typeOfStrategy = req.body.typeOfStrategy
+		if (typeOfStrategy !== constants.STRATEGY.BATTING_FIRST && typeOfStrategy !== constants.STRATEGY.BOWLING_FIRST && typeOfStrategy !== constants.STRATEGY.TOSS_WINNER) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("typeOfStrategy has to be TOSS_WINNER or BATTING_FIRST or BOWLING_FIRST")
+		}
+
+
 		const userData = new Users({
 			userUID: req.body.adminId,
 			username: req.body.adminName,
@@ -61,6 +79,15 @@ exports.addAdmin = async (req, res) => {
 		})
 
 		await userData.save()
+
+		const strategy = new Strategy({
+			userId: userData._id,
+			userUID: req.body.adminId,
+			confidence: confidence,
+			typeOfStrategy: typeOfStrategy
+		})
+
+		await strategy.save()
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
@@ -143,6 +170,21 @@ exports.allUsers = async (req, res) => {
 exports.updateAdmin = async (req, res) => {
 	try {
 
+		var confidence = req.body.confidence
+		var confidenceRegex = new RegExp('^(5[1-9]|[6-9][0-9]|100)$')
+		if (!confidenceRegex.test(confidence)) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Confidence has to be a between 51-100")
+		}
+
+		var typeOfStrategy = req.body.typeOfStrategy
+		if (typeOfStrategy !== constants.STRATEGY.BATTING_FIRST && typeOfStrategy !== constants.STRATEGY.BOWLING_FIRST && typeOfStrategy !== constants.STRATEGY.TOSS_WINNER) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("typeOfStrategy has to be TOSS_WINNER or BATTING_FIRST or BOWLING_FIRST")
+		}
+
 		var existingUser
 		
 		existingUser = await Users.find({
@@ -156,7 +198,17 @@ exports.updateAdmin = async (req, res) => {
 			.send("Cannot update non admin user info")
 		}
 
-		
+		await strategy.findOneAndUpdate(
+			{
+				userId: req.body.mongoId
+			},
+			{
+				userUID: req.body.adminId,
+				confidence: confidence,
+				typeOfStrategy: typeOfStrategy
+			}
+		)
+
 		await Users.findByIdAndUpdate(
 			req.body.mongoId,
 			{

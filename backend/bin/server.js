@@ -75,6 +75,10 @@ app.use('/game', gameRouter);
 app.use('/prediction', predictionRouter);
 app.use('/teams', teamsRouter);
 
+// Send email cron job
+require('../src/utils/sendMail');
+require('../src/utils/updateStrategies');
+
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
 	next(createError(404));

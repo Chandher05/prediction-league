@@ -24,6 +24,11 @@ const Prediction = new mongoose.Schema({
         required: true,
         default: true
     },
+    isStrategy : {
+        type : Boolean,
+        required: true,
+        default: false
+    },
     predictionTime : {
         type : Date,
         default : Date.now,
