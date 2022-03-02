@@ -56,7 +56,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
             var gameId = gameObj._id
             var gameStartTime = new Date(gameObj.startTime)
 
-            htmlBody += '<h2>Game ' + gameNumber + ' <a href="https://prediction-league.netlify.app/predict/' + gameId + '">Predict now!</a> </h2> <h4>Scheduled start: ' + gameStartTime.getHours() + ':00 PM IST</h4>'
+            htmlBody += '<h2>Game ' + gameNumber + ' <a href="' + config.APPLICATION_URL + '/predict/' + gameId + '">Predict now!</a> </h2> <h4>Scheduled start: ' + gameStartTime.getHours() + ':00 PM IST</h4>'
             for (var teamname of teamNames) {
                 imgAttachments.push({
                     filename: teamname + '.png',
@@ -81,7 +81,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
         var mailOptions = {
             from: 'jayasurya1796@gmail.com',
             subject: 'IPL Prediction league ' + typeOfEmail + ' ' + currentTime.getDate() + "/" + month,
-            html: htmlBody + '<hr><a href="https://prediction-league.netlify.app/leaderboard">View Leaderboard</a> | <a href="https://prediction-league.netlify.app/predictions">Predict other games</a> | <a href="google.com">Unsubscribe</a>',
+            html: htmlBody + '<hr><a href="' + config.APPLICATION_URL + '/leaderboard">View Leaderboard</a> | <a href="' + config.APPLICATION_URL + '/predictions">Predict other games</a> | <a href="' + config.APPLICATION_URL + '/unsubscribe">Unsubscribe</a>',
             attachments: imgAttachments,
         };
 
@@ -96,7 +96,8 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
         // }
 
         
-        let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
+        // let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
+        let subscribedUsers = ["jayasurya.pinaki@sjsu.edu"]
 
         for (var obj of subscribedUsers) {
             mailOptions.to = obj

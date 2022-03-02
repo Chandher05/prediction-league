@@ -272,3 +272,33 @@ exports.updateAdmin = async (req, res) => {
 			.send(error.message)
 	}
 }
+
+/**
+ * Resubscribe email updates for user.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+ exports.resubscribeUser = async (req, res) => {
+	try {
+
+		await Users.findOneAndUpdate(
+			{
+				userUID: req.body.userUID
+			},
+			{
+				sendEmail: true
+			}
+		)
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send("Unsubscribed from email")
+
+
+	} catch (error) {
+		console.log(`Error in game/isUserPartOfGame ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}

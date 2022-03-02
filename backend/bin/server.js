@@ -19,7 +19,6 @@ require('../src/models/mongoDB/index');
 
 const app = express();
 const { port } = config;
-const { frontendUrl } = config;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
