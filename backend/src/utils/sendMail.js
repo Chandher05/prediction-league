@@ -1,7 +1,6 @@
 import nodemailer from "nodemailer"
 import Game from '../models/mongoDB/game';
 import Team from '../models/mongoDB/team';
-import Users from '../models/mongoDB/users';
 import config from '../../config'
 var CronJob = require('cron').CronJob
 

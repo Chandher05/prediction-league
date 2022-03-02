@@ -70,15 +70,15 @@ function PastGames() {
               return (
                 <Tr key={index}>
                   <Td>{game.gameNumber}</Td>
-                  <Td>{game.team1}</Td>
-                  <Td>{game.team2}</Td>
+                  <Td>{game.team1.fullName}</Td>
+                  <Td>{game.team2.fullName}</Td>
                   {/* <Td>
                   {DateTime.fromISO(game.startTime, { zone: "utc" })
                     .toLocal()
                     .toLocaleString(DateTime.DATETIME_SHORT)}
                   {game.StartTime}
                 </Td> */}
-                  <Td>{game.winner}</Td>
+                  <Td>{game.winner.fullName}</Td>
                   <Td>
                     <ViewPredictions gameId={game.gameId}></ViewPredictions>
                   </Td>

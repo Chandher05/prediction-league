@@ -57,7 +57,7 @@ function ViewPredictions({ gameId }) {
                         }
                       >
                         <Td>{record.username}</Td>
-                        <Td>{record.prediction.predictedTeam}</Td>
+                        <Td>{record.prediction.predictedTeam.fullName}</Td>
                         <Td>{record.prediction.confidence}</Td>
                       </Tr>
                     );

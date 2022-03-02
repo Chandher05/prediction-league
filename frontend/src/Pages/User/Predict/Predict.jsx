@@ -23,7 +23,7 @@ export default function Predict() {
 
   const [games, setGames] = useState([]);
   const [showConfidence, setConfidence] = useState(true);
-  const [selected, setSelected] = useState({});
+  const [selected, setSelected] = useState([]);
   const { register, handleSubmit } = useForm();
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function Predict() {
             if (response.ok) {
               const res = await response.json();
               setGames([res]);
-              if (res) setSelected(res);
+              if (res) setSelected([res]);
             }
           }
         );
@@ -44,7 +44,7 @@ export default function Predict() {
             if (response.ok) {
               const games = await response.json();
               setGames(games);
-              if (games[0]) setSelected(games[0]);
+              if (games[0]) setSelected([games[0]]);
             }
           }
         );
@@ -53,7 +53,7 @@ export default function Predict() {
     getGames();
   }, [id]);
   const onSubmit = (data) => {
-    data["gameId"] = selected.gameId;
+    data["gameId"] = selected[0]?.gameId;
     fetch(process.env.REACT_APP_API + "/prediction/new", {
       method: "POST", // or 'PUT'
       headers: {
@@ -138,13 +138,13 @@ export default function Predict() {
               {games.map((game, index) => {
                 return (
                   <option value={JSON.stringify(game)} key={index}>
-                    Game {game.gameNumber} - {game.team1} v {game.team2}{" "}
+                    Game {game.gameNumber} - {game.team1.shortName} v {game.team2.shortName}{" "}
                   </option>
                 );
               })}
             </Select>
           </FormControl>
-          <FormControl isRequired>
+          {/* <FormControl isRequired>
             <FormLabel>Name</FormLabel>
             <Input type="text" {...register("userName")} />
           </FormControl>
@@ -156,12 +156,12 @@ export default function Predict() {
               type="text"
               {...register("uniqueCode")}
             />
-          </FormControl>
+          </FormControl> */}
           <FormControl isRequired>
             <FormLabel>Team</FormLabel>
-            <Select placeholder="Select team" {...register("predictedTeam")} onChange={checkIfLeave}>
-              <option value={selected.team1}>{selected.team1}</option>
-              <option value={selected.team2}>{selected.team2}</option>
+            <Select placeholder="Select team" {...register("predictedTeamId")} onChange={checkIfLeave}>
+              <option value={selected[0]?.team1._id}>{selected[0]?.team1.fullName}</option>
+              <option value={selected[0]?.team2._id}>{selected[0]?.team2.fullName}</option>
               <option value="Leave">Leave</option>
             </Select>
           </FormControl>

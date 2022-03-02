@@ -11,7 +11,7 @@ import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 
 function Countdown() {
-  const [nextGame, setNextGame] = useState({});
+  const [nextGame, setNextGame] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
 
   useEffect(() => {
@@ -85,7 +85,7 @@ function CountDownClock({ timeLeft, nextGame }) {
             // rounded={"full"}
           >
             No. {nextGame?.gameNumber} :{" "}
-            {`${nextGame?.team1} vs ${nextGame?.team2}`}
+            {`${nextGame?.team1.fullName} vs ${nextGame?.team2.fullName}`}
           </Text>
           {checkTime(timeLeft) && (
             <Stack direction={"row"} align={"center"} justify={"center"} spacing={5 }>

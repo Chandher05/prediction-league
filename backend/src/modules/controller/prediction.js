@@ -341,6 +341,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 		let userData = await Users.findOne({
 			userUID: req.body.userUID
 		})
+		
 
 		let allPredictions = await Prediction.find({
 			userUID: req.body.userUID,
@@ -351,7 +352,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 		for (var prediction of allPredictions) {
 			predictionByGame[prediction.gameId] = {
 				confidence: prediction.confidence,
-				predictedTeam: prediction.predictedTeam
+				predictedTeam: prediction.predictedTeamId
 			}
 		}
 		
@@ -372,10 +373,10 @@ exports.getPredictionsOfUser = async (req, res) => {
 				predictedTeam = teamById[predictionByGame[game._id].predictedTeam]
 			} else if (gameStartTime < currentTime) {
 				confidence = "L"
-				predictedTeam = "-"
+				predictedTeam = {}
 			} else {
 				confidence = "-"
-				predictedTeam = "-"	
+				predictedTeam = {}	
 			}
 
 			

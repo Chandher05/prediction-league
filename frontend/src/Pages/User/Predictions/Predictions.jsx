@@ -13,7 +13,7 @@ import {
   useToast,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 
 function Predictions() {
@@ -23,26 +23,27 @@ function Predictions() {
   const inputRef = useRef();
 
   const getPredictions = () => {
-    const userCode = inputRef.current.value;
-    if (userCode) {
-      fetch(`${process.env.REACT_APP_API}/prediction/user/${userCode}`).then(
-        async (response) => {
-          if (response.ok) {
-            const result = await response.json();
-            setGames(result.predictions);
-          } else {
-            toast({
-              title: "Please check your unique code and try again",
-              description: "Contact us for help if the issue persists.",
-              status: "error",
-              duration: 2000,
-              isClosable: true,
-            });
-          }
+    fetch(`${process.env.REACT_APP_API}/prediction/user`).then(
+      async (response) => {
+        if (response.ok) {
+          const result = await response.json();
+          setGames(result.predictions);
+        } else {
+          toast({
+            title: "Something went wrong",
+            description: "Contact us for help if the issue persists.",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
         }
-      );
-    }
+      }
+    );
   };
+
+  useEffect(() => {
+    getPredictions();
+  }, []);
 
   return (
     <Flex
@@ -65,39 +66,34 @@ function Predictions() {
           </Heading>
         </HStack>
 
-        <HStack spacing={3} alignItems="justify-center">
-          <Input placeholder="Enter Your Unique Code" border="solid" ref={inputRef}></Input>
-          <Button onClick={getPredictions} colorScheme="orange">
-            Get
-          </Button>
-        </HStack>
 
-        {games && games.length > 0 ? (
-          <Table variant="striped" colorScheme="orange" size="sm">
-            <Thead>
-              <Tr>
-                <Th>No.</Th>
-                <Th>Teams</Th>
-                <Th>Confidence</Th>
-                <Th>Predicted Team</Th>
-                <Th>Actual Winner</Th>
-              </Tr>
-            </Thead>
+        <Table variant="striped" colorScheme="orange" size="sm">
+          <Thead>
+            <Tr>
+              <Th>No.</Th>
+              <Th>Teams</Th>
+              <Th>Confidence</Th>
+              <Th>Predicted Team</Th>
+              <Th>Actual Winner</Th>
+            </Tr>
+          </Thead>
+          {games && games.length > 0 ? (
             <Tbody>
               {games.map((game) => {
                 return (
                   <Tr id={game.gameNumber}>
                     <Td>{game.gameNumber}</Td>
-                    <Td>{game.teams}</Td>
+                    <Td>{`${game.team1.shortName} vs ${game.team2.shortName}`}</Td>
                     <Td>{game.confidence}</Td>
-                    <Td>{game.predictedTeam}</Td>
-                    <Td>{game.winner}</Td>
+                    <Td>{game.predictedTeam.shortName}</Td>
+                    <Td>{game.winner.shortName}</Td>
                   </Tr>
                 );
               })}
             </Tbody>
-          </Table>
-        ) : null}
+          ) : null}
+        </Table>
+
       </VStack>
     </Flex>
   );

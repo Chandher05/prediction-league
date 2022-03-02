@@ -63,7 +63,7 @@ function Leaderboard() {
             {games.map((row, index) => {
               return (
                 <Tr>
-                  <Td>{index + 1}</Td>
+                  <Td>{row.position}</Td>
                   <Td>{row.username}</Td>
                   <Td>{row.score.toFixed(7)}</Td>
                   <Td>{row.freeHitsRemaining}</Td>

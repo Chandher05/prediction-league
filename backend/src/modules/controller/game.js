@@ -3,7 +3,7 @@ import Team from '../../models/mongoDB/team';
 import Prediction from '../../models/mongoDB/prediction';
 import constants from '../../utils/constants';
 import updateLeaderboard from '../../utils/updateLeaderboard';
-import updateStrategies from '../../utils/updateStrategies';
+import updateStrategy from '../../utils/updateStrategies';
 
 /**
  * Get all games in database.
@@ -234,6 +234,12 @@ exports.addGame = async (req, res) => {
 		// 		.send("Team winning toss and batting first must not be blank if winner is provided")
 		// }
 
+		if (req.body.team1 == req.body.team2) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team 1 and 2 cannot be the same")
+		}
+		
 		let teamInfo
 
 		teamInfo = await Team.findById(req.body.team1)
@@ -300,6 +306,11 @@ exports.updateGame = async (req, res) => {
 				.send("Game number already exists")
 		}
 
+		if (req.body.team1 == req.body.team2) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Team 1 and 2 cannot be the same")
+		}
 		
 
 		if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
@@ -402,7 +413,7 @@ exports.updateGame = async (req, res) => {
 			})
 		}
 
-		await updateStrategy("621b0d349ffb1e239445aa87")
+		await updateStrategy(req.body.gameId)
 
 
 		updateLeaderboard()

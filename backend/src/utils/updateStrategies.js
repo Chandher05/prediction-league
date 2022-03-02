@@ -13,7 +13,7 @@ var updateStrategy = (gameId) => {
                 resolve()
             }
 
-            var battingSecond = gameData.battingFirst == gameData.team1? gameData.team2 : gameData.team1
+            var battingSecond = gameData.battingFirst.toString() == gameData.team1.toString()? gameData.team2 : gameData.team1
 
             var allStrategies = await Strategy.find()
             for(var strategyObj of allStrategies) {
@@ -47,7 +47,6 @@ var updateStrategy = (gameId) => {
                 await predictionObj.save()
             }
 
-            console.log("Done")
             resolve()
 
         } catch (err) {

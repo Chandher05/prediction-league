@@ -16,7 +16,7 @@ var updateLeaderboard = async () => {
 	
 		let allCompletedGames = await Game.find({
 			winner: {
-				$ne: ""
+				$ne: null
 			}
 		})
 
@@ -36,7 +36,7 @@ var updateLeaderboard = async () => {
 				predictionsByGame[game._id][prediction.userUID] = {
 					predictionId: prediction._id,
 					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeam,
+					predictedTeam: prediction.predictedTeamId,
 				}
 			}
 		}
@@ -62,19 +62,20 @@ var updateLeaderboard = async () => {
 					totalGames += 1
 
 					prediction = predictionsByGame[game._id][user.userUID].confidence
-					predictedTeam = predictionsByGame[game._id][user.userUID].predictedTeam
-					winner = game.winner
-					if (prediction == "FH" && freeHitsTakenByUser[user.userUID] < constants.PREDICTION_INFO.MAX_FH_PER_PLAYER) {
-						if (predictedTeam == winner) {
+					predictedTeam = predictionsByGame[game._id][user.userUID].predictedTeam.toString()
+					winner = game.winner.toString()
+					
+					if (prediction === "FH" && freeHitsTakenByUser[user.userUID] < constants.PREDICTION_INFO.MAX_FH_PER_PLAYER) {
+						if (predictedTeam === winner) {
 							prediction = 0
 						} else {
 							prediction = 50
 						}
 						freeHitsTakenByUser[user.userUID] += 1
-					} else if (prediction == "FH") {			
+					} else if (prediction === "FH") {			
 						prediction = 100
 						freeHitsTakenByUser[user.userUID] += 1
-					} else if (predictedTeam == winner) {
+					} else if (predictedTeam === winner.toString()) {
 						prediction = 100 - prediction
 					} 
 					
@@ -84,6 +85,8 @@ var updateLeaderboard = async () => {
 				} else {
 					leavesTaken += 1
 				}
+				// console.log(user.username + "----" + predictedTeam + "------" + winner + "-----" + predictionsByGame[game._id][user.userUID].confidence + "-----" + prediction)
+				
 			}
 
 			if (leavesTaken > maxLeavesAllowed) {
