@@ -6,25 +6,31 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useStoreState } from "easy-peasy";
 
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 
 function Countdown() {
+  const authId = useStoreState((state) => state.authId);
+
   const [nextGame, setNextGame] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
 
   useEffect(() => {
-    fetch(process.env.REACT_APP_API + "/game/scheduled").then(
-      async (response) => {
+    fetch(process.env.REACT_APP_API + "/game/scheduled", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    })
+      .then(async (response) => {
         if (response.ok) {
           const games = await response.json();
           setNextGame(games[0]);
         }
-      }
-    )
-    .catch((e) => console.log(e));
-  }, []);
+      })
+      .catch((e) => console.log(e));
+  }, [authId]);
   useEffect(() => {
     const intervalTimeCountdownClock = () => {
       if (!nextGame?.startTime) return;
@@ -53,8 +59,8 @@ function Countdown() {
 export default Countdown;
 
 const checkTime = (timeLeft) => {
-  if(timeLeft?.seconds > 0) return true;
-   return false
+  if (timeLeft?.seconds > 0) return true;
+  return false;
 };
 
 function CountDownClock({ timeLeft, nextGame }) {
@@ -88,12 +94,19 @@ function CountDownClock({ timeLeft, nextGame }) {
             {`${nextGame?.team1.fullName} vs ${nextGame?.team2.fullName}`}
           </Text>
           {checkTime(timeLeft) && (
-            <Stack direction={"row"} align={"center"} justify={"center"} spacing={5 }>
+            <Stack
+              direction={"row"}
+              align={"center"}
+              justify={"center"}
+              spacing={5}
+            >
               <VStack spacing={0} p={0}>
                 <Text fontSize="4xl" fontWeight={700}>
                   {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}
                 </Text>
-                <Text fontSize="md" fontWeight={500}>hours</Text>
+                <Text fontSize="md" fontWeight={500}>
+                  hours
+                </Text>
               </VStack>{" "}
               <VStack spacing={0} p={0}>
                 <Text fontSize="4xl" fontWeight={700}>
@@ -101,7 +114,9 @@ function CountDownClock({ timeLeft, nextGame }) {
                     ? `0${timeLeft.minutes}`
                     : timeLeft.minutes}
                 </Text>
-                <Text fontSize="md" fontWeight={500}>minutes</Text>
+                <Text fontSize="md" fontWeight={500}>
+                  minutes
+                </Text>
               </VStack>
               <VStack spacing={0} p={0}>
                 <Text fontSize="4xl" fontWeight={700}>
@@ -109,7 +124,9 @@ function CountDownClock({ timeLeft, nextGame }) {
                     ? `0${timeLeft.seconds}`
                     : timeLeft.seconds}
                 </Text>
-                <Text fontSize="md" fontWeight={500}>seconds</Text>
+                <Text fontSize="md" fontWeight={500}>
+                  seconds
+                </Text>
               </VStack>
             </Stack>
           )}

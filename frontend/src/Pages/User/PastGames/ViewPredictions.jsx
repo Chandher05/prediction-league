@@ -10,24 +10,30 @@ import {
   ModalOverlay,
 } from "@chakra-ui/modal";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
+import { useStoreState } from "easy-peasy";
 import { useEffect, useState } from "react";
 
 function ViewPredictions({ gameId }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [predictions, setPredictions] = useState([]);
+  const authId = useStoreState((state) => state.authId);
 
   useEffect(() => {
     if (!gameId || !isOpen) return;
-    fetch(`${process.env.REACT_APP_API}/prediction/sorted/game/${gameId}`).then(
-      async (response) => {
-        if (response.ok) setPredictions(await response.json());
-      }
-    );
-  }, [gameId, isOpen]);
+    fetch(`${process.env.REACT_APP_API}/prediction/sorted/game/${gameId}`, {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) setPredictions(await response.json());
+    });
+  }, [gameId, isOpen, authId]);
 
   return (
     <>
-      <Button onClick={onOpen} size="sm">View</Button>
+      <Button onClick={onOpen} size="sm">
+        View
+      </Button>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />

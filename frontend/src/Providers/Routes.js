@@ -17,6 +17,7 @@ import Predictions from "../Pages/User/Predictions/Predictions";
 import Trends from "../Pages/User/Trends/Trends";
 import { auth } from "../Firebase/config";
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useStoreActions } from 'easy-peasy';
 
 function Routes() {
   const [authenticated, setAuth] = useState(false);
@@ -93,6 +94,7 @@ function PrivateRoute({ authenticated, children, ...rest }) {
 
 function PrivateGoogleRoute({ children, ...rest }) {
   const [user, loading, error] = useAuthState(auth);
+  const setAuthId = useStoreActions((actions) => actions.setAuthId);
   console.log(`Autheticated - ${auth}`)
   // console.log(`User - ${user.getIdToken()}`)
 
@@ -103,12 +105,13 @@ function PrivateGoogleRoute({ children, ...rest }) {
       if (user) {
         await user.getIdToken().then(function (idToken) {  // <------ Check this line
           console.log(idToken); // It shows the Firebase token now
+          setAuthId({authId: idToken});
           return idToken;
         });
       }
     }
     idToken()
-  }, [user])
+  }, [user, setAuthId])
 
 
   if (loading) {

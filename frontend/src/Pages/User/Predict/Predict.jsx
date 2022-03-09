@@ -15,6 +15,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import { useStoreState } from "easy-peasy";
 
 export default function Predict() {
   const history = useHistory();
@@ -25,19 +26,22 @@ export default function Predict() {
   const [showConfidence, setConfidence] = useState(true);
   const [selected, setSelected] = useState([]);
   const { register, handleSubmit } = useForm();
+  const authId = useStoreState((state) => state.authId);
 
   useEffect(() => {
     const getGames = () => {
       if (id) {
-        fetch(process.env.REACT_APP_API + `/game/id/${id}`).then(
-          async (response) => {
-            if (response.ok) {
-              const res = await response.json();
-              setGames([res]);
-              if (res) setSelected([res]);
-            }
+        fetch(process.env.REACT_APP_API + `/game/id/${id}`, {
+          headers: {
+            Authorization: `Bearer ${authId}`,
+          },
+        }).then(async (response) => {
+          if (response.ok) {
+            const res = await response.json();
+            setGames([res]);
+            if (res) setSelected([res]);
           }
-        );
+        });
       } else {
         fetch(process.env.REACT_APP_API + "/game/scheduled").then(
           async (response) => {
@@ -90,13 +94,12 @@ export default function Predict() {
       });
   };
   const checkIfLeave = (e) => {
-    if(e.target.value === "Leave") {
+    if (e.target.value === "Leave") {
       setConfidence(false);
-    }
-    else {
+    } else {
       setConfidence(true);
     }
-  }
+  };
   return (
     <Flex
       minH={"100vh"}
@@ -138,7 +141,8 @@ export default function Predict() {
               {games.map((game, index) => {
                 return (
                   <option value={JSON.stringify(game)} key={index}>
-                    Game {game.gameNumber} - {game.team1.shortName} v {game.team2.shortName}{" "}
+                    Game {game.gameNumber} - {game.team1.shortName} v{" "}
+                    {game.team2.shortName}{" "}
                   </option>
                 );
               })}
@@ -159,22 +163,30 @@ export default function Predict() {
           </FormControl> */}
           <FormControl isRequired>
             <FormLabel>Team</FormLabel>
-            <Select placeholder="Select team" {...register("predictedTeamId")} onChange={checkIfLeave}>
-              <option value={selected[0]?.team1._id}>{selected[0]?.team1.fullName}</option>
-              <option value={selected[0]?.team2._id}>{selected[0]?.team2.fullName}</option>
+            <Select
+              placeholder="Select team"
+              {...register("predictedTeamId")}
+              onChange={checkIfLeave}
+            >
+              <option value={selected[0]?.team1._id}>
+                {selected[0]?.team1.fullName}
+              </option>
+              <option value={selected[0]?.team2._id}>
+                {selected[0]?.team2.fullName}
+              </option>
               <option value="Leave">Leave</option>
             </Select>
           </FormControl>
-          {showConfidence && 
-          <FormControl>
-            <FormLabel>Confidence</FormLabel>
-            <Input
-              pattern="^(5[1-9]|[6-9][0-9]|100|FH|L)$"
-              {...register("confidence")}
-              placeholder="51 - 100 or FH or L"
-            />
-          </FormControl>
-          }
+          {showConfidence && (
+            <FormControl>
+              <FormLabel>Confidence</FormLabel>
+              <Input
+                pattern="^(5[1-9]|[6-9][0-9]|100|FH|L)$"
+                {...register("confidence")}
+                placeholder="51 - 100 or FH or L"
+              />
+            </FormControl>
+          )}
 
           <Stack spacing={6} mt={5}>
             <Button

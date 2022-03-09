@@ -13,17 +13,21 @@ import {
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-
+import { useStoreState } from "easy-peasy";
 
 function Leaderboard() {
   const history = useHistory();
+  const authId = useStoreState((state) => state.authId);
+
   const [games, setGames] = useState([]);
   const getLeaderboard = () => {
-    fetch(process.env.REACT_APP_API + "/prediction/leaderboard").then(
-      async (response) => {
-        if (response.ok) setGames(await response.json());
-      }
-    );
+    fetch(process.env.REACT_APP_API + "/prediction/leaderboard", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) setGames(await response.json());
+    });
   };
   useEffect(() => {
     getLeaderboard();
@@ -79,4 +83,3 @@ function Leaderboard() {
 }
 
 export default Leaderboard;
-

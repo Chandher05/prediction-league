@@ -11,6 +11,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "chart.js": "^3.6.0",
+    "easy-peasy": "^5.0.4",
     "firebase": "^9.6.7",
     "framer-motion": "^4.1.17",
     "luxon": "^2.0.2",

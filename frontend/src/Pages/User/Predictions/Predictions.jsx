@@ -9,36 +9,38 @@ import {
   Th,
   Td,
   Button,
-  Input,
   useToast,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useRef, useEffect, useState } from "react";
+import { useStoreState } from "easy-peasy";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 
 function Predictions() {
   const history = useHistory();
   const toast = useToast();
   const [games, setGames] = useState([]);
-  const inputRef = useRef();
+  const authId = useStoreState((state) => state.authId);
 
   const getPredictions = () => {
-    fetch(`${process.env.REACT_APP_API}/prediction/user`).then(
-      async (response) => {
-        if (response.ok) {
-          const result = await response.json();
-          setGames(result.predictions);
-        } else {
-          toast({
-            title: "Something went wrong",
-            description: "Contact us for help if the issue persists.",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-          });
-        }
+    fetch(`${process.env.REACT_APP_API}/prediction/user`, {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) {
+        const result = await response.json();
+        setGames(result.predictions);
+      } else {
+        toast({
+          title: "Something went wrong",
+          description: "Contact us for help if the issue persists.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
       }
-    );
+    });
   };
 
   useEffect(() => {
@@ -66,7 +68,6 @@ function Predictions() {
           </Heading>
         </HStack>
 
-
         <Table variant="striped" colorScheme="orange" size="sm">
           <Thead>
             <Tr>
@@ -93,7 +94,6 @@ function Predictions() {
             </Tbody>
           ) : null}
         </Table>
-
       </VStack>
     </Flex>
   );
