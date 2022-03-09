@@ -11,14 +11,15 @@ import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useHistory } from "react-router";
+import { useStoreState } from "easy-peasy";
 
 function Trends() {
   const history = useHistory();
   const [graphData, setGraphData] = useState({});
   const [loaded, setLoaded] = useState(false);
+  const authId = useStoreState((state) => state.authId);
 
   function getRandomColor() {
-
     var letters = "0123456789ABCDEF".split("");
     var color = "#";
     for (var i = 0; i < 6; i++) {
@@ -27,31 +28,33 @@ function Trends() {
     return color;
   }
   const getLeaderboard = () => {
-    fetch(process.env.REACT_APP_API + "/prediction/graph").then(
-      async (response) => {
-        if (response.ok) {
-          const res = await response.json();
-          const datasets = [];
-          for (let key in res.userScores) {
-            let randomCol = getRandomColor();
-            datasets.push({
-              label: res.userScores[key].username,
-              data: res.userScores[key].scores,
-              pointBorderColor: randomCol,
-              pointBackgroundColor: randomCol,
-              backgroundColor: randomCol,
-              borderColor: randomCol,
-            });
-          }
-          console.log(datasets);
-          setGraphData({
-            labels: res.gameNumbers,
-            datasets: datasets,
+    fetch(process.env.REACT_APP_API + "/prediction/graph", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) {
+        const res = await response.json();
+        const datasets = [];
+        for (let key in res.userScores) {
+          let randomCol = getRandomColor();
+          datasets.push({
+            label: res.userScores[key].username,
+            data: res.userScores[key].scores,
+            pointBorderColor: randomCol,
+            pointBackgroundColor: randomCol,
+            backgroundColor: randomCol,
+            borderColor: randomCol,
           });
-          setLoaded(true);
         }
+        console.log(datasets);
+        setGraphData({
+          labels: res.gameNumbers,
+          datasets: datasets,
+        });
+        setLoaded(true);
       }
-    );
+    });
   };
   const options = {
     plugins: {
@@ -72,11 +75,8 @@ function Trends() {
   }, []);
 
   return loaded ? (
-    <Box p="5"
-    w="100%"
-    justify={"center"}
-    >
-      <HStack spacing={3} alignItems="justify-center" >
+    <Box p="5" w="100%" justify={"center"}>
+      <HStack spacing={3} alignItems="justify-center">
         <Button
           colorScheme="orange"
           borderRadius="10px"
