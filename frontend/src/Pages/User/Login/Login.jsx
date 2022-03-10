@@ -26,7 +26,7 @@ export default function GoogleLogin() {
         >
           PREDICTION LEAGUE{" "}
           <Text as={"span"} color={"orange.400"}>
-            ICC WORLD CUP
+            IPL 2022
           </Text>
         </Heading>
         <Button

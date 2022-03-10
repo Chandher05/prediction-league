@@ -55,12 +55,8 @@ function ViewPredictions({ gameId }) {
                     return (
                       <Tr
                         key={record.index}
-                        bg={
-                          predictions[0].prediction.predictedTeam ===
-                          record.prediction.predictedTeam
-                            ? "blue.200"
-                            : "red.200"
-                        }
+                        bg={record.prediction.predictedTeam.colorCode}
+                        textColor="white"
                       >
                         <Td>{record.username}</Td>
                         <Td>{record.prediction.predictedTeam.fullName}</Td>

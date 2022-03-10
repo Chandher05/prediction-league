@@ -62,7 +62,6 @@ var checkAuth = async (req, res, next) => {
 		req.body.username = userRecord.displayName
 		next()
 	} catch (err) {
-		console.log(err)
 		res.status(403).send('Unauthorized')
 	}
 }

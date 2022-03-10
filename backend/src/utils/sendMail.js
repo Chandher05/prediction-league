@@ -96,8 +96,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
         // }
 
         
-        // let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
-        let subscribedUsers = ["jayasurya.pinaki@sjsu.edu"]
+        let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
 
         for (var obj of subscribedUsers) {
             mailOptions.to = obj
