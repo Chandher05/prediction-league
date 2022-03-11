@@ -41,7 +41,7 @@ function Leaderboard() {
       <VStack w="full" h="full" p={4} spacing={10}>
         <HStack spacing={3} alignItems="justify-center">
           <Button
-            colorScheme="orange"
+            color="blue.400"
             borderRadius="10px"
             size="sm"
             onClick={() => history.push("/")}
@@ -53,7 +53,7 @@ function Leaderboard() {
           </Heading>
         </HStack>
 
-        <Table variant="striped" colorScheme="orange" size="sm">
+        <Table  size="sm">
           <Thead>
             <Tr>
               <Th>#</Th>
@@ -66,7 +66,7 @@ function Leaderboard() {
           <Tbody>
             {games.map((row, index) => {
               return (
-                <Tr>
+                <Tr backgroundColor={row.isAdmin ? "blue.200" : 'blue.500'}>
                   <Td>{row.position}</Td>
                   <Td>{row.username}</Td>
                   <Td>{row.score.toFixed(7)}</Td>

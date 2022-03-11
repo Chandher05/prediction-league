@@ -70,7 +70,7 @@ function CountDownClock({ timeLeft, nextGame }) {
         minW={"350px"}
         maxW={"500px"}
         w={"full"}
-        bg={useColorModeValue("orange", "gray.800")}
+        bg={useColorModeValue("blue.200", "gray.800")}
         boxShadow={"2xl"}
         rounded={"md"}
         overflow={"hidden"}
@@ -84,10 +84,10 @@ function CountDownClock({ timeLeft, nextGame }) {
           <Text
             fontSize={"sm"}
             fontWeight={500}
-            bg={useColorModeValue("orange.50", "orange.900")}
+            bg={useColorModeValue("blue.50", "blue.900")}
             p={2}
             px={3}
-            color={"orange.500"}
+            color={"blue.500"}
             // rounded={"full"}
           >
             No. {nextGame?.gameNumber} :{" "}

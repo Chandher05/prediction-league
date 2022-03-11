@@ -2,7 +2,6 @@ import { Button } from "@chakra-ui/button";
 import { useColorModeValue } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
-import { signInWithGoogle } from "../../../Firebase/config";
 
 import { Flex, GridItem, Heading, SimpleGrid, VStack } from "@chakra-ui/layout";
 import { useRef } from "react";
@@ -53,15 +52,6 @@ function Login({ handleAuth }) {
               onClick={loginAdminConsole}
             >
               Login
-            </Button>
-            <Button
-              variant="solid"
-              size="lg"
-              w="full"
-              colorScheme="teal"
-              onClick={signInWithGoogle}
-            >
-              Login With Google
             </Button>
           </GridItem>
         </SimpleGrid>

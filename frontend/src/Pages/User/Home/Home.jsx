@@ -32,7 +32,7 @@ export default function Home() {
           lineHeight={"110%"}
         >
           PREDICTION LEAGUE{" "}
-          <Text as={"span"} color={"orange.400"}>
+          <Text as={"span"} color={"blue.400"}>
             IPL 2022
           </Text>
         </Heading>
@@ -42,9 +42,9 @@ export default function Home() {
         <Button
           rounded={"full"}
           px={6}
-          colorScheme={"orange"}
-          bg={"orange.400"}
-          _hover={{ bg: "orange.500" }}
+          colorScheme={"blue"}
+          bg={"blue.800"}
+          _hover={{ bg: "blue.500" }}
           onClick={() => navTo("predict")}
           size="lg"
         >
@@ -53,7 +53,7 @@ export default function Home() {
         <Stack spacing={6} direction={ "column" }>
           <Button
             rounded={"full"}
-            colorScheme={"red"}
+            colorScheme={"blue"}
             px={6}
             onClick={() => navTo("leaderboard")}
           >
@@ -61,7 +61,7 @@ export default function Home() {
           </Button>
           <Button
             rounded={"full"}
-            colorScheme={"red"}
+            colorScheme={"blue"}
             px={6}
             onClick={() => navTo("predictions")}
           >
@@ -70,7 +70,7 @@ export default function Home() {
           <Button
             rounded={"full"}
             px={6}
-            colorScheme={"red"}
+            colorScheme={"blue"}
             onClick={() => navTo("PastGames")}
           >
             Completed Games
@@ -78,7 +78,7 @@ export default function Home() {
           <Button
             rounded={"full"}
             px={6}
-            colorScheme={"red"}
+            colorScheme={"blue"}
             onClick={() => navTo("trends")}
           >
             Trends

@@ -56,7 +56,7 @@ function Predictions() {
       <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
         <HStack spacing={3} alignItems="justify-center">
           <Button
-            colorScheme="orange"
+            colorScheme="blue"
             borderRadius="10px"
             size="sm"
             onClick={() => history.push("/")}
@@ -68,7 +68,7 @@ function Predictions() {
           </Heading>
         </HStack>
 
-        <Table variant="striped" colorScheme="orange" size="sm">
+        <Table variant="striped" colorScheme="blue" size="sm">
           <Thead>
             <Tr>
               <Th>No.</Th>

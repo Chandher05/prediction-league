@@ -78,7 +78,7 @@ function Trends() {
     <Box p="5" w="100%" justify={"center"}>
       <HStack spacing={3} alignItems="justify-center">
         <Button
-          colorScheme="orange"
+          colorScheme="blue"
           borderRadius="10px"
           size="sm"
           onClick={() => history.push("/")}
@@ -89,7 +89,7 @@ function Trends() {
           Trends
         </Heading>
       </HStack>
-      <Text fontSize="2xl" color="orange.600">
+      <Text fontSize="2xl" color="blue.600">
         {" "}
         Best to be viewed on bigger screens.
       </Text>
@@ -97,7 +97,7 @@ function Trends() {
     </Box>
   ) : (
     <Center h="100vh">
-      <Spinner thickness="4px" color="orange.500" size="xl" />
+      <Spinner thickness="4px" color="blue.500" size="xl" />
     </Center>
   );
 }

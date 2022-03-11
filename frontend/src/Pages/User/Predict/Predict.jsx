@@ -11,6 +11,7 @@ import {
   useColorModeValue,
   useToast,
   HStack,
+  Image,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
@@ -24,7 +25,7 @@ export default function Predict() {
 
   const [games, setGames] = useState([]);
   const [showConfidence, setConfidence] = useState(true);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState({});
   const { register, handleSubmit } = useForm();
   const authId = useStoreState((state) => state.authId);
 
@@ -39,29 +40,32 @@ export default function Predict() {
           if (response.ok) {
             const res = await response.json();
             setGames([res]);
-            if (res) setSelected([res]);
+            if (res) setSelected(res);
           }
         });
       } else {
-        fetch(process.env.REACT_APP_API + "/game/scheduled").then(
-          async (response) => {
-            if (response.ok) {
-              const games = await response.json();
-              setGames(games);
-              if (games[0]) setSelected([games[0]]);
-            }
+        fetch(process.env.REACT_APP_API + "/game/scheduled", {
+          headers: {
+            Authorization: `Bearer ${authId}`,
+          },
+        }).then(async (response) => {
+          if (response.ok) {
+            const games = await response.json();
+            setGames(games);
+            if (games[0]) setSelected(games[0]);
           }
-        );
+        });
       }
     };
     getGames();
-  }, [id]);
+  }, [id, authId]);
   const onSubmit = (data) => {
-    data["gameId"] = selected[0]?.gameId;
+    data["gameId"] = selected?.gameId;
     fetch(process.env.REACT_APP_API + "/prediction/new", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`,
       },
       body: JSON.stringify(data),
     })
@@ -119,7 +123,7 @@ export default function Predict() {
       >
         <HStack>
           <Button
-            colorScheme="orange"
+            colorScheme="blue"
             borderRadius="10px"
             size="sm"
             onClick={() => history.push("/")}
@@ -168,14 +172,25 @@ export default function Predict() {
               {...register("predictedTeamId")}
               onChange={checkIfLeave}
             >
-              <option value={selected[0]?.team1._id}>
-                {selected[0]?.team1.fullName}
+              <option value={selected?.team1?._id}>
+                {selected?.team1?.fullName}
               </option>
-              <option value={selected[0]?.team2._id}>
-                {selected[0]?.team2.fullName}
+              <option value={selected?.team2?._id}>
+               
+                {selected?.team2?.fullName}
               </option>
               <option value="Leave">Leave</option>
             </Select>
+            <HStack  justifyContent='center'>
+            <Image
+              src={`${process.env.PUBLIC_URL}/Logo/${selected?.team1?.shortName}.png`}
+              alt={selected?.team1?.shortName}
+            />
+            <Image
+              src={`${process.env.PUBLIC_URL}/Logo/${selected?.team2?.shortName}.png`}
+              alt={selected?.team1?.shortName}
+            />
+            </HStack>
           </FormControl>
           {showConfidence && (
             <FormControl>
@@ -190,10 +205,10 @@ export default function Predict() {
 
           <Stack spacing={6} mt={5}>
             <Button
-              bg={"orange.400"}
+              bg={"blue.400"}
               color={"white"}
               _hover={{
-                bg: "orange.500",
+                bg: "blue.500",
               }}
               type="submit"
             >

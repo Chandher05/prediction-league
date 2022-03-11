@@ -25,15 +25,15 @@ export default function GoogleLogin() {
           lineHeight={"110%"}
         >
           PREDICTION LEAGUE{" "}
-          <Text as={"span"} color={"orange.400"}>
+          <Text as={"span"} color={"blue.400"}>
             IPL 2022
           </Text>
         </Heading>
         <Button
           px={6}
           colorScheme={"red"}
-          bg={"orange.400"}
-          _hover={{ bg: "orange.500" }}
+          bg={"blue.400"}
+          _hover={{ bg: "blue.500" }}
           onClick={signIn}
           size="lg"
         >

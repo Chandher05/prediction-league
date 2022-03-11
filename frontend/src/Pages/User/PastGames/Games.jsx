@@ -50,7 +50,7 @@ function PastGames() {
       >
         <HStack>
           <Button
-            colorScheme="orange"
+            colorScheme="blue"
             borderRadius="10px"
             size="sm"
             onClick={() => history.push("/")}
@@ -62,7 +62,7 @@ function PastGames() {
           </Heading>
         </HStack>
 
-        <Table variant="striped" colorScheme="orange" size="sm">
+        <Table variant="striped" colorScheme="blue" size="sm">
           <Thead>
             <Tr>
               <Th>No.</Th>

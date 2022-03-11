@@ -31,10 +31,11 @@ const signInWithGoogle = async () => {
     const res = await signInWithPopup(auth, googleProvider);
     const user = res.user;
     await user.getIdToken().then(function (idToken) {  // <------ Check this line
-      fetch(`${process.env.REACT_APP_API}/prediction/user`, {
+      fetch(`${process.env.REACT_APP_API}/users/login`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },
+        method: 'POST',
       })
     });
     return user;
