@@ -20,6 +20,7 @@ function Leaderboard() {
   const authId = useStoreState((state) => state.authId);
 
   const [games, setGames] = useState([]);
+  const [showStrategies, setShowStrategies] = useState(false);
   const getLeaderboard = () => {
     fetch(process.env.REACT_APP_API + "/prediction/leaderboard", {
       headers: {
@@ -53,7 +54,9 @@ function Leaderboard() {
           </Heading>
         </HStack>
 
-        <Table  size="sm">
+        <Button onClick={() => setShowStrategies(!showStrategies)}>{showStrategies ? "Hide Strategies" : "Show Strategies"}</Button>
+
+        <Table size="sm">
           <Thead>
             <Tr>
               <Th>#</Th>
@@ -65,16 +68,19 @@ function Leaderboard() {
           </Thead>
           <Tbody>
             {games.map((row, index) => {
-              return (
-                <Tr backgroundColor={row.isAdmin ? "blue.200" : 'blue.500'}>
-                  <Td>{row.position}</Td>
-                  <Td>{row.username}</Td>
-                  <Td>{row.score.toFixed(7)}</Td>
-                  <Td>{row.freeHitsRemaining}</Td>
-                  <Td>{row.leavesRemaining}</Td>
-                </Tr>
-              );
+              if ((showStrategies && row.isAdmin) || !row.isAdmin) {
+                return (
+                  <Tr backgroundColor={row.isAdmin ? "blue.200" : 'blue.500'}>
+                    <Td>{row.position}</Td>
+                    <Td>{row.username}</Td>
+                    <Td>{row.score.toFixed(7)}</Td>
+                    <Td>{row.freeHitsRemaining}</Td>
+                    <Td>{row.leavesRemaining}</Td>
+                  </Tr>
+                );
+              }
             })}
+
           </Tbody>
         </Table>
       </VStack>

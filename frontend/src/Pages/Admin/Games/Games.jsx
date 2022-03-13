@@ -28,13 +28,18 @@ import { useHistory } from "react-router";
 import { useToast } from "@chakra-ui/react";
 import ViewPredictions from "../../../common/ViewPredictions";
 import { CheckIcon, CopyIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { useStoreState } from "easy-peasy";
 
 function Games() {
   const history = useHistory();
   const [games, setGames] = useState([]);
+  const authId = useStoreState((state) => state.authId);
 
   const getGames = () => {
-    fetch(process.env.REACT_APP_API + "/game/all").then(async (response) => {
+    fetch(process.env.REACT_APP_API + "/game/all", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      }}).then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
   };
@@ -49,7 +54,7 @@ function Games() {
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
-        <AddGameModal onCloseCall={getGames}></AddGameModal>
+        {/* <AddGameModal onCloseCall={getGames}></AddGameModal> */}
         <Button onClick={getGames}>Refresh</Button>
         <Button onClick={navToUser}>Users Table</Button>
       </HStack>
@@ -72,14 +77,14 @@ function Games() {
               <Tr key={game.gameNumber}>
                 <Td>{game.gameNumber}</Td>
                 <Td>{game.gameId}</Td>
-                <Td>{game.team1}</Td>
-                <Td>{game.team2}</Td>
+                <Td>{game.team1.fullName}</Td>
+                <Td>{game.team2.fullName}</Td>
                 <Td>
                   {DateTime.fromISO(game.startTime, { zone: "utc" })
                     .toLocal()
                     .toLocaleString(DateTime.DATETIME_SHORT)}
                 </Td>
-                <Td>{game.winner}</Td>
+                <Td>{game.winner.fullName}</Td>
                 <Td>
                   <CopyLink id={game.gameId}></CopyLink>
                   <ViewPredictions gameId={game.gameId}></ViewPredictions>
@@ -179,6 +184,7 @@ function AddGameModal({ onCloseCall }) {
 
 function UpdateGameModal({ game }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const authId = useStoreState((state) => state.authId);
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       // startTime: toDatetimeLocal(game.startTime) || '',
@@ -190,6 +196,7 @@ function UpdateGameModal({ game }) {
       method: "PUT", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`
       },
       body: JSON.stringify(data),
     });
@@ -215,11 +222,11 @@ function UpdateGameModal({ game }) {
 
               <FormControl mt={4}>
                 <FormLabel>Team 1</FormLabel>
-                <Input placeholder="RCB" {...register("team1")} />
+                <Input placeholder="RCB" {...register("team1.fullName")} />
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Team 2</FormLabel>
-                <Input placeholder="DC" {...register("team2")} />
+                <Input placeholder="DC" {...register("team2.fullName")} />
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
@@ -227,7 +234,7 @@ function UpdateGameModal({ game }) {
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Winner</FormLabel>
-                <Input placeholder="" {...register("winner")} />
+                <Input placeholder="" {...register("winner.fullName")} />
               </FormControl>
             </ModalBody>
 

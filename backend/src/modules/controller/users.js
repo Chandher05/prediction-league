@@ -266,7 +266,7 @@ exports.updateAdmin = async (req, res) => {
 
 
 	} catch (error) {
-		console.log(`Error in game/isUserPartOfGame ${error}`)
+		console.log(`Error in game/unsubscribeUser ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)
@@ -292,11 +292,11 @@ exports.updateAdmin = async (req, res) => {
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
-			.send("Unsubscribed from email")
+			.send("Resubscribed to email")
 
 
 	} catch (error) {
-		console.log(`Error in game/isUserPartOfGame ${error}`)
+		console.log(`Error in game/resubscribeUser ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)

@@ -407,9 +407,9 @@ exports.updateGame = async (req, res) => {
 				team1: game.team1,
 				team2: game.team2,
 				startTime: game.startTime,
-				toss: game.toss,
-				battingFirst: game.battingFirst,
-				winner: game.winner,
+				toss: game.toss? game.toss: {},
+				battingFirst: game.battingFirst? game.battingFirst: {},
+				winner: game.winner? game.winner: {},
 			})
 		}
 

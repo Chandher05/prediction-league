@@ -15,7 +15,7 @@ function Login({ handleAuth }) {
     const adminPassword = inputRef.current.value;
     if (adminPassword === process.env.REACT_APP_ADMIN_PASSWORD) {
       handleAuth(true);
-      history.push("/admin/Users");
+      history.push("/admin/Games");
     }
   };
   return (

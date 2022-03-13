@@ -9,6 +9,7 @@ import {
   Td,
   Button,
   useColorModeValue,
+  Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
@@ -20,6 +21,8 @@ function PastGames() {
   const history = useHistory();
   const authId = useStoreState((state) => state.authId);
   const [games, setGames] = useState([]);
+  const [allTeams, setAllTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState([]);
 
   useEffect(() => {
     const getGames = async () => {
@@ -28,7 +31,19 @@ function PastGames() {
           Authorization: `Bearer ${authId}`,
         },
       }).then(async (response) => {
-        if (response.ok) setGames(await response.json());
+        if (response.ok) {
+          const completedGames = await response.json()
+
+          let allTeamsFromResponse = new Set(["Show all"])
+
+          for (var game of completedGames) {
+            allTeamsFromResponse.add(game.team1.fullName)
+            allTeamsFromResponse.add(game.team2.fullName)
+          }
+          setAllTeams(Array.from(allTeamsFromResponse))
+          setSelectedTeam("Show all")
+          setGames(completedGames);
+        }
       });
     };
     getGames();
@@ -62,6 +77,14 @@ function PastGames() {
           </Heading>
         </HStack>
 
+        <Select selected={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)}>
+          {
+            allTeams.map((team) => {
+              return <option value={team}>{team}</option>
+            })
+          }
+        </Select>
+
         <Table variant="striped" colorScheme="blue" size="sm">
           <Thead>
             <Tr>
@@ -76,24 +99,27 @@ function PastGames() {
           <Tbody>
             {games
               .map((game, index) => {
-                return (
-                  <Tr key={index}>
-                    <Td>{game.gameNumber}</Td>
-                    <Td>{game.team1.fullName}</Td>
-                    <Td>{game.team2.fullName}</Td>
-                    {/* <Td>
+                if (selectedTeam == "Show all" || selectedTeam == game.team1.fullName || selectedTeam == game.team2.fullName) {
+                  return (
+                    <Tr key={index}>
+                      <Td>{game.gameNumber}</Td>
+                      <Td>{game.team1.fullName}</Td>
+                      <Td>{game.team2.fullName}</Td>
+                      {/* <Td>
                   {DateTime.fromISO(game.startTime, { zone: "utc" })
                     .toLocal()
                     .toLocaleString(DateTime.DATETIME_SHORT)}
                   {game.StartTime}
                 </Td> */}
-                    <Td>{game.winner.fullName}</Td>
-                    <Td>
-                      <ViewPredictions gameId={game.gameId}></ViewPredictions>
-                    </Td>
-                  </Tr>
-                );
+                      <Td>{game.winner.fullName}</Td>
+                      <Td>
+                        <ViewPredictions gameId={game.gameId}></ViewPredictions>
+                      </Td>
+                    </Tr>
+                  );
+                }
               })
+
               .reverse()}
           </Tbody>
         </Table>

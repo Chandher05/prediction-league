@@ -22,12 +22,17 @@ import {
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router";
+import { useStoreState } from "easy-peasy";
 
 function Users() {
   const history = useHistory();
   const [users, setUsers] = useState([]);
+  const authId = useStoreState((state) => state.authId);
   const getUsers = () => {
-    fetch(process.env.REACT_APP_API+"/users/all").then(async (response) => {
+    fetch(process.env.REACT_APP_API+"/users/all", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      }}).then(async (response) => {
       if (response.ok) setUsers(await response.json());
     });
   };
@@ -43,7 +48,7 @@ function Users() {
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="flex-end">
         <Heading size="2xl">Users</Heading>
-        <AddUserModal></AddUserModal>
+        {/* <AddUserModal></AddUserModal> */}
         <Button onClick={navToGame}>Games Table</Button>
       </HStack>
 
@@ -51,10 +56,10 @@ function Users() {
         <Thead>
           <Tr>
             <Th >No.</Th>
+            <Th>Mongo ID</Th>
             <Th>User name</Th>
-            <Th>Unique Code</Th>
+            <Th>Admin</Th>
             <Th>Active</Th>
-            <Th>Actions</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -62,10 +67,10 @@ function Users() {
             return (
               <Tr key={index}>
                 <Td >{index + 1}</Td>
+                <Td>{element.mongoId}</Td>
                 <Td>{element.username}</Td>
-                <Td>{element.uniqueCode}</Td>
+                <Td>{element.isAdmin ? "Yes" : "No"}</Td>
                 <Td>{element.isActive ? "Yes" : "No"}</Td>
-                <Td>Actions</Td>
               </Tr>
             );
           })}

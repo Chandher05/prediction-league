@@ -15,6 +15,7 @@ import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
 import Trends from "../Pages/User/Trends/Trends";
+import Unsubscribe from "../common/Unsubscribe";
 import { auth } from "../Firebase/config";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useStoreActions } from 'easy-peasy';
@@ -56,6 +57,9 @@ function Routes() {
         <PrivateGoogleRoute path="/trends">
           <Trends />
         </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/unsubscribe">
+          <Unsubscribe />
+        </PrivateGoogleRoute>
         <Route path="/login">
           <GoogleLogin />
         </Route>
@@ -95,6 +99,8 @@ function PrivateRoute({ authenticated, children, ...rest }) {
 function PrivateGoogleRoute({ children, ...rest }) {
   const [user, loading, error] = useAuthState(auth);
   const setAuthId = useStoreActions((actions) => actions.setAuthId);
+  const setUserName = useStoreActions((actions) => actions.setUserName);
+  const setPhotoURL = useStoreActions((actions) => actions.setPhotoURL);
   console.log(`Autheticated - ${auth}`)
   // console.log(`User - ${user.getIdToken()}`)
 
@@ -108,6 +114,8 @@ function PrivateGoogleRoute({ children, ...rest }) {
           setAuthId({authId: idToken});
           return idToken;
         });
+        setUserName({userName: user.displayName})
+        setPhotoURL({photoURL: user.photoURL})
       }
     }
     idToken()
