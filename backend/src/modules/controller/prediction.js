@@ -556,7 +556,8 @@ exports.getGraph = async (req, res) => {
 
 			predictionsForGame = await Prediction.find({
 				gameId: gameObj._id,
-				isConsidered: true
+				isConsidered: true,
+				isStrategy: false
 			})
 			for (var temp of predictionsForGame) {
 				if (temp.confidence == "FH" && temp.predictedTeamId == gameWinnerId) {
