@@ -14,6 +14,7 @@ var updateStrategy = (gameId) => {
             }
 
             var battingSecond = gameData.battingFirst.toString() == gameData.team1.toString()? gameData.team2 : gameData.team1
+            var tossLoser = gameData.toss.toString() == gameData.team1.toString()? gameData.team2 : gameData.team1
 
             var allStrategies = await Strategy.find()
             for(var strategyObj of allStrategies) {
@@ -30,10 +31,14 @@ var updateStrategy = (gameId) => {
                 var strategyPrediction 
                 if (strategyObj.typeOfStrategy == constants.STRATEGY.TOSS_WINNER) {
                     strategyPrediction = gameData.toss
+                } else if (strategyObj.typeOfStrategy == constants.STRATEGY.TOSS_LOSER) {
+                    strategyPrediction = tossLoser
                 } else if (strategyObj.typeOfStrategy == constants.STRATEGY.BATTING_FIRST) {
                     strategyPrediction = gameData.battingFirst
                 } else if (strategyObj.typeOfStrategy == constants.STRATEGY.BOWLING_FIRST) {
                     strategyPrediction = battingSecond
+                } else {
+                    continue
                 }
 
                 var predictionObj = new Prediction({

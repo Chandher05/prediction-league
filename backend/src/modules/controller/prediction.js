@@ -132,7 +132,7 @@ exports.getPredictionByGame = async (req, res) => {
 				allPlayers[prediction.userUID].push({
 					predictionId: prediction._id,
 					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeamId == gameData.team1? team1Obj: team2Obj,
+					predictedTeam: prediction.predictedTeamId.toString() == gameData.team1.toString()? team1Obj: team2Obj,
 					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered,
 				})
@@ -140,7 +140,7 @@ exports.getPredictionByGame = async (req, res) => {
 				allPlayers[prediction.userUID] = [{
 					predictionId: prediction._id,
 					confidence: prediction.confidence,
-					predictedTeam: prediction.predictedTeamId == gameData.team1? team1Obj: team2Obj,
+					predictedTeam: prediction.predictedTeamId.toString() == gameData.team1.toString()? team1Obj: team2Obj,
 					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered,
 				}]
@@ -200,7 +200,7 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 			allPlayers[prediction.userUID] = {
 				predictionId: prediction._id,
 				confidence: prediction.confidence,
-				predictedTeam: prediction.predictedTeamId == gameData.team1? team1Obj: team2Obj,
+				predictedTeam: prediction.predictedTeamId.toString() == gameData.team1.toString()? team1Obj: team2Obj,
 				predictionTime: prediction.predictionTime,
 				isConsidered: prediction.isConsidered,
 			}
