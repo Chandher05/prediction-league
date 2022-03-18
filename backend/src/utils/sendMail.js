@@ -9,11 +9,11 @@ var job1 = new CronJob('0 0 * * *', async () => {
     sendMail(24, "schedule")
 }, null, true, "Asia/Kolkata")
 
-var job2 = new CronJob('30 15 * * *', async () => {
+var job2 = new CronJob('00 15 * * *', async () => {
     sendMail(2, "reminder")
 }, null, true, "Asia/Kolkata")
 
-var job3 = new CronJob('30 19 * * *', async () => {
+var job3 = new CronJob('00 19 * * *', async () => {
     sendMail(2, "reminder")
 }, null, true, "Asia/Kolkata")
 
@@ -85,18 +85,11 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
             attachments: imgAttachments,
         };
 
-        // let subscribedUsers = await Users.find({
-        //     sendEmail: true
-        // })
-
-        // for (var obj of subscribedUsers) {
-        //     mailOptions.to = obj.email
-        //     var info = await transporter.sendMail(mailOptions)
-        //     console.log('Email sent to ' + obj.email + ': ' + info.response);
-        // }
-
+        let subscribedUsers = await Users.find({
+            sendEmail: true
+        })
         
-        let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
+        // let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
 
         for (var obj of subscribedUsers) {
             mailOptions.to = obj
