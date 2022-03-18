@@ -1,14 +1,19 @@
 import { Container, Heading, Stack, Text, Button } from "@chakra-ui/react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 
 import { signInWithGoogle } from "../../../Firebase/config";
 
 export default function GoogleLogin() {
   const history = useHistory();
+  const location = useLocation();
 
   const signIn = async () => {
     await signInWithGoogle();
-    history.push('/')
+    if (location.state?.from) {
+      history.push(location.state.from);
+    } else {
+      history.push("/");
+    }
   };
 
   return (

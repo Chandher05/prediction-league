@@ -73,7 +73,7 @@ export default function Home() {
             colorScheme={"blue"}
             onClick={() => navTo("PastGames")}
           >
-            Completed Games
+            All Games
           </Button>
           <Button
             rounded={"full"}

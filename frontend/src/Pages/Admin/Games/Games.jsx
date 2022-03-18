@@ -21,6 +21,7 @@ import {
   ModalCloseButton,
   Input,
   useClipboard,
+  Select,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
@@ -39,7 +40,8 @@ function Games() {
     fetch(process.env.REACT_APP_API + "/game/all", {
       headers: {
         Authorization: `Bearer ${authId}`,
-      }}).then(async (response) => {
+      },
+    }).then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
   };
@@ -184,11 +186,19 @@ function AddGameModal({ onCloseCall }) {
 
 function UpdateGameModal({ game }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const authId = useStoreState((state) => state.authId);
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       // startTime: toDatetimeLocal(game.startTime) || '',
-      ...game,
+      gameId: game.gameId,      
+      toss: game?.toss?._id,
+      battingFirst: game?.battingFirst?._id,
+      winner: game?.winner?._id,
+      gameNumber: game.gameNumber,
+      team1: game.team1?._id,
+      team2: game.team2?._id,
+      startTime: game?.startTime
     },
   });
   const onSubmit = (data) => {
@@ -196,7 +206,7 @@ function UpdateGameModal({ game }) {
       method: "PUT", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`
+        Authorization: `Bearer ${authId}`,
       },
       body: JSON.stringify(data),
     });
@@ -220,21 +230,38 @@ function UpdateGameModal({ game }) {
                 <Input placeholder="No." {...register("gameNumber")} />
               </FormControl>
 
-              <FormControl mt={4}>
+              {/* <FormControl mt={4}>
                 <FormLabel>Team 1</FormLabel>
-                <Input placeholder="RCB" {...register("team1.fullName")} />
+                <Input placeholder="Team 1" {...register("team1.fullName")} />
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Team 2</FormLabel>
-                <Input placeholder="DC" {...register("team2.fullName")} />
-              </FormControl>
+                <Input placeholder="Team 2" {...register("team2.fullName")} />
+              </FormControl>*/} 
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
                 <Input type="datetime-local" {...register("startTime")} />
-              </FormControl>
+              </FormControl> 
               <FormControl mt={4}>
                 <FormLabel>Winner</FormLabel>
-                <Input placeholder="" {...register("winner.fullName")} />
+                <Select {...register("winner")}>
+                  <option value={game.team1._id}>{game.team1.fullName}</option>
+                  <option value={game.team2._id}>{game.team2.fullName}</option>
+                </Select>
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Toss</FormLabel>
+                <Select {...register("toss")}>
+                  <option value={game.team1._id}>{game.team1.fullName}</option>
+                  <option value={game.team2._id}>{game.team2.fullName}</option>
+                </Select>
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Batting First</FormLabel>
+                <Select {...register("battingFirst")}>
+                  <option value={game.team1._id}>{game.team1.fullName}</option>
+                  <option value={game.team2._id}>{game.team2.fullName}</option>
+                </Select>
               </FormControl>
             </ModalBody>
 
@@ -297,8 +324,12 @@ function DeleteConfirmModal({ gameId }) {
           <ModalHeader color="red">Delete Game</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <Text fontSize="xl">Are you sure you want to delete this game?</Text>
-            <Text color="red" fontSize="sm">Note: This is not reversible</Text>
+            <Text fontSize="xl">
+              Are you sure you want to delete this game?
+            </Text>
+            <Text color="red" fontSize="sm">
+              Note: This is not reversible
+            </Text>
           </ModalBody>
 
           <ModalFooter>

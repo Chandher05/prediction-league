@@ -6,14 +6,12 @@ import {
 	FormLabel,
 	Heading,
 	Input,
-	Select,
 	Stack,
 	useColorModeValue,
 	useToast,
 	HStack,
 	Image,
 	Text,
-	Box
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
@@ -117,7 +115,7 @@ export default function Predict() {
 
 	const updateSelected = (game) => {
 
-		if (game.gameId != selected.gameId) {
+		if (game.gameId !== selected.gameId) {
 			setSelected(game)
 			setConfidence(true);
 			setPredictedTeamId(null);
@@ -164,7 +162,7 @@ export default function Predict() {
 					<HStack>
 						{games.map((game, index) => {
 							return (
-								<Button bg={selected.gameId == game.gameId ? 'blue.500' : 'blue.200'} w='100%' p={4} color='white' onClick={() => updateSelected(game)}>
+								<Button bg={selected.gameId === game.gameId ? 'blue.500' : 'blue.200'} w='100%' p={4} color='white' onClick={() => updateSelected(game)}>
 									Game {game.gameNumber} - {game.team1.shortName} v{" "}
 									{game.team2.shortName}{" "}
 								</Button>
@@ -177,13 +175,13 @@ export default function Predict() {
 							<HStack justifyContent='center'>
 								<Image
 									onClick={() => predictionForGame(selected.team1._id)}
-									src={`${process.env.PUBLIC_URL}/Logo/${selected.team1.shortName}${selected.team1._id == predictedTeamId ? " - Selected" : ""}.png`}
+									src={`${process.env.PUBLIC_URL}/Logo/${selected.team1.shortName}${selected.team1._id === predictedTeamId ? " - Selected" : ""}.png`}
 									alt={selected.team1.shortName}
 								/>
 
 								<Image
 									onClick={() => predictionForGame(selected.team2._id)}
-									src={`${process.env.PUBLIC_URL}/Logo/${selected.team2.shortName}${selected.team2._id == predictedTeamId ? " - Selected" : ""}.png`}
+									src={`${process.env.PUBLIC_URL}/Logo/${selected.team2.shortName}${selected.team2._id === predictedTeamId ? " - Selected" : ""}.png`}
 									alt={selected.team2.shortName}
 								/>
 

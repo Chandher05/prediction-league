@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
+  useLocation
 } from "react-router-dom";
 import Games from "../Pages/Admin/Games/Games";
 import Login from "../Pages/Admin/Login/Login";
@@ -101,6 +102,7 @@ function PrivateGoogleRoute({ children, ...rest }) {
   const setAuthId = useStoreActions((actions) => actions.setAuthId);
   const setUserName = useStoreActions((actions) => actions.setUserName);
   const setPhotoURL = useStoreActions((actions) => actions.setPhotoURL);
+
   console.log(`Autheticated - ${auth}`)
   // console.log(`User - ${user.getIdToken()}`)
 
