@@ -56,8 +56,9 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
             var gameNumber = gameObj.gameNumber
             var gameId = gameObj._id
             var gameStartTime = new Date(gameObj.startTime)
+            var gameStartHour = parseInt(gameStartTime.getHours()) + 5
 
-            htmlBody += '<h2>Game ' + gameNumber + ' <a href="' + config.APPLICATION_URL + '/predict/' + gameId + '">Predict now!</a> </h2> <h4>Scheduled start: ' + gameStartTime.getHours() + ':00 PM IST</h4>'
+            htmlBody += '<h2>Game ' + gameNumber + ' <a href="' + config.APPLICATION_URL + '/predict/' + gameId + '">Predict now!</a> </h2> <h4>Scheduled start: ' + gameStartHour + ':30 PM IST</h4>'
             for (var teamname of teamNames) {
                 imgAttachments.push({
                     filename: teamname + '.png',
