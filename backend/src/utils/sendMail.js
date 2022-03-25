@@ -6,7 +6,7 @@ import config from '../../config'
 var CronJob = require('cron').CronJob
 
 
-var job1 = new CronJob('20 0 * * *', async () => {
+var job1 = new CronJob('23 0 * * *', async () => {
     sendMail(24, "schedule")
 }, null, true, "Asia/Kolkata")
 
@@ -61,7 +61,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
             for (var teamname of teamNames) {
                 imgAttachments.push({
                     filename: teamname + '.png',
-                    path: __dirname + '../../logos/' + teamname + 'roundbig.png',
+                    path: __dirname + '/../logos/' + teamname + 'roundbig.png',
                     cid: teamname + 'logo'
                 })
                 htmlBody += ' <img src="cid:' + teamname + 'logo" />'
