@@ -94,7 +94,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
         // let subscribedUsers = ["jayasurya.pinaki@sjsu.edu", "chandher0596@gmail.com", "rsujith83@gmail.com"]
 
         for (var obj of subscribedUsers) {
-            mailOptions.to = obj
+            mailOptions.to = obj.email
             var info = await transporter.sendMail(mailOptions)
             console.log('Email sent to ' + obj.username + ': ' + info.response);
         }
