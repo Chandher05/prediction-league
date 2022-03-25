@@ -6,7 +6,7 @@ import config from '../../config'
 var CronJob = require('cron').CronJob
 
 
-var job1 = new CronJob('23 0 * * *', async () => {
+var job1 = new CronJob('0 0 * * *', async () => {
     sendMail(24, "schedule")
 }, null, true, "Asia/Kolkata")
 
@@ -95,7 +95,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
         for (var obj of subscribedUsers) {
             mailOptions.to = obj
             var info = await transporter.sendMail(mailOptions)
-            console.log('Email sent to ' + obj + ': ' + info.response);
+            console.log('Email sent to ' + obj.username + ': ' + info.response);
         }
 
     } catch (err) {
