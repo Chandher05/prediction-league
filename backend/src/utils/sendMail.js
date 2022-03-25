@@ -1,11 +1,12 @@
 import nodemailer from "nodemailer"
 import Game from '../models/mongoDB/game';
 import Team from '../models/mongoDB/team';
+import Users from '../models/mongoDB/users';
 import config from '../../config'
 var CronJob = require('cron').CronJob
 
 
-var job1 = new CronJob('0 0 * * *', async () => {
+var job1 = new CronJob('20 0 * * *', async () => {
     sendMail(24, "schedule")
 }, null, true, "Asia/Kolkata")
 

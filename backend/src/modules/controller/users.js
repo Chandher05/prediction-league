@@ -63,10 +63,10 @@ exports.addAdmin = async (req, res) => {
 		}
 
 		var typeOfStrategy = req.body.typeOfStrategy
-		if (typeOfStrategy !== constants.STRATEGY.BATTING_FIRST && typeOfStrategy !== constants.STRATEGY.BOWLING_FIRST && typeOfStrategy !== constants.STRATEGY.TOSS_WINNER) {
+		if (typeOfStrategy !== constants.STRATEGY.BATTING_FIRST && typeOfStrategy !== constants.STRATEGY.BOWLING_FIRST && typeOfStrategy !== constants.STRATEGY.TOSS_WINNER && typeOfStrategy !== constants.STRATEGY.TOSS_LOSER) {
 			return res
 			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-			.send("typeOfStrategy has to be TOSS_WINNER or BATTING_FIRST or BOWLING_FIRST")
+			.send("typeOfStrategy has to be TOSS_WINNER or BATTING_FIRST or BOWLING_FIRST or TOSS_LOSER")
 		}
 
 
@@ -179,10 +179,10 @@ exports.updateAdmin = async (req, res) => {
 		}
 
 		var typeOfStrategy = req.body.typeOfStrategy
-		if (typeOfStrategy !== constants.STRATEGY.BATTING_FIRST && typeOfStrategy !== constants.STRATEGY.BOWLING_FIRST && typeOfStrategy !== constants.STRATEGY.TOSS_WINNER) {
+		if (typeOfStrategy !== constants.STRATEGY.BATTING_FIRST && typeOfStrategy !== constants.STRATEGY.BOWLING_FIRST && typeOfStrategy !== constants.STRATEGY.TOSS_WINNER && typeOfStrategy !== constants.STRATEGY.TOSS_LOSER) {
 			return res
 			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-			.send("typeOfStrategy has to be TOSS_WINNER or BATTING_FIRST or BOWLING_FIRST")
+			.send("typeOfStrategy has to be TOSS_WINNER or BATTING_FIRST or BOWLING_FIRST or TOSS_LOSER")
 		}
 
 		var existingUser
