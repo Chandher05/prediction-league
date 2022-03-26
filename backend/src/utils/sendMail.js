@@ -6,7 +6,8 @@ import config from '../../config'
 var CronJob = require('cron').CronJob
 
 
-var job1 = new CronJob('0 0 * * *', async () => {
+var job1 = new CronJob('59 0 * * *', async () => {
+    console.log("HERE")
     sendMail(24, "schedule")
 }, null, true, "Asia/Kolkata")
 
@@ -80,9 +81,10 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
             }
         });
 
+        var currentIndiaTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })
         var mailOptions = {
             from: 'jayasurya1796@gmail.com',
-            subject: 'IPL Prediction league ' + typeOfEmail + ' ' + currentTime.getDate() + "/" + month,
+            subject: 'IPL Prediction League ' + typeOfEmail + ' ' + currentIndiaTime.substring(2, 4) + "/" + month,
             html: htmlBody + '<hr><a href="' + config.APPLICATION_URL + '/leaderboard">View Leaderboard</a> | <a href="' + config.APPLICATION_URL + '/predictions">Predict other games</a> | <a href="' + config.APPLICATION_URL + '/unsubscribe">Unsubscribe</a>',
             attachments: imgAttachments,
         };
