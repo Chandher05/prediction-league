@@ -13,6 +13,7 @@ const usersRouter = require('../src/modules/router/users');
 const gameRouter = require('../src/modules/router/game');
 const predictionRouter = require('../src/modules/router/prediction');
 const teamsRouter = require('../src/modules/router/teams');
+const statsRouter = require('../src/modules/router/stats');
 
 // database connections
 require('../src/models/mongoDB/index');
@@ -67,6 +68,7 @@ var checkAuth = async (req, res, next) => {
 }
 
 // base routes for modules
+app.use('/stats', statsRouter);
 app.use('/', checkAuth)
 app.use('/users', usersRouter);
 app.use('/game', gameRouter);

@@ -82,7 +82,7 @@ var sendMail = async (hoursOffset, typeOfEmail) => {
 
         var currentIndiaTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })
         var todayArr = currentIndiaTime.split("/")
-        var todayDate = todayArr[0]
+        var todayDate = todayArr[1]
         var mailOptions = {
             from: 'jayasurya1796@gmail.com',
             subject: 'IPL Prediction League ' + typeOfEmail + ' ' + todayDate + "/" + month,
