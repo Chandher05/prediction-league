@@ -57,7 +57,7 @@ import constants from '../../utils/constants';
 			returnData.push({
 				gameNumber: game.gameNumber,
 				teamsPlaying: [teamObj[game.team1].fullName, teamObj[game.team2].fullName],
-				winner: teamObj[game.winner].fullName,
+				winner: game.winner? teamObj[game.winner].fullName: "",
 				predictions: predictionData
 			})
 		}
