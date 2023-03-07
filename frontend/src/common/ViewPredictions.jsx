@@ -21,7 +21,7 @@ function ViewPredictions({ gameId }) {
 
   useEffect(() => {
     if (!gameId || !isOpen) return;
-    fetch(`${process.env.REACT_APP_API}/prediction/game/${gameId}`, {
+    fetch(`${process.env.REACT_APP_API_BE}/prediction/game/${gameId}`, {
       headers: {
         Authorization: `Bearer ${authId}`,
       }}).then(

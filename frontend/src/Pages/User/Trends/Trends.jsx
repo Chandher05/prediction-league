@@ -28,7 +28,7 @@ function Trends() {
     return color;
   }
   const getLeaderboard = () => {
-    fetch(process.env.REACT_APP_API + "/prediction/graph", {
+    fetch(process.env.REACT_APP_API_BE + "/prediction/graph", {
       headers: {
         Authorization: `Bearer ${authId}`,
       },

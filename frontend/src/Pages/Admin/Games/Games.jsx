@@ -37,7 +37,7 @@ function Games() {
   const authId = useStoreState((state) => state.authId);
 
   const getGames = () => {
-    fetch(process.env.REACT_APP_API + "/game/all", {
+    fetch(process.env.REACT_APP_API_BE + "/game/all", {
       headers: {
         Authorization: `Bearer ${authId}`,
       },
@@ -56,7 +56,7 @@ function Games() {
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
-        {/* <AddGameModal onCloseCall={getGames}></AddGameModal> */}
+        <AddGameModal onCloseCall={getGames}></AddGameModal>
         <Button onClick={getGames}>Refresh</Button>
         <Button onClick={navToUser}>Users Table</Button>
       </HStack>
@@ -110,7 +110,7 @@ function AddGameModal({ onCloseCall }) {
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
     console.log(data);
-    fetch(process.env.REACT_APP_API + "/game/add", {
+    fetch(process.env.REACT_APP_API_BE + "/game/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -202,7 +202,7 @@ function UpdateGameModal({ game }) {
     },
   });
   const onSubmit = (data) => {
-    fetch(process.env.REACT_APP_API + "/game/update", {
+    fetch(process.env.REACT_APP_API_BE + "/game/update", {
       method: "PUT", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -295,7 +295,7 @@ function DeleteConfirmModal({ gameId }) {
 
   const delGame = () => {
     if (!gameId) return;
-    fetch(`${process.env.REACT_APP_API}/game/delete/${gameId}`, {
+    fetch(`${process.env.REACT_APP_API_BE}/game/delete/${gameId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

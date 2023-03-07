@@ -26,7 +26,7 @@ function Predictions() {
   const authId = useStoreState((state) => state.authId);
 
   const getPredictions = () => {
-    fetch(`${process.env.REACT_APP_API}/prediction/user`, {
+    fetch(`${process.env.REACT_APP_API_BE}/prediction/user`, {
       headers: {
         Authorization: `Bearer ${authId}`,
       },

@@ -29,7 +29,7 @@ function Users() {
   const [users, setUsers] = useState([]);
   const authId = useStoreState((state) => state.authId);
   const getUsers = () => {
-    fetch(process.env.REACT_APP_API+"/users/all", {
+    fetch(process.env.REACT_APP_API_BE+"/users/all", {
       headers: {
         Authorization: `Bearer ${authId}`,
       }}).then(async (response) => {
@@ -86,7 +86,7 @@ function AddUserModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
-    fetch(process.env.REACT_APP_API+"/users/add", {
+    fetch(process.env.REACT_APP_API_BE+"/users/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",

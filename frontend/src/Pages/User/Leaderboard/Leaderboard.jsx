@@ -22,7 +22,7 @@ function Leaderboard() {
   const [games, setGames] = useState([]);
   const [showStrategies, setShowStrategies] = useState(false);
   const getLeaderboard = () => {
-    fetch(process.env.REACT_APP_API + "/prediction/leaderboard", {
+    fetch(process.env.REACT_APP_API_BE + "/prediction/leaderboard", {
       headers: {
         Authorization: `Bearer ${authId}`,
       },

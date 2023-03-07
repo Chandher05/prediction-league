@@ -20,7 +20,7 @@ function Unsubscribe() {
   const [nextGame, setNextGame] = useState(null);
 
   useEffect(() => {
-    fetch(process.env.REACT_APP_API + "/users/unsubscribe", {
+    fetch(process.env.REACT_APP_API_BE + "/users/unsubscribe", {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -47,7 +47,7 @@ function Unsubscribe() {
 
 
   const resubscribe = () => {
-    fetch(process.env.REACT_APP_API + "/users/resubscribe", {
+    fetch(process.env.REACT_APP_API_BE + "/users/resubscribe", {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${authId}`,

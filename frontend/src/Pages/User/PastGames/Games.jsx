@@ -26,7 +26,7 @@ function PastGames() {
 
   useEffect(() => {
     const getGames = async () => {
-      fetch(process.env.REACT_APP_API + "/game/completed", {
+      fetch(process.env.REACT_APP_API_BE + "/game/completed", {
         headers: {
           Authorization: `Bearer ${authId}`,
         },

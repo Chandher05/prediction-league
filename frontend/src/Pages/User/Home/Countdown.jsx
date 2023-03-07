@@ -18,7 +18,7 @@ function Countdown() {
   const [timeLeft, setTimeLeft] = useState({});
 
   useEffect(() => {
-    fetch(process.env.REACT_APP_API + "/game/scheduled", {
+    fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
       headers: {
         Authorization: `Bearer ${authId}`,
       },
@@ -70,7 +70,7 @@ function CountDownClock({ timeLeft, nextGame }) {
         minW={"350px"}
         maxW={"500px"}
         w={"full"}
-        bg={useColorModeValue("blue.200", "gray.800")}
+        bg={useColorModeValue("purple.200", "gray.800")}
         boxShadow={"2xl"}
         rounded={"md"}
         overflow={"hidden"}
@@ -84,10 +84,10 @@ function CountDownClock({ timeLeft, nextGame }) {
           <Text
             fontSize={"sm"}
             fontWeight={500}
-            bg={useColorModeValue("blue.50", "blue.900")}
+            bg={useColorModeValue("purple.50", "purple.900")}
             p={2}
             px={3}
-            color={"blue.500"}
+            color={"purple.500"}
             // rounded={"full"}
           >
             No. {nextGame?.gameNumber} :{" "}

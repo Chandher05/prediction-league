@@ -14,7 +14,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_API_FIREBASE,
+  apiKey: "AIzaSyAvItmkd0u1tanvH7Vzw-xSRSPfsT1_9UI",
   authDomain: process.env.REACT_APP_API_FIREBASE_PROJECT_AUTH_DOMAIN,
   projectId: process.env.REACT_APP_API_FIREBASE,
   appId: process.env.REACT_APP_API_FIREBASE_PROJECT_ID,
@@ -31,7 +31,7 @@ const signInWithGoogle = async () => {
     const res = await signInWithPopup(auth, googleProvider);
     const user = res.user;
     await user.getIdToken().then(function (idToken) {  // <------ Check this line
-      fetch(`${process.env.REACT_APP_API}/users/login`, {
+      fetch(`${process.env.REACT_APP_API_BE}/users/login`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },

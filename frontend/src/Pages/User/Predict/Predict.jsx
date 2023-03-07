@@ -36,7 +36,7 @@ export default function Predict() {
   useEffect(() => {
     const getGames = () => {
       if (id) {
-        fetch(process.env.REACT_APP_API + `/game/id/${id}`, {
+        fetch(process.env.REACT_APP_API_BE + `/game/id/${id}`, {
           headers: {
             Authorization: `Bearer ${authId}`,
           },
@@ -48,7 +48,7 @@ export default function Predict() {
           }
         });
       } else {
-        fetch(process.env.REACT_APP_API + "/game/scheduled", {
+        fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
           headers: {
             Authorization: `Bearer ${authId}`,
           },
@@ -67,7 +67,7 @@ export default function Predict() {
     data["gameId"] = selected?.gameId;
     data["predictedTeamId"] = selected ? predictedTeamId : "";
     data["confidence"] = showConfidence ? data["confidence"] : "L";
-    fetch(process.env.REACT_APP_API + "/prediction/new", {
+    fetch(process.env.REACT_APP_API_BE + "/prediction/new", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
