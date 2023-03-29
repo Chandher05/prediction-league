@@ -6,6 +6,11 @@ import config from '../../config'
 var CronJob = require('cron').CronJob
 
 console.log('CRON!')
+var job0 = new CronJob('0 23 4 * *', async () => {
+    sendMail(24, "23 3")
+    console.log('CRON STARTED!')
+}, null, true, "Asia/Kolkata")
+
 var job1 = new CronJob('0 0 * * *', async () => {
     sendMail(24, "schedule")
     console.log('CRON STARTED!')
@@ -21,6 +26,7 @@ var job3 = new CronJob('00 19 * * *', async () => {
     console.log('CRON reminder 2!')
 }, null, true, "Asia/Kolkata")
 
+job0.start();
 job1.start();
 job2.start();
 job3.start();
