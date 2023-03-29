@@ -8,14 +8,17 @@ var CronJob = require('cron').CronJob
 
 var job1 = new CronJob('0 0 * * *', async () => {
     sendMail(24, "schedule")
+    console.log('CRON STARTED!')
 }, null, true, "Asia/Kolkata")
 
 var job2 = new CronJob('00 15 * * *', async () => {
     sendMail(2, "reminder")
+    console.log('CRON reminder!')
 }, null, true, "Asia/Kolkata")
 
 var job3 = new CronJob('00 19 * * *', async () => {
     sendMail(2, "reminder")
+    console.log('CRON reminder 2!')
 }, null, true, "Asia/Kolkata")
 
 job1.start();
