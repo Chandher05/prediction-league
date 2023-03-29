@@ -42,7 +42,7 @@ function Leaderboard() {
       <VStack w="full" h="full" p={4} spacing={10}>
         <HStack spacing={3} alignItems="justify-center">
           <Button
-            color="blue.400"
+            color="blue.300"
             borderRadius="10px"
             size="sm"
             onClick={() => history.push("/")}
@@ -70,7 +70,7 @@ function Leaderboard() {
             {games.map((row, index) => {
               if ((showStrategies && row.isAdmin) || !row.isAdmin) {
                 return (
-                  <Tr backgroundColor={row.isAdmin ? "blue.200" : 'blue.500'}>
+                  <Tr backgroundColor={row.isAdmin ? "blue.400" : 'blue.200'}>
                     <Td>{row.position}</Td>
                     <Td>{row.username}</Td>
                     <Td>{row.score.toFixed(7)}</Td>
