@@ -5,7 +5,7 @@ import Users from '../models/mongoDB/users';
 import config from '../../config'
 var CronJob = require('cron').CronJob
 
-
+console.log('CRON!')
 var job1 = new CronJob('0 0 * * *', async () => {
     sendMail(24, "schedule")
     console.log('CRON STARTED!')
