@@ -17,7 +17,7 @@ import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
 import Trends from "../Pages/User/Trends/Trends";
 import Unsubscribe from "../common/Unsubscribe";
-import { auth } from "../Firebase/config";
+import { auth, logout } from "../Firebase/config";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useStoreActions } from 'easy-peasy';
 
@@ -109,14 +109,19 @@ function PrivateGoogleRoute({ children, ...rest }) {
   useEffect(() => {
     const idToken = async () => {
       // console.log(await user.getIdToken())
-      
+
+      if(user) {
         await user?.getIdToken().then(function (idToken) {  // <------ Check this line
           console.log(idToken); // It shows the Firebase token now
           setAuthId({authId: idToken});
           return idToken;
         });
+        console.log(user)
         setUserName({userName: user.displayName})
         setPhotoURL({photoURL: user.photoURL})
+
+      }
+      
       
     }
     idToken();
@@ -130,7 +135,7 @@ function PrivateGoogleRoute({ children, ...rest }) {
     return 'loading'
   }
   if (error) {
-    signOut(auth);
+    logout(auth);
     return 'Something has gone wrong'
   }
 

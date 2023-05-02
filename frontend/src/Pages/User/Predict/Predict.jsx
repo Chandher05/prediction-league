@@ -31,7 +31,7 @@ export default function Predict() {
   const { register, handleSubmit } = useForm();
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
-  const photoURL = useStoreState((state) => state.photoURL);
+  const photoURL = useStoreState((state) => state?.photoURL);
 
   useEffect(() => {
     const getGames = () => {
@@ -84,7 +84,7 @@ export default function Predict() {
       .then((data) => {
         toast({
           title: "You have predicted the future",
-          description: "Hopefully it is the right future",
+          description: "May the force be with you!",
           status: "success",
           duration: 3000,
           isClosable: true,
