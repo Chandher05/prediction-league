@@ -107,20 +107,22 @@ function PrivateGoogleRoute({ children, ...rest }) {
   // console.log(`User - ${user.getIdToken()}`)
 
   useEffect(() => {
-
     const idToken = async () => {
       // console.log(await user.getIdToken())
-      if (user) {
-        await user.getIdToken().then(function (idToken) {  // <------ Check this line
+      
+        await user?.getIdToken().then(function (idToken) {  // <------ Check this line
           console.log(idToken); // It shows the Firebase token now
           setAuthId({authId: idToken});
           return idToken;
         });
         setUserName({userName: user.displayName})
         setPhotoURL({photoURL: user.photoURL})
-      }
+      
     }
-    idToken()
+    idToken();
+    // return () => {
+    //   signOut(auth);
+    // }
   }, [user, setAuthId])
 
 
@@ -128,6 +130,7 @@ function PrivateGoogleRoute({ children, ...rest }) {
     return 'loading'
   }
   if (error) {
+    signOut(auth);
     return 'Something has gone wrong'
   }
 
