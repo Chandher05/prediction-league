@@ -4,7 +4,7 @@ import {
   Switch,
   Route,
   Redirect,
-  useLocation
+  // useLocation
 } from "react-router-dom";
 import Games from "../Pages/Admin/Games/Games";
 import Login from "../Pages/Admin/Login/Login";
@@ -128,7 +128,7 @@ function PrivateGoogleRoute({ children, ...rest }) {
     // return () => {
     //   signOut(auth);
     // }
-  }, [user, setAuthId])
+  }, [user, setAuthId, setUserName, setPhotoURL])
 
 
   if (loading) {

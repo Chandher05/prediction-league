@@ -16,6 +16,15 @@ function Countdown() {
 
   const [nextGame, setNextGame] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
+  const color = () => {
+    if (
+      nextGame.team1.shortName == "RCB" ||
+      nextGame.team2.shortName == "RCB"
+    ) {
+      return "red";
+    }
+    return "blue";
+  };
 
   useEffect(() => {
     fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
@@ -50,6 +59,7 @@ function Countdown() {
         <CountDownClock
           timeLeft={timeLeft}
           nextGame={nextGame}
+          color={color()}
         ></CountDownClock>
       )}
     </Box>
@@ -63,14 +73,14 @@ const checkTime = (timeLeft) => {
   return false;
 };
 
-function CountDownClock({ timeLeft, nextGame }) {
+function CountDownClock({ timeLeft, nextGame, color }) {
   return (
     <Center>
       <Box
         minW={"350px"}
         maxW={"500px"}
         w={"full"}
-        bg={useColorModeValue("blue.200", "gray.800")}
+        bg={useColorModeValue(`${color}.200`, "gray.800")}
         boxShadow={"2xl"}
         rounded={"md"}
         overflow={"hidden"}
@@ -84,10 +94,10 @@ function CountDownClock({ timeLeft, nextGame }) {
           <Text
             fontSize={"sm"}
             fontWeight={500}
-            bg={useColorModeValue("blue.50", "blue.900")}
+            bg={useColorModeValue(`${color}.50`, `${color}.900`)}
             p={2}
             px={3}
-            color={"blue.500"}
+            color={`${color}.500`}
             // rounded={"full"}
           >
             No. {nextGame?.gameNumber} :{" "}

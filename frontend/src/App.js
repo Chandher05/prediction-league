@@ -2,6 +2,7 @@ import Routes from "./Providers/Routes";
 import { useStoreRehydrated, StoreProvider } from "easy-peasy";
 import { store } from './Providers/Store';
 import { Center, CircularProgress } from "@chakra-ui/react";
+import "./App.css";
 
 function WaitForStateRehydration({ children }) {
   const isRehydrated = useStoreRehydrated();

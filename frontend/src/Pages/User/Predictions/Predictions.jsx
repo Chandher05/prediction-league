@@ -11,7 +11,7 @@ import {
   Button,
   useToast,
   useColorModeValue,
-  Select
+  Select,
 } from "@chakra-ui/react";
 import { useStoreState } from "easy-peasy";
 import { useEffect, useState } from "react";
@@ -33,14 +33,14 @@ function Predictions() {
     }).then(async (response) => {
       if (response.ok) {
         const result = await response.json();
-        let allTeamsFromResponse = new Set(["Show all"])
+        let allTeamsFromResponse = new Set(["Show all"]);
 
         for (var game of result.predictions) {
-          allTeamsFromResponse.add(game.team1.fullName)
-          allTeamsFromResponse.add(game.team2.fullName)
+          allTeamsFromResponse.add(game.team1.fullName);
+          allTeamsFromResponse.add(game.team2.fullName);
         }
-        setAllTeams(Array.from(allTeamsFromResponse))
-        setSelectedTeam("Show all")
+        setAllTeams(Array.from(allTeamsFromResponse));
+        setSelectedTeam("Show all");
         setGames(result.predictions);
       } else {
         toast({
@@ -79,12 +79,13 @@ function Predictions() {
           </Heading>
         </HStack>
 
-        <Select selected={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)}>
-          {
-            allTeams.map((team) => {
-              return <option value={team}>{team}</option>
-            })
-          }
+        <Select
+          selected={selectedTeam}
+          onChange={(e) => setSelectedTeam(e.target.value)}
+        >
+          {allTeams.map((team) => {
+            return <option value={team}>{team}</option>;
+          })}
         </Select>
 
         <Table variant="striped" colorScheme="blue" size="sm">
@@ -100,7 +101,11 @@ function Predictions() {
           {games && games.length > 0 ? (
             <Tbody>
               {games.map((game) => {
-                if (selectedTeam == "Show all" || selectedTeam == game.team1.fullName || selectedTeam == game.team2.fullName) {
+                if (
+                  selectedTeam === "Show all" ||
+                  selectedTeam === game.team1.fullName ||
+                  selectedTeam === game.team2.fullName
+                ) {
                   return (
                     <Tr id={game.gameNumber}>
                       <Td>{game.gameNumber}</Td>
@@ -110,7 +115,7 @@ function Predictions() {
                       <Td>{game.winner.shortName}</Td>
                     </Tr>
                   );
-                }
+                } else return <div>Not Found</div>;
               })}
             </Tbody>
           ) : null}

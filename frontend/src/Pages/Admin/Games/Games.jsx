@@ -48,7 +48,7 @@ function Games() {
 
   useEffect(() => {
     getGames();
-  }, []);
+  }, [getGames]);
   const navToUser = () => {
     history.push("/admin/Users");
   };
@@ -191,14 +191,14 @@ function UpdateGameModal({ game }) {
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       // startTime: toDatetimeLocal(game.startTime) || '',
-      gameId: game.gameId,      
+      gameId: game.gameId,
       toss: game?.toss?._id,
       battingFirst: game?.battingFirst?._id,
       winner: game?.winner?._id,
       gameNumber: game.gameNumber,
       team1: game.team1?._id,
       team2: game.team2?._id,
-      startTime: game?.startTime
+      startTime: game?.startTime,
     },
   });
   const onSubmit = (data) => {
@@ -237,11 +237,11 @@ function UpdateGameModal({ game }) {
               <FormControl mt={4}>
                 <FormLabel>Team 2</FormLabel>
                 <Input placeholder="Team 2" {...register("team2.fullName")} />
-              </FormControl>*/} 
+              </FormControl>*/}
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
                 <Input type="datetime-local" {...register("startTime")} />
-              </FormControl> 
+              </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Winner</FormLabel>
                 <Select {...register("winner")}>

@@ -32,16 +32,16 @@ function PastGames() {
         },
       }).then(async (response) => {
         if (response.ok) {
-          const completedGames = await response.json()
+          const completedGames = await response.json();
 
-          let allTeamsFromResponse = new Set(["Show all"])
+          let allTeamsFromResponse = new Set(["Show all"]);
 
           for (var game of completedGames) {
-            allTeamsFromResponse.add(game.team1.fullName)
-            allTeamsFromResponse.add(game.team2.fullName)
+            allTeamsFromResponse.add(game.team1.fullName);
+            allTeamsFromResponse.add(game.team2.fullName);
           }
-          setAllTeams(Array.from(allTeamsFromResponse))
-          setSelectedTeam("Show all")
+          setAllTeams(Array.from(allTeamsFromResponse));
+          setSelectedTeam("Show all");
           setGames(completedGames);
         }
       });
@@ -77,12 +77,13 @@ function PastGames() {
           </Heading>
         </HStack>
 
-        <Select selected={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)}>
-          {
-            allTeams.map((team) => {
-              return <option value={team}>{team}</option>
-            })
-          }
+        <Select
+          selected={selectedTeam}
+          onChange={(e) => setSelectedTeam(e.target.value)}
+        >
+          {allTeams.map((team) => {
+            return <option value={team}>{team}</option>;
+          })}
         </Select>
 
         <Table variant="striped" colorScheme="blue" size="sm">
@@ -99,7 +100,11 @@ function PastGames() {
           <Tbody>
             {games
               .map((game, index) => {
-                if (selectedTeam == "Show all" || selectedTeam == game.team1.fullName || selectedTeam == game.team2.fullName) {
+                if (
+                  selectedTeam === "Show all" ||
+                  selectedTeam === game.team1.fullName ||
+                  selectedTeam === game.team2.fullName
+                ) {
                   return (
                     <Tr key={index}>
                       <Td>{game.gameNumber}</Td>

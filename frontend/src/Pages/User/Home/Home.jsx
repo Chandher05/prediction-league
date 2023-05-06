@@ -1,10 +1,11 @@
 import {
-  Flex,
   Container,
   Heading,
   Stack,
   Text,
   Button,
+  Center,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { useHistory } from "react-router";
 import { Illustration } from "./Illustration";
@@ -17,9 +18,9 @@ export default function Home() {
   const navTo = (route) => {
     history.push(`/${route}`);
   };
- 
+
   return (
-    <Container maxW={"2xl"}>
+    <Container maxW={"full"}>
       <Stack
         textAlign={"center"}
         align={"center"}
@@ -30,15 +31,13 @@ export default function Home() {
           fontWeight={600}
           fontSize={{ base: "3xl", sm: "2xl", md: "4xl" }}
           lineHeight={"110%"}
+          className="neon"
         >
           PREDICTION LEAGUE{" "}
           <Text as={"span"} color={"blue.600"}>
             IPL 2023
           </Text>
         </Heading>
-        <div>
-          <Countdown ></Countdown>
-        </div>
         <Button
           rounded={"full"}
           px={6}
@@ -50,60 +49,65 @@ export default function Home() {
         >
           Predict Now
         </Button>
-        <Stack spacing={6} direction={ "column" }>
-          <Button
-            rounded={"full"}
-            colorScheme={"blue"}
-            px={6}
-            onClick={() => navTo("leaderboard")}
-          >
-            Leaderboard
-          </Button>
-          <Button
-            rounded={"full"}
-            colorScheme={"blue"}
-            px={6}
-            onClick={() => navTo("predictions")}
-          >
-            Your Predictions
-          </Button>
-          <Button
-            rounded={"full"}
-            px={6}
-            colorScheme={"blue"}
-            onClick={() => navTo("PastGames")}
-          >
-            All Games
-          </Button>
-          <Button
-            rounded={"full"}
-            px={6}
-            colorScheme={"blue"}
-            onClick={() => navTo("trends")}
-          >
-            Trends
-          </Button>
-          <Button
-            rounded={"full"}
-            px={6}
-            colorScheme={"red"}
-            onClick={() => {
-              logout();
-              history.push('/login')
-            }}
-          >
-            Log out
-          </Button>
-        </Stack>
-        <Flex w={"full"}>
+
+        <>
+          <Center>
+            <Countdown></Countdown>
+          </Center>
+          <SimpleGrid columns={[1, 5]} spacingY={3} spacingX={3}>
+            <Button
+              rounded={"full"}
+              colorScheme={"blue"}
+              px={6}
+              onClick={() => navTo("leaderboard")}
+            >
+              Leaderboard
+            </Button>
+            <Button
+              rounded={"full"}
+              colorScheme={"blue"}
+              px={6}
+              onClick={() => navTo("predictions")}
+            >
+              Your Predictions
+            </Button>
+            <Button
+              rounded={"full"}
+              px={6}
+              colorScheme={"blue"}
+              onClick={() => navTo("PastGames")}
+            >
+              All Games
+            </Button>
+            <Button
+              rounded={"full"}
+              px={6}
+              colorScheme={"blue"}
+              onClick={() => navTo("trends")}
+            >
+              Trends
+            </Button>
+            <Button
+              rounded={"full"}
+              px={6}
+              colorScheme={"red"}
+              onClick={() => {
+                logout();
+                history.push("/login");
+              }}
+            >
+              Log out
+            </Button>
+          </SimpleGrid>
+        </>
+
+        <Center w={"full"}>
           <Illustration
-            height={{ sm: "18rem", lg: "19rem" }}
-            mt={{ base: 12, sm: 16 }}
+          // height={{ sm: "5srem", lg: "10rem" }}÷
+          // mt={{ base: 0, sm: 0 }}
           />
-        </Flex>
+        </Center>
       </Stack>
     </Container>
   );
 }
-
-

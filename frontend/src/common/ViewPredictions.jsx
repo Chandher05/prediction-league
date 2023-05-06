@@ -24,16 +24,17 @@ function ViewPredictions({ gameId }) {
     fetch(`${process.env.REACT_APP_API_BE}/prediction/game/${gameId}`, {
       headers: {
         Authorization: `Bearer ${authId}`,
-      }}).then(
-      async (response) => {
-        if (response.ok) setPredictions(await response.json());
-      }
-    );
-  }, [gameId, isOpen]);
+      },
+    }).then(async (response) => {
+      if (response.ok) setPredictions(await response.json());
+    });
+  }, [gameId, isOpen, authId]);
 
   return (
     <>
-      <Button m={1} variant="ghost" size="sm" onClick={onOpen}><ViewIcon></ViewIcon> </Button>
+      <Button m={1} variant="ghost" size="sm" onClick={onOpen}>
+        <ViewIcon></ViewIcon>{" "}
+      </Button>
 
       <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalOverlay />
@@ -58,9 +59,9 @@ function ViewPredictions({ gameId }) {
                       <Td>
                         {" "}
                         {record.prediction.map((rec) => (
-                          <p>{`${rec.predictedTeam.fullName} - ${rec.confidence} - ${
-                            rec.isConsidered ? "Yes" : "No"
-                          }`}</p>
+                          <p>{`${rec.predictedTeam.fullName} - ${
+                            rec.confidence
+                          } - ${rec.isConsidered ? "Yes" : "No"}`}</p>
                         ))}
                       </Td>
                     </Tr>
