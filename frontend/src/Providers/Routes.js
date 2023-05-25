@@ -17,18 +17,19 @@ import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
 import Trends from "../Pages/User/Trends/Trends";
 import Unsubscribe from "../common/Unsubscribe";
+import HallOfFame from "../Pages/User/HallOfFame";
 import { auth, logout } from "../Firebase/config";
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { useStoreActions } from 'easy-peasy';
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useStoreActions } from "easy-peasy";
 
 function Routes() {
   const [authenticated, setAuth] = useState(false);
   const handleAuth = (value) => {
-    setAuth(value)
-  }
+    setAuth(value);
+  };
 
   return (
-    <Router >
+    <Router>
       <Switch>
         <PrivateRoute authenticated={authenticated} path="/admin/Users">
           <User></User>
@@ -58,6 +59,9 @@ function Routes() {
         <PrivateGoogleRoute path="/trends">
           <Trends />
         </PrivateGoogleRoute>
+        <PrivateGoogleRoute path="/halloffame">
+          <HallOfFame />
+        </PrivateGoogleRoute>
         <PrivateGoogleRoute path="/unsubscribe">
           <Unsubscribe />
         </PrivateGoogleRoute>
@@ -69,29 +73,26 @@ function Routes() {
         </PrivateGoogleRoute>
       </Switch>
     </Router>
-  )
+  );
 }
 
 export default Routes;
 
 function PrivateRoute({ authenticated, children, ...rest }) {
-
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        authenticated
-          ? (
-            children
-          )
-          : (
-            <Redirect
-              to={{
-                pathname: "/admin/",
-                state: { from: location }
-              }}
-            />
-          )
+        authenticated ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/admin/",
+              state: { from: location },
+            }}
+          />
+        )
       }
     />
   );
@@ -103,60 +104,54 @@ function PrivateGoogleRoute({ children, ...rest }) {
   const setUserName = useStoreActions((actions) => actions.setUserName);
   const setPhotoURL = useStoreActions((actions) => actions.setPhotoURL);
 
-  console.log(`Autheticated - ${auth}`)
+  console.log(`Autheticated - ${auth}`);
   // console.log(`User - ${user.getIdToken()}`)
 
   useEffect(() => {
     const idToken = async () => {
       // console.log(await user.getIdToken())
 
-      if(user) {
-        await user?.getIdToken().then(function (idToken) {  // <------ Check this line
+      if (user) {
+        await user?.getIdToken().then(function (idToken) {
+          // <------ Check this line
           console.log(idToken); // It shows the Firebase token now
-          setAuthId({authId: idToken});
+          setAuthId({ authId: idToken });
           return idToken;
         });
-        console.log(user)
-        setUserName({userName: user.displayName})
-        setPhotoURL({photoURL: user.photoURL})
-
+        console.log(user);
+        setUserName({ userName: user.displayName });
+        setPhotoURL({ photoURL: user.photoURL });
       }
-      
-      
-    }
+    };
     idToken();
     // return () => {
     //   signOut(auth);
     // }
-  }, [user, setAuthId, setUserName, setPhotoURL])
-
+  }, [user, setAuthId, setUserName, setPhotoURL]);
 
   if (loading) {
-    return 'loading'
+    return "loading";
   }
   if (error) {
     logout(auth);
-    return 'Something has gone wrong'
+    return "Something has gone wrong";
   }
 
   return (
     <Route
       {...rest}
       render={({ location }) =>
-        user
-          ? (
-            children
-          )
-          : (
-            <Redirect
-              to={{
-                pathname: "/login",
-                state: { from: location }
-              }}
-            />
-          )
+        user ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location },
+            }}
+          />
+        )
       }
     />
   );
 }
-

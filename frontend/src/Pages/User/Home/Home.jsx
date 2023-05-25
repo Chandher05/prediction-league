@@ -90,15 +90,23 @@ export default function Home() {
             <Button
               rounded={"full"}
               px={6}
-              colorScheme={"red"}
-              onClick={() => {
-                logout();
-                history.push("/login");
-              }}
+              colorScheme={"blue"}
+              onClick={() => navTo("halloffame")}
             >
-              Log out
+              Hall of Fame
             </Button>
           </SimpleGrid>
+          <Button
+            rounded={"full"}
+            px={6}
+            colorScheme={"red"}
+            onClick={() => {
+              logout();
+              history.push("/login");
+            }}
+          >
+            Log out
+          </Button>
         </>
 
         <Center w={"full"}>
