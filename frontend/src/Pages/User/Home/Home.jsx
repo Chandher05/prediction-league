@@ -33,9 +33,9 @@ export default function Home() {
           lineHeight={"110%"}
           className="neon"
         >
-          PREDICTION LEAGUE{" "}
-          <Text as={"span"} color={"blue.600"}>
-            IPL 2023
+          ICC WORLD CUP 2023 <br />
+          <Text as={"span"} color={"blue.500"} py={{ base: 20 }}>
+            PREDICTION LEAGUE
           </Text>
         </Heading>
         <Button

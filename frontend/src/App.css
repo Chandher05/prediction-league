@@ -10,3 +10,8 @@
     0 0 100px rgb(0, 174, 255),
     0 0 150px rgb(0, 174, 255);
 }
+
+
+#root {
+  background-color: linear-gradient(#e66465, #9198e5)!;
+}

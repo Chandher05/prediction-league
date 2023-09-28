@@ -19,32 +19,39 @@ function HallOfFame() {
   const history = useHistory();
   const getWinners = [
     {
-      winner: "Abhishek Gupta",
-      year: "2020",
-      event: "IPL 2020",
+      winners: ["🥇Prajwal Prasad", "🥈Barath C", "🥉Jayasurya P"],
+      year: "2023",
+      event: "IPL",
     },
     {
-      winner: "Jayasurya P",
-      year: "2021",
-      event: "World Cup 2020",
+      winners: ["🥇Sujith R", "🥈Chandher Shekar", "🥉Abhishek Gupta"],
+      year: "2023",
+      event: "WPL",
     },
     {
-      winner: "Sujith KM",
+      winners: ["🥇KAUSHAL DONGRE", "🥈Jayasurya Pinaki", "🥉Barath C"],
       year: "2022",
-      event: "WPL 2020",
+      event: "IPL",
+    },
+    {
+      winners: ["🥇Sujith", "🥈Abhishek Gupta", "🥉Barath C"],
+      year: "2021",
+      event: "T20 World Cup",
+    },
+    {
+      winners: ["🥇Abhishek Gupta"],
+      year: "2021",
+      event: "IPL",
     },
   ];
   return (
-    <Flex
-      minH={"100vh"}
-      justify={"center"}
-      bg={useColorModeValue("white", "gray.800")}
-    >
-      <VStack w="full" h="full" p={4} spacing={10}>
+    <Flex minH={"100vh"} justify={"center"}>
+      <VStack w="full" h="full" p={4} spacing={10} bg={"blue.200"}>
         <HStack spacing={3} alignItems="justify-center">
           <Button
             color="blue.300"
             borderRadius="10px"
+            borderColor={"blue.100"}
             size="sm"
             onClick={() => history.push("/")}
           >
@@ -54,9 +61,9 @@ function HallOfFame() {
             Hall Of Fame
           </Heading>
         </HStack>
-        {getWinners.map(({ winner, year, event }) => {
+        {getWinners.map(({ winners, year, event }) => {
           return (
-            <FameCard winner={winner} year={year} event={event}></FameCard>
+            <FameCard winners={winners} year={year} event={event}></FameCard>
           );
         })}
       </VStack>

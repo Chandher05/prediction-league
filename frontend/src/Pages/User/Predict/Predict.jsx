@@ -157,6 +157,7 @@ export default function Predict() {
             borderRadius="full"
             src={photoURL}
             alt="Profile photo"
+            border={"2px"}
           />
           <Text fontSize="25px">{userName}</Text>
         </HStack>
@@ -184,15 +185,32 @@ export default function Predict() {
           {selected.team1 && selected.team2 ? (
             <Box borderWidth="1px" borderRadius="lg" m={2}>
               <HStack justifyContent="center">
+                <div>
+                  <Image
+                    onClick={() => predictionForGame(selected.team1._id)}
+                    src={`${process.env.PUBLIC_URL}/Logo/${
+                      selected.team1.shortName
+                    }${
+                      selected.team1._id === predictedTeamId
+                        ? " - Selected"
+                        : ""
+                    }.png`}
+                    alt={selected.team1.shortName}
+                    width="100px"
+                    border={"2px"}
+                    borderColor={
+                      selected.team1._id === predictedTeamId && "green.400"
+                    }
+                  />
+                </div>
+
                 <Image
-                  onClick={() => predictionForGame(selected.team1._id)}
-                  src={`${process.env.PUBLIC_URL}/Logo/${
-                    selected.team1.shortName
-                  }${
-                    selected.team1._id === predictedTeamId ? " - Selected" : ""
+                  onClick={() => predictionForGame("Leave")}
+                  src={`${process.env.PUBLIC_URL}/Logo/Leave${
+                    showConfidence ? "" : " - Selected"
                   }.png`}
-                  alt={selected.team1.shortName}
-                  width="100px"
+                  alt={selected.team2.shortName}
+                  height="100px"
                 />
 
                 <Image
@@ -204,15 +222,10 @@ export default function Predict() {
                   }.png`}
                   alt={selected.team2.shortName}
                   width="100px"
-                />
-
-                <Image
-                  onClick={() => predictionForGame("Leave")}
-                  src={`${process.env.PUBLIC_URL}/Logo/Leave${
-                    showConfidence ? "" : " - Selected"
-                  }.png`}
-                  alt={selected.team2.shortName}
-                  width="100px"
+                  border={"2px"}
+                  borderColor={
+                    selected.team2._id === predictedTeamId && "green.400"
+                  }
                 />
               </HStack>
               <Text fontSize="xs" p="2">
