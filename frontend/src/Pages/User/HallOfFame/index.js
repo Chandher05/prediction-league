@@ -19,6 +19,11 @@ function HallOfFame() {
   const history = useHistory();
   const getWinners = [
     {
+      winners: ["🥇Barath C", "🥈Harikumar Shastry", "🥉Aditya Ranjan"],
+      year: "2023",
+      event: "Cricket World Cup",
+    },
+    {
       winners: ["🥇Prajwal Prasad", "🥈Barath C", "🥉Jayasurya P"],
       year: "2023",
       event: "IPL",
