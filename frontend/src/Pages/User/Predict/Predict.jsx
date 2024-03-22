@@ -197,10 +197,10 @@ export default function Predict() {
                     }.png`}
                     alt={selected.team1.shortName}
                     width="100px"
-                    border={"2px"}
-                    borderColor={
-                      selected.team1._id === predictedTeamId && "green.400"
-                    }
+                    // border={"2px"}
+                    // borderColor={
+                    //   selected.team1._id === predictedTeamId && "green.400"
+                    // }
                   />
                 </div>
 
@@ -222,10 +222,10 @@ export default function Predict() {
                   }.png`}
                   alt={selected.team2.shortName}
                   width="100px"
-                  border={"2px"}
-                  borderColor={
-                    selected.team2._id === predictedTeamId && "green.400"
-                  }
+                  // border={"2px"}
+                  // borderColor={
+                  //   selected.team2._id === predictedTeamId && "green.400"
+                  // }
                 />
               </HStack>
               <Text fontSize="xs" p="2">

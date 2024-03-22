@@ -48,7 +48,7 @@ function Games() {
 
   useEffect(() => {
     getGames();
-  }, [getGames]);
+  }, []);
   const navToUser = () => {
     history.push("/admin/Users");
   };
@@ -109,7 +109,7 @@ function AddGameModal({ onCloseCall }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
-    console.log(data);
+    console.log({ data });
     fetch(process.env.REACT_APP_API_BE + "/game/add", {
       method: "POST", // or 'PUT'
       headers: {
@@ -149,7 +149,7 @@ function AddGameModal({ onCloseCall }) {
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
-                <Input type="datetime-local" {...register("startTime")} />
+                <Input type="datetime" {...register("startTime")} />
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Winner</FormLabel>
@@ -198,7 +198,7 @@ function UpdateGameModal({ game }) {
       gameNumber: game.gameNumber,
       team1: game.team1?._id,
       team2: game.team2?._id,
-      startTime: game?.startTime,
+      startTime: new Date(game?.startTime),
     },
   });
   const onSubmit = (data) => {
@@ -245,6 +245,7 @@ function UpdateGameModal({ game }) {
               <FormControl mt={4}>
                 <FormLabel>Winner</FormLabel>
                 <Select {...register("winner")}>
+                  <option value={null}></option>
                   <option value={game.team1._id}>{game.team1.fullName}</option>
                   <option value={game.team2._id}>{game.team2.fullName}</option>
                 </Select>
@@ -252,6 +253,7 @@ function UpdateGameModal({ game }) {
               <FormControl mt={4}>
                 <FormLabel>Toss</FormLabel>
                 <Select {...register("toss")}>
+                  <option value={null}></option>
                   <option value={game.team1._id}>{game.team1.fullName}</option>
                   <option value={game.team2._id}>{game.team2.fullName}</option>
                 </Select>
@@ -259,6 +261,7 @@ function UpdateGameModal({ game }) {
               <FormControl mt={4}>
                 <FormLabel>Batting First</FormLabel>
                 <Select {...register("battingFirst")}>
+                  <option value={null}></option>
                   <option value={game.team1._id}>{game.team1.fullName}</option>
                   <option value={game.team2._id}>{game.team2.fullName}</option>
                 </Select>
