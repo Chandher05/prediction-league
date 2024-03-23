@@ -33,7 +33,7 @@ export default function Home() {
           lineHeight={"110%"}
           className="neon"
         >
-          ICC WORLD CUP 2024 <br />
+          IPL 2024 <br />
           <Text as={"span"} color={"red.500"} py={{ base: 20 }}>
             PREDICTION LEAGUE
           </Text>
