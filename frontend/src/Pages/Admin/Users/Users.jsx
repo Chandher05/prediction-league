@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Heading, HStack, VStack } from "@chakra-ui/layout";
 import {
   Table,
@@ -28,7 +28,7 @@ function Users() {
   const history = useHistory();
   const [users, setUsers] = useState([]);
   const authId = useStoreState((state) => state.authId);
-  const getUsers = () => {
+  const getUsers = useCallback(() => {
     fetch(process.env.REACT_APP_API_BE + "/users/all", {
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -36,10 +36,10 @@ function Users() {
     }).then(async (response) => {
       if (response.ok) setUsers(await response.json());
     });
-  };
+  }, [authId]);
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [getUsers]);
 
   const navToGame = () => {
     history.push("/admin/Games");

@@ -23,7 +23,7 @@ import {
   useClipboard,
   Select,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
 import { useHistory } from "react-router";
 import { useToast } from "@chakra-ui/react";
@@ -36,7 +36,7 @@ function Games() {
   const [games, setGames] = useState([]);
   const authId = useStoreState((state) => state.authId);
 
-  const getGames = () => {
+  const getGames = useCallback(() => {
     fetch(process.env.REACT_APP_API_BE + "/game/all", {
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -44,11 +44,11 @@ function Games() {
     }).then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
-  };
+  }, [authId]);
 
   useEffect(() => {
     getGames();
-  }, []);
+  }, [getGames]);
   const navToUser = () => {
     history.push("/admin/Users");
   };

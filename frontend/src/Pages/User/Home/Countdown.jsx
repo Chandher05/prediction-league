@@ -18,8 +18,8 @@ function Countdown() {
   const [timeLeft, setTimeLeft] = useState({});
   const color = () => {
     if (
-      nextGame.team1.shortName == "RCB" ||
-      nextGame.team2.shortName == "RCB"
+      nextGame.team1.shortName === "RCB" ||
+      nextGame.team2.shortName === "RCB"
     ) {
       return "red";
     }

@@ -14,7 +14,7 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useStoreState } from "easy-peasy";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 
 function Predictions() {
@@ -25,7 +25,7 @@ function Predictions() {
   const [selectedTeam, setSelectedTeam] = useState([]);
   const authId = useStoreState((state) => state.authId);
 
-  const getPredictions = () => {
+  const getPredictions = useCallback(() => {
     fetch(`${process.env.REACT_APP_API_BE}/prediction/user`, {
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -52,11 +52,11 @@ function Predictions() {
         });
       }
     });
-  };
+  }, [authId, toast]);
 
   useEffect(() => {
     getPredictions();
-  }, []);
+  }, [getPredictions]);
 
   return (
     <Flex

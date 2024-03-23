@@ -1,16 +1,7 @@
 import { Heading, VStack, HStack, Flex } from "@chakra-ui/layout";
 
-import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Button,
-  useColorModeValue,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Button } from "@chakra-ui/react";
+
 import { useHistory } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import FameCard from "./FameCard";
