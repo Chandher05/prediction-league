@@ -33,7 +33,7 @@ function Unsubscribe() {
           isClosable: true,
         });
       });
-  }, [authId]);
+  }, [authId, toast]);
 
   const resubscribe = () => {
     fetch(process.env.REACT_APP_API_BE + "/users/resubscribe", {

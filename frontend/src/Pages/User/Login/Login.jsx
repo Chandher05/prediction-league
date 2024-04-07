@@ -31,7 +31,7 @@ export default function GoogleLogin() {
         >
           PREDICTION LEAGUE{" "}
           <Text as={"span"} color={"blue.400"}>
-            IPL 2022
+            IPL 2024
           </Text>
         </Heading>
         <Button

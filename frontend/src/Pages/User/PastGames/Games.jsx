@@ -47,7 +47,7 @@ function PastGames() {
       });
     };
     getGames();
-  }, []);
+  }, [authId]);
   return (
     <Flex
       minH={"100vh"}
@@ -122,6 +122,8 @@ function PastGames() {
                       </Td>
                     </Tr>
                   );
+                } else {
+                  return null;
                 }
               })
 

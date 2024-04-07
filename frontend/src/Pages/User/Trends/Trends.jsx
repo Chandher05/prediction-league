@@ -7,7 +7,7 @@ import {
   Button,
   Heading,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useHistory } from "react-router";
@@ -27,7 +27,7 @@ function Trends() {
     }
     return color;
   }
-  const getLeaderboard = () => {
+  const getLeaderboard = useCallback(() => {
     fetch(process.env.REACT_APP_API_BE + "/prediction/graph", {
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -55,7 +55,7 @@ function Trends() {
         setLoaded(true);
       }
     });
-  };
+  }, [authId]);
   const options = {
     plugins: {
       tooltip: {
@@ -72,7 +72,7 @@ function Trends() {
   };
   useEffect(() => {
     getLeaderboard();
-  }, []);
+  }, [getLeaderboard]);
 
   return loaded ? (
     <Box p="5" w="100%" justify={"center"}>

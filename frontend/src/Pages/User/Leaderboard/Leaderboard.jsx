@@ -10,7 +10,7 @@ import {
   Button,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useStoreState } from "easy-peasy";
@@ -21,7 +21,7 @@ function Leaderboard() {
 
   const [games, setGames] = useState([]);
   const [showStrategies, setShowStrategies] = useState(false);
-  const getLeaderboard = () => {
+  const getLeaderboard = useCallback(() => {
     fetch(process.env.REACT_APP_API_BE + "/prediction/leaderboard", {
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -29,10 +29,10 @@ function Leaderboard() {
     }).then(async (response) => {
       if (response.ok) setGames(await response.json());
     });
-  };
+  }, [authId]);
   useEffect(() => {
     getLeaderboard();
-  }, []);
+  }, [getLeaderboard]);
   return (
     <Flex
       minH={"100vh"}
@@ -54,7 +54,9 @@ function Leaderboard() {
           </Heading>
         </HStack>
 
-        <Button onClick={() => setShowStrategies(!showStrategies)}>{showStrategies ? "Hide Strategies" : "Show Strategies"}</Button>
+        <Button onClick={() => setShowStrategies(!showStrategies)}>
+          {showStrategies ? "Hide Strategies" : "Show Strategies"}
+        </Button>
 
         <Table size="sm">
           <Thead>
@@ -70,7 +72,7 @@ function Leaderboard() {
             {games.map((row, index) => {
               if ((showStrategies && row.isAdmin) || !row.isAdmin) {
                 return (
-                  <Tr backgroundColor={row.isAdmin ? "blue.400" : 'blue.200'}>
+                  <Tr backgroundColor={row.isAdmin ? "blue.400" : "blue.200"}>
                     <Td>{row.position}</Td>
                     <Td>{row.username}</Td>
                     <Td>{row.score.toFixed(7)}</Td>
@@ -78,9 +80,10 @@ function Leaderboard() {
                     <Td>{row.leavesRemaining}</Td>
                   </Tr>
                 );
+              } else {
+                return null;
               }
             })}
-
           </Tbody>
         </Table>
       </VStack>

@@ -188,7 +188,7 @@ export default function Predict() {
                 <div>
                   <Image
                     onClick={() => predictionForGame(selected.team1._id)}
-                    src={`${process.env.PUBLIC_URL}/Logo/${
+                    src={`${process.env.PUBLIC_URL}/Logo_IPL/${
                       selected.team1.shortName
                     }${
                       selected.team1._id === predictedTeamId
@@ -197,16 +197,16 @@ export default function Predict() {
                     }.png`}
                     alt={selected.team1.shortName}
                     width="100px"
-                    border={"2px"}
-                    borderColor={
-                      selected.team1._id === predictedTeamId && "green.400"
-                    }
+                    // border={"2px"}
+                    // borderColor={
+                    //   selected.team1._id === predictedTeamId && "green.400"
+                    // }
                   />
                 </div>
 
                 <Image
                   onClick={() => predictionForGame("Leave")}
-                  src={`${process.env.PUBLIC_URL}/Logo/Leave${
+                  src={`${process.env.PUBLIC_URL}/Logo_IPL/Leave${
                     showConfidence ? "" : " - Selected"
                   }.png`}
                   alt={selected.team2.shortName}
@@ -215,17 +215,17 @@ export default function Predict() {
 
                 <Image
                   onClick={() => predictionForGame(selected.team2._id)}
-                  src={`${process.env.PUBLIC_URL}/Logo/${
+                  src={`${process.env.PUBLIC_URL}/Logo_IPL/${
                     selected.team2.shortName
                   }${
                     selected.team2._id === predictedTeamId ? " - Selected" : ""
                   }.png`}
                   alt={selected.team2.shortName}
                   width="100px"
-                  border={"2px"}
-                  borderColor={
-                    selected.team2._id === predictedTeamId && "green.400"
-                  }
+                  // border={"2px"}
+                  // borderColor={
+                  //   selected.team2._id === predictedTeamId && "green.400"
+                  // }
                 />
               </HStack>
               <Text fontSize="xs" p="2">
