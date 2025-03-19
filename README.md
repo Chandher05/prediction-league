@@ -30,4 +30,5 @@ No,Date,Month,Match,Time (IST)
 22,8,Apr,Chennai Super Kings vs Kolkata Knight Riders,19:30
 23,9,Apr,Punjab Kings vs Sunrisers Hyderabad,19:30
 ```
-4. Add games using add-games.py
+4. Update year and/or time in getStartTime method
+5. Add games using add-games.py

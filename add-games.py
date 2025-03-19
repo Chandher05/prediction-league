@@ -1,76 +1,19 @@
 import pandas as pd
 import requests
+import json
+
+r = requests.get('http://localhost:8000/teams/all')
+teams = json.loads(r.text)
 
 def getTeamId(teamName):
-	teams = [
-	    {
-	        "teamId": "65fd15627f6bf13de4d6688f",
-	        "fullName": "Chennai Super Kings",
-	        "shortName": "CSK",
-	        "colorCode": "#FCCA06"
-	    },
-	    {
-	        "teamId": "65fd15627f6bf13de4d66892",
-	        "fullName": "Delhi Capitals",
-	        "shortName": "DC",
-	        "colorCode": "#0078BC"
-	    },
-	    {
-	        "teamId": "65fd15627f6bf13de4d66895",
-	        "fullName": "Gujarat Titans",
-	        "shortName": "GT",
-	        "colorCode": "#315079"
-	    },
-	    {
-	        "teamId": "65fd15627f6bf13de4d66898",
-	        "fullName": "Kolkata Knight Riders",
-	        "shortName": "KKR",
-	        "colorCode": "#3B215D"
-	    },
-	    {
-	        "teamId": "65fd15627f6bf13de4d6689b",
-	        "fullName": "Lucknow Super Giants",
-	        "shortName": "LSG",
-	        "colorCode": "#D6296E"
-	    },
-	    {
-	        "teamId": "65fd15637f6bf13de4d6689e",
-	        "fullName": "Mumbai Indians",
-	        "shortName": "MI",
-	        "colorCode": "#006CB7"
-	    },
-	    {
-	        "teamId": "65fd15637f6bf13de4d668a1",
-	        "fullName": "Punjab Kings",
-	        "shortName": "PBKS",
-	        "colorCode": "#D71920"
-	    },
-	    {
-	        "teamId": "65fd15637f6bf13de4d668a4",
-	        "fullName": "Rajasthan Royals",
-	        "shortName": "RR",
-	        "colorCode": "#EA1A85"
-	    },
-	    {
-	        "teamId": "65fd15637f6bf13de4d668a7",
-	        "fullName": "Royal Challengers Bengaluru",
-	        "shortName": "RCB",
-	        "colorCode": "#84171B"
-	    },
-	    {
-	        "teamId": "65fd15637f6bf13de4d668aa",
-	        "fullName": "Sunrisers Hyderabad",
-	        "shortName": "SRH",
-	        "colorCode": "#F26522"
-	    }
-	]
 	for obj in teams:
 		if obj['fullName'] == teamName:
 			return obj['teamId']
+	print(teamName, "not found")
 
 def setTeams(row):
 	arr = row['Match'].split(" vs ")
-	print(arr)
+	# print(arr)
 	row['Team 1'] = getTeamId(arr[0])
 	row['Team 2'] = getTeamId(arr[1])
 	return row
@@ -90,7 +33,7 @@ def getStartTime(row):
 	if row['Time (IST)'] == "15:30":
 		time = "10:00"
 
-	row['Start Time'] = "2024-" + month + "-" + date + "T" + time + ":00.000Z"
+	row['Start Time'] = "2025-" + month + "-" + date + "T" + time + ":00.000Z"
 	return row
 
 def updateDB(row):
@@ -104,8 +47,7 @@ def updateDB(row):
 	r = requests.post('http://localhost:8000/game/add', data=body)
 	print (r.text, row['No'])
 
-file = open("ipl 2024.csv")
-df = pd.read_csv(file)
+df = pd.read_csv("ipl 2025.csv")
 
 df['Team 1'] = ""
 df['Team 2'] = ""
