@@ -19,6 +19,9 @@ const Game = new mongoose.Schema({
         type : Date,
         required: true
     },
+	cricApiMatchId: {
+		type: String
+	},
     toss: {
         type: mongoose.Types.ObjectId,
     },

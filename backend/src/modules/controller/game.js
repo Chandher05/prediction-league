@@ -263,6 +263,7 @@ exports.addGame = async (req, res) => {
 			team1: req.body.team1,
 			team2: req.body.team2,
 			startTime: req.body.startTime,
+			cricApiMatchId: req.body.cricApiMatchId,
 			battingFirst: null,
 			toss: null,
 			winner: null

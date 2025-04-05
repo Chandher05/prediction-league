@@ -58,7 +58,7 @@ teamCodes = {
   "Tbc": {
     "fullName": "Tbc",
     "shortName": "TBC",
-    "colorCode": ""  # No color code available
+    "colorCode": "#D9D9D9"  # No color code available
   },
   "Afghanistan": {
     "fullName": "Afghanistan",
@@ -208,6 +208,10 @@ def getMatchesInSeries(series_id):
     return json.loads(response.text)
 
 if __name__ == "__main__":
+    if api_key == "":
+        print("Please add API key from https://cricketdata.org/")
+        exit()
+        
     getCurrentSeries()
     series_id = input("\nEnter series id to be loaded: ")
     
@@ -225,7 +229,7 @@ if __name__ == "__main__":
     teamNamesAvailable = True
     for team in tournamentTeams:
         if team not in teamCodes:
-            print(team, "team code is missing. Add logo in frontend resources")
+            print(team, "team code is missing. Add team code on line 7 and add logo in frontend resources")
             teamNamesAvailable = False
             
     if not teamNamesAvailable:
@@ -234,5 +238,6 @@ if __name__ == "__main__":
     for team in tournamentTeams:
         payload = teamCodes[team]
         print(payload)
-        # addTeam(payload)
-        
+        addTeam(payload)
+    
+    print("All teams loaded")
