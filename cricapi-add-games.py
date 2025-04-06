@@ -47,7 +47,7 @@ if __name__ == "__main__":
     series_id = input("\nEnter series id to be loaded: ")
     
     if series_id not in series_ids:
-        print("Invalid series id", series_id, series_ids)
+        print("Invalid series id", series_id)
         exit() 
         
     matches_response = getMatchesInSeries(series_id)

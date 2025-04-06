@@ -20,7 +20,8 @@ const Game = new mongoose.Schema({
         required: true
     },
 	cricApiMatchId: {
-		type: String
+		type: String,
+        default: ""
 	},
     toss: {
         type: mongoose.Types.ObjectId,
@@ -30,6 +31,11 @@ const Game = new mongoose.Schema({
     },
     winner: {
         type: mongoose.Types.ObjectId,
+    },
+    matchEnded: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 }, { versionKey: false })
 

@@ -4,6 +4,8 @@ import Prediction from '../../models/mongoDB/prediction';
 import constants from '../../utils/constants';
 import updateLeaderboard from '../../utils/updateLeaderboard';
 import updateStrategy from '../../utils/updateStrategies';
+import config from '../../../config';
+const axios = require('axios');
 
 /**
  * Get all games in database.
@@ -391,9 +393,11 @@ exports.updateGame = async (req, res) => {
 				team1: req.body.team1,
 				team2: req.body.team2,
 				startTime: req.body.startTime,
+				cricApiMatchId: oldValues.cricApiMatchId,
 				battingFirst: req.body.battingFirst.length > 0? req.body.battingFirst: null,
 				toss: req.body.toss.length > 0? req.body.toss: null,
-				winner: req.body.winner.length > 0? req.body.winner: null
+				winner: req.body.winner.length > 0? req.body.winner: null,
+				matchEnded: req.body.winner.length > 0? true: false
 			}
 		)
 
@@ -459,6 +463,189 @@ exports.deleteGame = async (req, res) => {
 
 	} catch (error) {
 		console.log(`Error game/startGame ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+
+	
+/**
+ * Update schedule with cricapi.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.updateSchedule = async (req, res) => {
+	try {
+
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team.fullName] = team._id
+		}
+
+		let allGames
+		allGames = await Game.find().sort('startTime')
+
+		let gameData = {}
+		for (var game of allGames) {
+			gameData[game.cricApiMatchId] = {
+				gameId: game._id,
+				startTime: game.startTime
+			}
+		}
+
+		var response = await axios.get('https://api.cricapi.com/v1/series_info?apikey=' + config.cricapi.key + '&id=' + config.cricapi.series_id);
+		if (response.status != 200) {
+			return res
+				.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
+				.send("Cricapi failed with status " + response.status)
+		}
+		var api_response = response.data
+		var all_matches = {}
+
+		for (var game of api_response["data"]["matchList"]) {
+			
+			var team1 = teamObj[game["teams"][0]]
+			if (team1 === undefined) {
+				return res
+					.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
+					.send(game["teams"][0] + " team not available in database")
+			}
+			var team2 = teamObj[game["teams"][1]]
+			if (team2 === undefined) {
+				return res
+					.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
+					.send(game["teams"][1] + " team not available in database")
+			}
+			if (team1 != team2) {
+				all_matches[game["dateTimeGMT"]] = {
+					"team1": team1,
+					"team2": team2,
+					"startTime": game["dateTimeGMT"] + ".000Z",
+					"cricApiMatchId": game["id"]
+				}
+			}
+		}
+
+		const sortedStartTimes = Object.keys(all_matches).sort()
+		var index = 1
+		for (var startTime of sortedStartTimes) {
+			var gameObj = all_matches[startTime]
+			var dbData = gameData[gameObj["cricApiMatchId"]]
+			index += 1
+			if (dbData === undefined) {
+				gameObj["gameNumber"] = index
+				gameObj["battingFirst"] = null
+				gameObj["toss"] = null
+				gameObj["winner"] = null
+				var dbObj = new Game(gameObj)
+				await dbObj.save()
+			}
+		}
+		
+		allGames = await Game.find().sort('startTime')
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(allGames)
+
+	} catch (error) {
+		console.log(`Error in adding a game ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+
+/**
+ * Update match winner using cric api.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+ exports.updateWinner = async (req, res) => {
+	try {
+
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team.fullName] = team._id
+		}
+
+		let game = await Game.findById(req.params.gameId)
+
+		let cricApiMatchId = game.cricApiMatchId
+		if (cricApiMatchId.length == 0) {
+			return res
+				.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+				.send("Cric API match id not available")
+		}
+		if (game.matchEnded) {
+			return res
+				.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+				.send("Match has ended on database. Nothing to update")
+		}
+
+		
+		var response = await axios.get('https://api.cricapi.com/v1/match_info?apikey=' + config.cricapi.key + '&id=' + cricApiMatchId);
+		if (response.status != 200) {
+			return res
+				.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
+				.send("Cricapi failed with status " + response.status)
+		}
+		var api_response = response.data
+
+		if (!api_response["data"]["matchEnded"]) {
+			return res
+				.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+				.send("Cannot update winner before match has ended")
+		}
+		
+		let teams = api_response["data"]["teams"]
+		let tossWinner = api_response["data"]["tossWinner"]
+		let battingFirst = api_response["data"]["tossWinner"]
+		let tossLoser = teams[0]
+		if (tossLoser == tossWinner) {
+			tossLoser = teams[1]
+		}
+		let tossChoice = api_response["data"]["tossChoice"]
+		if (tossChoice == "bowl") {
+			battingFirst = tossLoser
+		}
+		let matchWinner = api_response["data"]["matchWinner"]
+
+		if (teams.includes(matchWinner)) {
+			game["toss"] = teamObj[tossWinner]
+			game["battingFirst"] = teamObj[battingFirst]
+			game["winner"] = teamObj[matchWinner]
+			game["matchEnded"] = true
+		} else {
+			game["matchEnded"] = true
+		}
+
+		await Game.findByIdAndUpdate(
+			req.params.gameId,
+			game
+		)
+		
+
+		await updateStrategy(req.params.gameId)
+
+
+		updateLeaderboard()
+
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(game)
+	} catch (error) {
+		console.log(`Error while getting all games ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)
