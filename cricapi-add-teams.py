@@ -8,183 +8,254 @@ teamCodes = {
   "Chennai Super Kings": {
     "fullName": "Chennai Super Kings",
     "shortName": "CSK",
-    "colorCode": "#FFB81C"  # Yellow and black
+    "colorCode": "#FFB81C",
+    "colorDescription": "Yellow and black"
   },
   "Delhi Capitals": {
     "fullName": "Delhi Capitals",
     "shortName": "DC",
-    "colorCode": "#1C3879"  # Blue and red
+    "colorCode": "#1C3879",
+    "colorDescription": "Blue and red"
   },
   "Gujarat Titans": {
     "fullName": "Gujarat Titans",
     "shortName": "GT",
-    "colorCode": "#00B5E2"  # Blue and yellow
+    "colorCode": "#00B5E2",
+    "colorDescription": "Blue and yellow"
   },
   "Kolkata Knight Riders": {
     "fullName": "Kolkata Knight Riders",
     "shortName": "KKR",
-    "colorCode": "#4E1C4C"  # Purple and gold
+    "colorCode": "#4E1C4C",
+    "colorDescription": "Purple and gold"
   },
   "Lucknow Super Giants": {
     "fullName": "Lucknow Super Giants",
     "shortName": "LSG",
-    "colorCode": "#1E7D1E"  # Green and gold
+    "colorCode": "#1E7D1E",
+    "colorDescription": "Green and gold"
   },
   "Mumbai Indians": {
     "fullName": "Mumbai Indians",
     "shortName": "MI",
-    "colorCode": "#007BB6"  # Blue and gold
+    "colorCode": "#007BB6",
+    "colorDescription": "Blue and gold"
   },
   "Punjab Kings": {
     "fullName": "Punjab Kings",
     "shortName": "PBKS",
-    "colorCode": "#E30022"  # Red and white
+    "colorCode": "#E30022",
+    "colorDescription": "Red and white"
   },
   "Rajasthan Royals": {
     "fullName": "Rajasthan Royals",
     "shortName": "RR",
-    "colorCode": "#3A4E9B"  # Blue and pink
+    "colorCode": "#3A4E9B",
+    "colorDescription": "Blue and pink"
   },
   "Royal Challengers Bengaluru": {
     "fullName": "Royal Challengers Bengaluru",
     "shortName": "RCB",
-    "colorCode": "#C8102E"  # Red and black
+    "colorCode": "#C8102E",
+    "colorDescription": "Red and black"
   },
   "Sunrisers Hyderabad": {
     "fullName": "Sunrisers Hyderabad",
     "shortName": "SRH",
-    "colorCode": "#FF6A13"  # Orange and black
+    "colorCode": "#FF6A13",
+    "colorDescription": "Orange and black"
   },
   "Tbc": {
     "fullName": "Tbc",
     "shortName": "TBC",
-    "colorCode": "#D9D9D9"  # No color code available
+    "colorCode": "#D9D9D9",
+    "colorDescription": "No color code available"
   },
   "Afghanistan": {
     "fullName": "Afghanistan",
     "shortName": "AFG",
-    "colorCode": "#D20000"  # Afghanistan's national cricket team uses red and white
+    "colorCode": "#D20000",
+    "colorDescription": "Red and white"
   },
   "India": {
     "fullName": "India",
     "shortName": "IND",
-    "colorCode": "#0066B1"  # India's cricket team is known for blue
+    "colorCode": "#0066B1",
+    "colorDescription": "Blue"
   },
   "Australia": {
     "fullName": "Australia",
     "shortName": "AUS",
-    "colorCode": "#A7C636"  # Australia's cricket team uses yellow and green
+    "colorCode": "#A7C636",
+    "colorDescription": "Yellow and green"
   },
   "Bangladesh": {
     "fullName": "Bangladesh",
     "shortName": "BAN",
-    "colorCode": "#006747"  # Bangladesh's national cricket team is associated with green and red
+    "colorCode": "#006747",
+    "colorDescription": "Green and red"
   },
   "England": {
     "fullName": "England",
     "shortName": "ENG",
-    "colorCode": "#E30613"  # England's national cricket team uses red and blue
+    "colorCode": "#E30613",
+    "colorDescription": "Red and blue"
   },
   "South Africa": {
     "fullName": "South Africa",
     "shortName": "RSA",
-    "colorCode": "#007A33"  # South Africa's team colors are green and gold
+    "colorCode": "#007A33",
+    "colorDescription": "Green and gold"
   },
   "United States": {
     "fullName": "United States",
     "shortName": "USA",
-    "colorCode": "#B22234"  # United States cricket team commonly uses red, white, and blue
+    "colorCode": "#B22234",
+    "colorDescription": "Red, white, and blue"
   },
   "West Indies": {
     "fullName": "West Indies",
     "shortName": "WI",
-    "colorCode": "#6600CC"  # West Indies cricket team is known for maroon and yellow
+    "colorCode": "#6600CC",
+    "colorDescription": "Maroon and yellow"
   },
   "Pakistan": {
     "fullName": "Pakistan",
     "shortName": "PAK",
-    "colorCode": "#006B3F"  # Pakistan's team uses green
+    "colorCode": "#006B3F",
+    "colorDescription": "Green"
   },
   "Canada": {
     "fullName": "Canada",
     "shortName": "CAN",
-    "colorCode": "#D91D2A"  # Canada's team commonly uses red
+    "colorCode": "#D91D2A",
+    "colorDescription": "Red"
   },
   "Oman": {
     "fullName": "Oman",
     "shortName": "OMAN",
-    "colorCode": "#F9A800"  # Oman's cricket team uses orange and white
+    "colorCode": "#F9A800",
+    "colorDescription": "Orange and white"
   },
   "Scotland": {
     "fullName": "Scotland",
     "shortName": "SCO",
-    "colorCode": "#006F8E"  # Scotland's team is associated with navy blue
+    "colorCode": "#006F8E",
+    "colorDescription": "Navy blue"
   },
   "Nepal": {
     "fullName": "Nepal",
     "shortName": "NEP",
-    "colorCode": "#D10F3E"  # Nepal's national cricket team uses red and blue
+    "colorCode": "#D10F3E",
+    "colorDescription": "Red and blue"
   },
   "Sri Lanka": {
     "fullName": "Sri Lanka",
     "shortName": "SL",
-    "colorCode": "#FFD700"  # Sri Lanka's cricket team uses yellow and blue
+    "colorCode": "#FFD700",
+    "colorDescription": "Yellow and blue"
   },
   "Papua New Guinea": {
     "fullName": "Papua New Guinea",
     "shortName": "PNG",
-    "colorCode": "#E4002B"  # PNG's cricket team uses red and yellow
+    "colorCode": "#E4002B",
+    "colorDescription": "Red and yellow"
   },
   "Ireland": {
     "fullName": "Ireland",
     "shortName": "IRE",
-    "colorCode": "#169B62"  # Ireland's cricket team uses green
+    "colorCode": "#169B62",
+    "colorDescription": "Green"
   },
   "New Zealand": {
     "fullName": "New Zealand",
     "shortName": "NZ",
-    "colorCode": "#000000"  # New Zealand's national cricket team is associated with black
+    "colorCode": "#000000",
+    "colorDescription": "Black"
   },
   "Uganda": {
     "fullName": "Uganda",
     "shortName": "UGA",
-    "colorCode": "#F5A900"  # Uganda's national cricket team uses yellow and red
+    "colorCode": "#F5A900",
+    "colorDescription": "Yellow and red"
   },
   "Namibia": {
     "fullName": "Namibia",
     "shortName": "NAM",
-    "colorCode": "#006B8E"  # Namibia's cricket team uses blue and yellow
+    "colorCode": "#006B8E",
+    "colorDescription": "Blue and yellow"
   },
   "Netherlands": {
     "fullName": "Netherlands",
     "shortName": "NED",
-    "colorCode": "#FF5A00"  # Netherlands cricket team uses orange
+    "colorCode": "#FF5A00",
+    "colorDescription": "Orange"
   },
-  
   "Mumbai Indians Women": {
     "fullName": "Mumbai Indians Women",
     "shortName": "MIW",
-    "colorCode": "#007BB6"  # Blue and gold (similar to Mumbai Indians men’s team)
+    "colorCode": "#007BB6",
+    "colorDescription": "Blue and gold"
   },
   "Royal Challengers Bengaluru Women": {
     "fullName": "Royal Challengers Bengaluru Women",
     "shortName": "RCBW",
-    "colorCode": "#C8102E"  # Red and black (similar to Royal Challengers Bengaluru men’s team)
+    "colorCode": "#C8102E",
+    "colorDescription": "Red and black"
   },
   "Gujarat Giants Women": {
     "fullName": "Gujarat Giants Women",
     "shortName": "GGW",
-    "colorCode": "#00B5E2"  # Blue and yellow (similar to Gujarat Titans men’s team)
+    "colorCode": "#00B5E2",
+    "colorDescription": "Blue and yellow"
   },
   "Delhi Capitals Women": {
     "fullName": "Delhi Capitals Women",
     "shortName": "DCW",
-    "colorCode": "#1C3879"  # Blue and red (similar to Delhi Capitals men’s team)
+    "colorCode": "#1C3879",
+    "colorDescription": "Blue and red"
   },
   "UP Warriorz Women": {
     "fullName": "UP Warriorz Women",
     "shortName": "UPW",
-    "colorCode": "#7C3A4D"  # Maroon and gold
+    "colorCode": "#7C3A4D",
+    "colorDescription": "Maroon and gold"
+  },
+  "Los Angeles Knight Riders": {
+    "fullName": "Los Angeles Knight Riders",
+    "shortName": "LAKR",
+    "colorCode": "#3b1c4d",
+    "colorDescription": "Purple and gold"
+  },
+  "MI New York": {
+    "fullName": "MI New York",
+    "shortName": "MINY",
+    "colorCode": "#0000B1",
+    "colorDescription": "Blue and gold"
+  },
+  "San Francisco Unicorns": {
+    "fullName": "San Francisco Unicorns",
+    "shortName": "SFU",
+    "colorCode": "#1E2952",
+    "colorDescription": "Orange and blue"
+  },
+  "Seattle Orcas": {
+    "fullName": "Seattle Orcas",
+    "shortName": "SEO",
+    "colorCode": "#AEFF07",
+    "colorDescription": "Black, white, light green, and orange"
+  },
+  "Texas Super Kings": {
+    "fullName": "Texas Super Kings",
+    "shortName": "TSK",
+    "colorCode": "#FFB81C",
+    "colorDescription": "Yellow and black"
+  },
+  "Washington Freedom": {
+    "fullName": "Washington Freedom",
+    "shortName": "WF",
+    "colorCode": "#000028",
+    "colorDescription": "Red, white, and blue"
   }
 }
 
