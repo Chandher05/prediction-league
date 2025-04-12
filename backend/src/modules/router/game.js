@@ -14,5 +14,6 @@ router.put('/update', gameController.updateGame);
 router.delete('/delete/:gameId', gameController.deleteGame);
 router.post('/update-schedule', gameController.updateSchedule);
 router.put('/update-winner/:gameId', gameController.updateWinner);
+router.get('/impact/active', gameController.isImpactActive);
 
 module.exports = router;

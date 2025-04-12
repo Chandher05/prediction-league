@@ -135,6 +135,7 @@ exports.getPredictionByGame = async (req, res) => {
 					predictedTeam: prediction.predictedTeamId.toString() == gameData.team1.toString()? team1Obj: team2Obj,
 					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered,
+					isImpact: prediction.isImpact,
 				})
 			} else {
 				allPlayers[prediction.userUID] = [{
@@ -143,6 +144,7 @@ exports.getPredictionByGame = async (req, res) => {
 					predictedTeam: prediction.predictedTeamId.toString() == gameData.team1.toString()? team1Obj: team2Obj,
 					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered,
+					isImpact: prediction.isImpact,
 				}]
 			}
 		}
@@ -203,6 +205,7 @@ exports.getPredictionByGameToShowUser = async (req, res) => {
 				predictedTeam: prediction.predictedTeamId.toString() == gameData.team1.toString()? team1Obj: team2Obj,
 				predictionTime: prediction.predictionTime,
 				isConsidered: prediction.isConsidered,
+				isImpact: prediction.isImpact,
 			}
 		}
 
@@ -302,6 +305,7 @@ exports.getLeaderboard = async (req, res) => {
 					score: obj.totalScore,
 					freeHitsRemaining: null,
 					leavesRemaining: null,
+					impactRemaining: null,
 					isAdmin: true
 				})
 			} else {
@@ -311,6 +315,7 @@ exports.getLeaderboard = async (req, res) => {
 					score: obj.totalScore,
 					freeHitsRemaining: obj.freeHitsRemaining,
 					leavesRemaining: obj.leavesRemaining,
+					impactRemaining: obj.impactRemaining,
 					isAdmin: false
 				})
 				playerPosition += 1
@@ -625,6 +630,138 @@ exports.getGraph = async (req, res) => {
 
 	} catch (error) {
 		console.log(`Error game/getGraph ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+/**
+ * Add a impact prediction in database.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.addImpactPrediction = async (req, res) => {
+	try {
+
+		var user = await Users.findOne({
+			userUID: req.body.userUID,
+			isActive: true
+		})
+
+
+		let userUID = req.body.userUID
+
+		let game = await Game.findById(req.body.gameId)
+
+		if (!user) {
+			return res
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("User not active")
+		}
+
+		if (!game) {
+			return res
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("Game not found")
+		}
+
+		var gameStartTime = new Date(game.startTime)
+		var predictionTime = new Date()
+		
+		let timeSinceStart = (predictionTime - gameStartTime) / (1000 * 60)
+
+		if (timeSinceStart < 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Cannot add impact prediction before game has started")
+		}
+
+		if (timeSinceStart > constants.PREDICTION_INFO.TIME_SINCE_START_FOR_IMPACT) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Cannot add impact prediction " + constants.PREDICTION_INFO.TIME_SINCE_START_FOR_IMPACT + " mins after game has started")
+		}
+
+		if (req.body.confidence === "L") {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Cannot leave impact prediction")
+		}
+
+		if (req.body.predictedTeamId != game.team1 && req.body.predictedTeamId != game.team2) {
+			return res
+			.status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+			.send("Predicted team must be one of the teams playing the game")
+		}
+
+		var confidence = req.body.confidence
+		var confidenceRegex = new RegExp('^(5[1-9]|[6-9][0-9]|100|FH)$')
+		if (!confidenceRegex.test(confidence)) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Invalid confidence")
+		}
+		
+
+		let allPredictions = await Prediction.find({
+			userUID: userUID,
+			isConsidered: true,
+			gameId: game._id
+		})
+
+		if (allPredictions.length == 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Cannot add impact when prediction is not available")
+		}
+
+		if (allPredictions[0].isImpact) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Impact used for this game")
+		}
+
+		if (allPredictions[0].confidence != confidence) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Cannot change confidence during impact prediction")
+		}
+
+		if (allPredictions[0].predictedTeamId == req.body.predictedTeamId) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Team must be changed for impact prediction")
+		}
+
+		await Prediction.updateMany(
+			{
+				userUID: userUID,
+				gameId: req.body.gameId,
+			},
+			{
+				isConsidered: false
+			}
+		)
+		
+		const predictionData = new Prediction({
+			confidence: confidence,
+			predictedTeamId: req.body.predictedTeamId,
+			userUID: userUID,
+			gameId: req.body.gameId,
+			isImpact: true
+		})
+
+		await predictionData.save()
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send({
+				predictionId: predictionData._id
+			})
+
+	} catch (error) {
+		console.log(`Error while adding a prediction ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)

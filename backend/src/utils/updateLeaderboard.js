@@ -37,15 +37,20 @@ var updateLeaderboard = async () => {
 					predictionId: prediction._id,
 					confidence: prediction.confidence,
 					predictedTeam: prediction.predictedTeamId,
+					isImpact: prediction.isImpact,
 				}
 			}
 		}
 
 		let allPredictionsByUsers = []
 		let freeHitsTakenByUser = {}
+		let impactsTakenByUser = {}
 		
 		for (var user of allUsersData) {
 			freeHitsTakenByUser[user.userUID] = 0
+		}
+		for (var user of allUsersData) {
+			impactsTakenByUser[user.userUID] = 0
 		}
 		let prediction, predictedTeam, winner, leavesRemaining, leavesTaken = 0, totalScore = 0, totalGames = 0, extraLeavesTaken = 0
 		for (var user of allUsersData) {
@@ -64,7 +69,9 @@ var updateLeaderboard = async () => {
 					prediction = predictionsByGame[game._id][user.userUID].confidence
 					predictedTeam = predictionsByGame[game._id][user.userUID].predictedTeam.toString()
 					winner = game.winner.toString()
-					
+					if (predictionsByGame[game._id][user.userUID].isImpact) {
+						impactsTakenByUser[user.userUID] += 1
+					}
 					if (prediction === "FH" && freeHitsTakenByUser[user.userUID] < constants.PREDICTION_INFO.MAX_FH_PER_PLAYER) {
 						if (predictedTeam === winner) {
 							prediction = 0
@@ -112,13 +119,14 @@ var updateLeaderboard = async () => {
 		})
 
 
-		var position = 1, obj, freeHitsRemainingForUser
-
+		var position = 1, obj, freeHitsRemainingForUser, impactsRemainingForUser
+		console.log(impactsTakenByUser)
 		for (obj of allPredictionsByUsers) {
 			if (isNaN(obj.score)) {
 				obj.score = 0
 			}
 			freeHitsRemainingForUser = Math.max(0, constants.PREDICTION_INFO.MAX_FH_PER_PLAYER - freeHitsTakenByUser[obj.userUID])
+			impactsRemainingForUser = Math.max(0, constants.PREDICTION_INFO.MAX_IMPACT_PER_PLAYER - impactsTakenByUser[obj.userUID])
 			if (obj.isAdmin) {
 				await Users.findOneAndUpdate(
 					{
@@ -137,7 +145,8 @@ var updateLeaderboard = async () => {
 						positionOnLeaderoard: position,
 						totalScore: obj.score,
 						leavesRemaining: obj.leavesRemaining,
-						freeHitsRemaining: freeHitsRemainingForUser
+						freeHitsRemaining: freeHitsRemainingForUser,
+						impactRemaining: impactsRemainingForUser
 					}
 				)
 				position += 1

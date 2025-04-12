@@ -11,6 +11,7 @@ router.get('/sorted/game/:gameId', gameController.getPredictionByGameToShowUser)
 router.get('/leaderboard', gameController.getLeaderboard);
 router.get('/user', gameController.getPredictionsOfUser);
 router.get('/graph', gameController.getGraph);
+router.post('/impact', gameController.addImpactPrediction);
 // router.put('/update', gameController.updatePrediction);
 
 module.exports = router;

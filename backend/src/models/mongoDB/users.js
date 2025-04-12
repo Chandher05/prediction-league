@@ -34,6 +34,12 @@ const Users = new mongoose.Schema({
 		default: constants.PREDICTION_INFO.MAX_LEAVES_PER_PLAYER,
 		min: 0
 	},
+	impactRemaining: {
+		type: Number,
+		required: true,
+		default: constants.PREDICTION_INFO.MAX_IMPACT_PER_PLAYER,
+		min: 0
+	},
 	positionOnLeaderoard:{
 		type: Number,
 		required: true,

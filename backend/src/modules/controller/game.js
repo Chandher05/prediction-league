@@ -1,6 +1,7 @@
 import Game from '../../models/mongoDB/game';
 import Team from '../../models/mongoDB/team';
 import Prediction from '../../models/mongoDB/prediction';
+import Users from '../../models/mongoDB/users';
 import constants from '../../utils/constants';
 import updateLeaderboard from '../../utils/updateLeaderboard';
 import updateStrategy from '../../utils/updateStrategies';
@@ -646,6 +647,92 @@ exports.updateSchedule = async (req, res) => {
 			.send(game)
 	} catch (error) {
 		console.log(`Error while getting all games ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
+
+/**
+ * Check if user is able to add impact prediction.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.isImpactActive = async (req, res) => {
+	try {
+		var user = await Users.findOne({
+			userUID: req.body.userUID,
+			isActive: true
+		})
+		
+		if (!user) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("User not active")
+		}
+
+		if (user.impactRemaining == 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("No impact remaining for user")
+		}
+
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
+		let allGames
+		allGames = await Game.find({
+			startTime: {
+				$lte: new Date()
+			}
+		})
+		.sort({startTime : -1})
+		.limit(1)
+
+		if (allGames.length == 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Tournament has not started")
+		}
+		let timeSinceStart = (new Date() - allGames[0].startTime) / (1000 * 60)
+
+		if (timeSinceStart > constants.PREDICTION_INFO.TIME_SINCE_START_FOR_IMPACT) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Cannot add impact prediction " + constants.PREDICTION_INFO.TIME_SINCE_START_FOR_IMPACT + " mins after match started")
+		}
+
+		let allPredictions = await Prediction.find({
+			userUID: req.body.userUID,
+			isConsidered: true,
+			gameId: allGames[0]._id
+		})
+
+		if (allPredictions.length == 0) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("No prediction in latest game")
+		}
+
+		if (allPredictions[0].isImpact) {
+			return res
+			.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+			.send("Impact used for this game")
+		}
+		
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send({
+				confidence: allPredictions[0].confidence,
+				predictedTeam: teamObj[allPredictions[0].predictedTeamId]
+			})
+	} catch (error) {
+		console.log(`Error while getting scheduled game ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)

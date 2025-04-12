@@ -29,6 +29,11 @@ const Prediction = new mongoose.Schema({
         required: true,
         default: false
     },
+    isImpact : {
+        type : Boolean,
+        required: true,
+        default: false
+    },
     predictionTime : {
         type : Date,
         default : Date.now,
