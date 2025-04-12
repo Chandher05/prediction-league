@@ -120,7 +120,7 @@ var updateLeaderboard = async () => {
 
 
 		var position = 1, obj, freeHitsRemainingForUser, impactsRemainingForUser
-		console.log(impactsTakenByUser)
+		
 		for (obj of allPredictionsByUsers) {
 			if (isNaN(obj.score)) {
 				obj.score = 0
