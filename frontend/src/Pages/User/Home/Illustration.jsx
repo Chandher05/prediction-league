@@ -3,8 +3,8 @@
 export const Illustration = (props) => {
   return (
     <svg
-      width="500"
-      height="500"
+      width="960"
+      height="960"
       viewBox="0 0 960 960"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
