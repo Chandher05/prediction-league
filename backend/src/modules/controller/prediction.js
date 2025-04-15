@@ -370,10 +370,10 @@ exports.getPredictionsOfUser = async (req, res) => {
 		}
 
 		let returnData = []
-		let confidence, predictedTeam, gameStartTime, isImpact = false, currentTime = new Date()
+		let confidence, predictedTeam, gameStartTime, isImpact, currentTime = new Date()
 		for (var game of allGames) {
 			gameStartTime = new Date(game.startTime)
-
+			isImpact = false
 			if (game._id in predictionByGame) {
 				confidence = predictionByGame[game._id].confidence
 				predictedTeam = teamById[predictionByGame[game._id].predictedTeam]

@@ -31,6 +31,7 @@ export default function Impact() {
 
   const [selected, setSelected] = useState({});
   const [predictedTeamId, setPredictedTeamId] = useState({});
+  const [originalPredictedTeamId, setOriginalPredictedTeamId] = useState({});
   const { register, handleSubmit } = useForm();
   const [currConfidenceLevel, setCurrConfidenceLevel] = useState(0);
 
@@ -48,7 +49,7 @@ export default function Impact() {
             console.log(data);
             setCurrConfidenceLevel(data.confidence);
             predictionForGame(data.predictedTeam._id);
-
+            setOriginalPredictedTeamId(data.predictedTeam._id);
             updateSelected(data.game);
           } else {
             toast({
@@ -131,8 +132,6 @@ export default function Impact() {
   const updateSelected = (game) => {
     if (game.gameId !== selected.gameId) {
       setSelected(game);
-
-      setPredictedTeamId(null);
     }
   };
   return (
@@ -240,7 +239,7 @@ export default function Impact() {
                 />
               </HStack>
               <Text fontSize="xs" p="2">
-                Click on the above option
+                Select {originalPredictedTeamId == selected.team1._id?selected.team2.fullName:selected.team1.fullName} and submit to switch teams
               </Text>
             </Box>
           ) : null}
@@ -252,6 +251,7 @@ export default function Impact() {
               _hover={{
                 bg: "blue.500",
               }}
+              disabled={originalPredictedTeamId == predictedTeamId?true:false}
               type="submit"
             >
               Submit
