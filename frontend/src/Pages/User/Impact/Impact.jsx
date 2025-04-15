@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   Button,
   Flex,
@@ -25,50 +25,66 @@ export default function Impact() {
   const toast = useToast();
   let { id } = useParams();
 
-  const [games, setGames] = useState([]);
-  const [showConfidence, setConfidence] = useState(true);
-  const [selected, setSelected] = useState({});
-  const [predictedTeamId, setPredictedTeamId] = useState({});
-  const { register, handleSubmit } = useForm();
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
 
+  const [selected, setSelected] = useState({});
+  const [predictedTeamId, setPredictedTeamId] = useState({});
+  const { register, handleSubmit } = useForm();
+  const [currConfidenceLevel, setCurrConfidenceLevel] = useState(0);
+
   useEffect(() => {
-    const getGames = () => {
-      if (id) {
-        fetch(process.env.REACT_APP_API_BE + `/game/id/${id}`, {
-          headers: {
-            Authorization: `Bearer ${authId}`,
-          },
-        }).then(async (response) => {
-          if (response.ok) {
-            const res = await response.json();
-            setGames([res]);
-            if (res) setSelected(res);
+    const getGames = async () => {
+      fetch(`${process.env.REACT_APP_API_BE}/game/impact/active`, {
+        headers: {
+          Authorization: `Bearer ${authId}`,
+        },
+      })
+        .then(async (res) => {
+          if (res.status == 200) {
+            console.log("Impact is on");
+            const data = await res.json();
+            console.log(data);
+            setCurrConfidenceLevel(data.confidence);
+            predictionForGame(data.predictedTeam._id);
+
+            updateSelected(data.game);
+          } else {
+            toast({
+              title: "Oops. You can't submit an Impact prediction now",
+              // Custom error message from server
+              description: "Maybe wait for the game to start.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+            history.push("/");
           }
+        })
+        .catch((err) => {
+          toast({
+            title: "Oops. You can't submit an Impact player now",
+            // Custom error message from server
+            description: "Maybe wait for the game to start.",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
+          history.push("/");
+          console.log("error fetching....");
+          console.log(err);
         });
-      } else {
-        fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
-          headers: {
-            Authorization: `Bearer ${authId}`,
-          },
-        }).then(async (response) => {
-          if (response.ok) {
-            const games = await response.json();
-            setGames(games);
-            if (games[0]) setSelected(games[0]);
-          }
-        });
-      }
     };
     getGames();
   }, [id, authId]);
-  const onSubmit = (data) => {
-    data["gameId"] = selected?.gameId;
-    data["predictedTeamId"] = selected ? predictedTeamId : "";
-    data["confidence"] = showConfidence ? data["confidence"] : "L";
-    fetch(process.env.REACT_APP_API_BE + "/prediction/new", {
+  const onSubmit = () => {
+    const data = {
+      gameId: selected?.gameId,
+      predictedTeamId: predictedTeamId,
+      confidence: currConfidenceLevel || "",
+    };
+    fetch(process.env.REACT_APP_API_BE + "/prediction/impact", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
@@ -84,8 +100,8 @@ export default function Impact() {
       })
       .then((data) => {
         toast({
-          title: "You have predicted the future",
-          description: "May the force be with you!",
+          title: "You have made a dangerous change!",
+          description: "Wish you luck!",
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -106,10 +122,8 @@ export default function Impact() {
   };
   const predictionForGame = (value) => {
     if (value === "Leave") {
-      setConfidence(false);
       setPredictedTeamId(null);
     } else {
-      setConfidence(true);
       setPredictedTeamId(value);
     }
   };
@@ -117,7 +131,7 @@ export default function Impact() {
   const updateSelected = (game) => {
     if (game.gameId !== selected.gameId) {
       setSelected(game);
-      setConfidence(true);
+
       setPredictedTeamId(null);
     }
   };
@@ -159,13 +173,6 @@ export default function Impact() {
           >
             Do you want to switch your team?
           </Text>
-          <Text
-            align={"center"}
-            color={"red.500"}
-            fontSize={{ base: "md", md: "md" }}
-          >
-            Warning: You confidence level remains same
-          </Text>
         </VStack>
 
         <HStack justifyContent="center">
@@ -178,27 +185,23 @@ export default function Impact() {
           />
           <Text fontSize="25px">{userName}</Text>
         </HStack>
+        <VStack
+          style={{
+            justifyContent: "center",
+            border: "1px solid",
+            borderRadius: "10px",
+            padding: "10px",
+          }}
+        >
+          <Text fontSize={{ base: "md", md: "md" }}>
+            Confidence Level: {currConfidenceLevel}
+          </Text>
+          <Text align={"center"} color={"red.500"} fontSize={{ base: "xs" }}>
+            Warning: You confidence level remains same
+          </Text>
+        </VStack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* <HStack>
-            {games.map((game, index) => {
-              return (
-                <Button
-                  colorScheme={
-                    selected.gameId === game.gameId ? "blue" : "teal"
-                  }
-                  w="100%"
-                  p={4}
-                  color="white"
-                  onClick={() => updateSelected(game)}
-                >
-                  Game {game.gameNumber} - {game.team1.shortName} v{" "}
-                  {game.team2.shortName}{" "}
-                </Button>
-              );
-            })}
-          </HStack> */}
-
           {selected.team1 && selected.team2 ? (
             <Box borderWidth="1px" borderRadius="lg" m={2}>
               <HStack justifyContent="center">
@@ -249,7 +252,6 @@ export default function Impact() {
               _hover={{
                 bg: "blue.500",
               }}
-              disabled
               type="submit"
             >
               Submit

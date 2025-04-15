@@ -25,6 +25,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    console.log("calling impact------------");
     fetch(`${process.env.REACT_APP_API_BE}/game/impact/active`, {
       headers: {
         Authorization: `Bearer ${authId}`,
