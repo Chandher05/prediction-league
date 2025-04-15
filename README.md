@@ -26,13 +26,13 @@ SERIES_ID=
 
 ## Load data using cric api
 1. Create database on atlas
-2. Use connection URL and update MONGODB_URL on backend .env
+2. Get connection URL from atlas and update MONGODB_URL on backend .env
 3. Start backend server 
 4. Get API KEY from https://cricketdata.org/
-5. Add API Key in backend env
-6. Use API key and add teams using [cricapi-add-teams.py](cricapi-add-teams.py)
-7. Add series id used in this script to backend env
-8. Use API key and add teams using [cricapi-add-games.py](cricapi-add-games.py)
+5. Add API Key in backend env as CRICAPI_KEY
+6. Use API key in the script and add teams using [cricapi-add-teams.py](cricapi-add-teams.py)
+7. Add series id used in this script to backend env as SERIES_ID
+8. Use Cric API key and add teams using [cricapi-add-games.py](cricapi-add-games.py)
 
 
 ## Load data manually
