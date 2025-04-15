@@ -12,12 +12,36 @@ import { Illustration } from "./Illustration";
 import Countdown from "./Countdown";
 
 import { logout } from "../../../Firebase/config";
+import { useEffect } from "react";
+import { useStoreState } from "easy-peasy";
+import { useState } from "react";
 
 export default function Home() {
+  const [impact, setImpact] = useState(false);
+  const authId = useStoreState((state) => state.authId);
   const history = useHistory();
   const navTo = (route) => {
     history.push(`/${route}`);
   };
+
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_BE}/game/impact/active`, {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    })
+      .then((res) => {
+        if (res.status == 200) {
+          console.log("Impact is on");
+        }
+      })
+      .catch((err) => {
+        console.log("error fetching....");
+        console.log(err);
+      });
+  }, []);
+
+  console.log("Home page");
 
   return (
     <Container maxW={"full"}>
@@ -33,13 +57,14 @@ export default function Home() {
           lineHeight={"110%"}
           className="neon"
         >
-          IPL 2024 <br />
-          <Text as={"span"} color={"red.500"} py={{ base: 20 }}>
+          IPL {new Date().getFullYear()} <br />
+          <Text as={"span"} color={"red.600"} py={{ base: 20 }}>
             PREDICTION LEAGUE
           </Text>
         </Heading>
         <Button
-          rounded={"full"}
+          rounded={"8"}
+          minWidth={"180px"}
           px={6}
           colorScheme={"blue"}
           bg={"blue.800"}
@@ -49,14 +74,28 @@ export default function Home() {
         >
           Predict Now
         </Button>
+        {impact && (
+          <Button
+            rounded={"8"}
+            minWidth={"180px"}
+            px={6}
+            colorScheme={"blue"}
+            bg={"green.500"}
+            _hover={{ bg: "green.300" }}
+            onClick={() => navTo("impact")}
+            size="lg"
+          >
+            Impact
+          </Button>
+        )}
 
         <>
           <Center>
             <Countdown></Countdown>
           </Center>
-          <SimpleGrid columns={[1, 5]} spacingY={3} spacingX={3}>
+          <SimpleGrid columns={"1"} spacingY={3} spacingX={3}>
             <Button
-              rounded={"full"}
+              rounded={"8"}
               colorScheme={"blue"}
               px={6}
               onClick={() => navTo("leaderboard")}
@@ -64,7 +103,7 @@ export default function Home() {
               Leaderboard
             </Button>
             <Button
-              rounded={"full"}
+              rounded={"8"}
               colorScheme={"blue"}
               px={6}
               onClick={() => navTo("predictions")}
@@ -72,23 +111,23 @@ export default function Home() {
               Your Predictions
             </Button>
             <Button
-              rounded={"full"}
+              rounded={"8"}
               px={6}
               colorScheme={"blue"}
               onClick={() => navTo("PastGames")}
             >
               All Games
             </Button>
-            <Button
-              rounded={"full"}
+            {/* <Button
+               rounded={"8"}
               px={6}
               colorScheme={"blue"}
               onClick={() => navTo("trends")}
             >
               Trends
-            </Button>
+            </Button> */}
             <Button
-              rounded={"full"}
+              rounded={"8"}
               px={6}
               colorScheme={"blue"}
               onClick={() => navTo("halloffame")}
@@ -97,7 +136,7 @@ export default function Home() {
             </Button>
           </SimpleGrid>
           <Button
-            rounded={"full"}
+            rounded={"8"}
             px={6}
             colorScheme={"red"}
             onClick={() => {
@@ -109,7 +148,15 @@ export default function Home() {
           </Button>
         </>
 
-        <Center w={"full"}>
+        <Center
+          opacity={0.5}
+          position={"fixed"}
+          zIndex={-1}
+          w={"full"}
+
+          // w={"full"}
+          // h={"full"}
+        >
           <Illustration
           // height={{ sm: "5srem", lg: "10rem" }}÷
           // mt={{ base: 0, sm: 0 }}

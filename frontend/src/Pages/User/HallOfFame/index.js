@@ -10,6 +10,11 @@ function HallOfFame() {
   const history = useHistory();
   const getWinners = [
     {
+      winners: ["🥇Himavarshith", "🥈Jayasurya Pinaki", "🥉Gurumoorthy Baskar"],
+      year: "2024",
+      event: "IPL",
+    },
+    {
       winners: ["🥇Barath C", "🥈Harikumar Shastry", "🥉Aditya Ranjan"],
       year: "2023",
       event: "Cricket World Cup",

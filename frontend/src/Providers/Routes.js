@@ -21,6 +21,7 @@ import HallOfFame from "../Pages/User/HallOfFame";
 import { auth, logout } from "../Firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useStoreActions } from "easy-peasy";
+import Impact from "../Pages/User/Impact/Impact";
 
 function Routes() {
   const [authenticated, setAuth] = useState(false);
@@ -65,12 +66,15 @@ function Routes() {
         <PrivateGoogleRoute path="/unsubscribe">
           <Unsubscribe />
         </PrivateGoogleRoute>
-        <Route path="/login">
-          <GoogleLogin />
-        </Route>
+        <PrivateGoogleRoute path="/impact">
+          <Impact />
+        </PrivateGoogleRoute>
         <PrivateGoogleRoute path="/">
           <Home />
         </PrivateGoogleRoute>
+        <Route path="/login">
+          <GoogleLogin />
+        </Route>
       </Switch>
     </Router>
   );

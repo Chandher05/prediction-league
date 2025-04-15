@@ -16,6 +16,7 @@ function Countdown() {
 
   const [nextGame, setNextGame] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
+
   const color = () => {
     if (
       nextGame.team1.shortName === "RCB" ||
@@ -27,6 +28,7 @@ function Countdown() {
   };
 
   useEffect(() => {
+    console.log("backend api", process.env.REACT_APP_API_BE);
     fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
       headers: {
         Authorization: `Bearer ${authId}`,
@@ -35,6 +37,7 @@ function Countdown() {
       .then(async (response) => {
         if (response.ok) {
           const games = await response.json();
+
           setNextGame(games[0]);
         }
       })
@@ -69,8 +72,9 @@ function Countdown() {
 export default Countdown;
 
 const checkTime = (timeLeft) => {
-  if (timeLeft?.seconds > 0) return true;
-  return false;
+  if (timeLeft?.seconds == 0 && timeLeft?.minutes == 0 && timeLeft?.hours == 0)
+    return false;
+  return true;
 };
 
 function CountDownClock({ timeLeft, nextGame, color }) {
@@ -131,7 +135,7 @@ function CountDownClock({ timeLeft, nextGame, color }) {
               <VStack spacing={0} p={0}>
                 <Text fontSize="4xl" fontWeight={700}>
                   {timeLeft.seconds < 10
-                    ? `0${timeLeft.seconds}`
+                    ? `0${timeLeft.seconds || "0"}`
                     : timeLeft.seconds}
                 </Text>
                 <Text fontSize="md" fontWeight={500}>
