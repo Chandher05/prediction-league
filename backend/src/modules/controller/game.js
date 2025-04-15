@@ -729,7 +729,13 @@ exports.isImpactActive = async (req, res) => {
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send({
 				confidence: allPredictions[0].confidence,
-				predictedTeam: teamObj[allPredictions[0].predictedTeamId]
+				predictedTeam: teamObj[allPredictions[0].predictedTeamId],
+				game: {
+					gameId: allGames[0]._id,
+					gameNumber: allGames[0].gameNumber,
+					team1: teamObj[allGames[0].team1],
+					team2: teamObj[allGames[0].team2]
+				}
 			})
 	} catch (error) {
 		console.log(`Error while getting scheduled game ${error}`)
