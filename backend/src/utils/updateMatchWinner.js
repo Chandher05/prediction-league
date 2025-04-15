@@ -9,9 +9,12 @@ import cron from "node-cron"
 console.log('CRON running to update match winners')
 
 cron.schedule('*/10 * * * *', async () => {
+    const now = new Date();
+    const eightHoursAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000);
     let allGames = await Game.find({
         startTime: {
-            $lte: new Date()
+            $lte: new Date(),
+            $gte: eightHoursAgo
         },
         matchEnded: false
     }).sort('startTime')
