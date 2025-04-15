@@ -33,6 +33,7 @@ export default function Home() {
       .then((res) => {
         if (res.status == 200) {
           console.log("Impact is on");
+          setImpact(true);
         }
       })
       .catch((err) => {

@@ -726,7 +726,7 @@ exports.isImpactActive = async (req, res) => {
 		}
 		
 		return res
-			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.status(constants.STATUS_CODE.SUCCESS_STATUS)
 			.send({
 				confidence: allPredictions[0].confidence,
 				predictedTeam: teamObj[allPredictions[0].predictedTeamId],

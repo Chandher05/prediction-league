@@ -110,7 +110,7 @@ function Predictions() {
                     <Tr id={game.gameNumber}>
                       <Td>{game.gameNumber}</Td>
                       <Td>{`${game.team1.shortName} vs ${game.team2.shortName}`}</Td>
-                      <Td>{game.confidence}</Td>
+                      <Td>{`${game.confidence}${game.isImpact?" - IMP":""}`}</Td>
                       <Td>{game.predictedTeam.shortName}</Td>
                       <Td>{game.winner.shortName}</Td>
                     </Tr>

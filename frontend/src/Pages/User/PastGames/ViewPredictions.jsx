@@ -60,7 +60,7 @@ function ViewPredictions({ gameId }) {
                       >
                         <Td>{record.username}</Td>
                         <Td>{record.prediction.predictedTeam.fullName}</Td>
-                        <Td>{record.prediction.confidence}</Td>
+                        <Td>{`${record.prediction.confidence}${record.prediction.isImpact?" - IMP":""}`}</Td>
                       </Tr>
                     );
                   })}

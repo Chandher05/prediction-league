@@ -357,7 +357,8 @@ exports.getPredictionsOfUser = async (req, res) => {
 		for (var prediction of allPredictions) {
 			predictionByGame[prediction.gameId] = {
 				confidence: prediction.confidence,
-				predictedTeam: prediction.predictedTeamId
+				predictedTeam: prediction.predictedTeamId,
+				isImpact: prediction.isImpact
 			}
 		}
 		
@@ -369,13 +370,14 @@ exports.getPredictionsOfUser = async (req, res) => {
 		}
 
 		let returnData = []
-		let confidence, predictedTeam, gameStartTime, currentTime = new Date()
+		let confidence, predictedTeam, gameStartTime, isImpact = false, currentTime = new Date()
 		for (var game of allGames) {
 			gameStartTime = new Date(game.startTime)
 
 			if (game._id in predictionByGame) {
 				confidence = predictionByGame[game._id].confidence
 				predictedTeam = teamById[predictionByGame[game._id].predictedTeam]
+				isImpact = predictionByGame[game._id].isImpact
 			} else if (gameStartTime < currentTime) {
 				confidence = "L"
 				predictedTeam = {}
@@ -391,6 +393,7 @@ exports.getPredictionsOfUser = async (req, res) => {
 				team2: teamById[game.team2],
 				confidence: confidence,
 				predictedTeam: predictedTeam,
+				isImpact: isImpact,
 				winner: game.winner == null? {} : teamById[game.winner]
 			})
 		}

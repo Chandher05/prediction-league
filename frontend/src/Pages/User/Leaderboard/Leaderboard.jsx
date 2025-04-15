@@ -65,6 +65,7 @@ function Leaderboard() {
               <Th>Name</Th>
               <Th>Score</Th>
               <Th>FH</Th>
+              <Th>IMP</Th>
               <Th>L</Th>
             </Tr>
           </Thead>
@@ -77,6 +78,7 @@ function Leaderboard() {
                     <Td>{row.username}</Td>
                     <Td>{row.score.toFixed(7)}</Td>
                     <Td>{row.freeHitsRemaining}</Td>
+                    <Td>{row.impactRemaining}</Td>
                     <Td>{row.leavesRemaining}</Td>
                   </Tr>
                 );
