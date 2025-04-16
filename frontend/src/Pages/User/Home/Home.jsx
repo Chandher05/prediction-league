@@ -45,6 +45,10 @@ export default function Home() {
 
   console.log("Home page");
 
+  function handleLogout() {
+    logout(history);
+  }
+
   return (
     <Container maxW={"full"}>
       <Stack
@@ -141,10 +145,7 @@ export default function Home() {
             rounded={"8"}
             px={6}
             colorScheme={"red"}
-            onClick={() => {
-              logout();
-              history.push("/login");
-            }}
+            onClick={handleLogout}
           >
             Log out
           </Button>

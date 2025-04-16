@@ -20,7 +20,7 @@ import Unsubscribe from "../common/Unsubscribe";
 import HallOfFame from "../Pages/User/HallOfFame";
 import { auth, logout } from "../Firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useStoreActions } from "easy-peasy";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import Impact from "../Pages/User/Impact/Impact";
 
 function Routes() {
@@ -57,24 +57,24 @@ function Routes() {
         <PrivateGoogleRoute path="/predictions">
           <Predictions />
         </PrivateGoogleRoute>
-        <PrivateGoogleRoute path="/trends">
+        {/* <Route path="/trends">
           <Trends />
-        </PrivateGoogleRoute>
+        </Route> */}
         <PrivateGoogleRoute path="/halloffame">
           <HallOfFame />
         </PrivateGoogleRoute>
-        <PrivateGoogleRoute path="/unsubscribe">
+        {/* <Route path="/unsubscribe">
           <Unsubscribe />
-        </PrivateGoogleRoute>
+        </Route> */}
         <PrivateGoogleRoute path="/impact">
           <Impact />
-        </PrivateGoogleRoute>
-        <PrivateGoogleRoute path="/">
-          <Home />
         </PrivateGoogleRoute>
         <Route path="/login">
           <GoogleLogin />
         </Route>
+        <PrivateGoogleRoute path="/">
+          <Home />
+        </PrivateGoogleRoute>
       </Switch>
     </Router>
   );
