@@ -9,15 +9,18 @@ import {
   signOut,
 } from "firebase/auth";
 
-import { useAuthState } from 'react-firebase-hooks/auth';
-
+import { useAuthState } from "react-firebase-hooks/auth";
 
 // Your web app's Firebase configuration
+// Firebase config now uses Vite environment variables
+// Firebase config now uses Create React App environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyAvItmkd0u1tanvH7Vzw-xSRSPfsT1_9UI",
-  authDomain: process.env.REACT_APP_API_FIREBASE_PROJECT_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_API_FIREBASE,
-  appId: process.env.REACT_APP_API_FIREBASE_PROJECT_ID,
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY, // REACT_APP_FIREBASE_API_KEY
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN, // REACT_APP_FIREBASE_AUTH_DOMAIN
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID, // REACT_APP_FIREBASE_PROJECT_ID
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET, // REACT_APP_FIREBASE_STORAGE_BUCKET
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID, // REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+  appId: process.env.REACT_APP_FIREBASE_APP_ID, // REACT_APP_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
@@ -29,14 +32,17 @@ const auth = getAuth(app);
 const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
-    const user = res.user;
-    await user.getIdToken().then(function (idToken) {  // <------ Check this line
-      fetch(`${process.env.REACT_APP_API_BE}/users/login`, {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-        method: 'POST',
-      })
+    console.log(res);
+    const user = await res.user;
+
+    const userIdToken = await user.getIdToken();
+
+    console.log({ userIdToken });
+    fetch(`${process.env.REACT_APP_API_BE}/users/login`, {
+      headers: {
+        Authorization: `Bearer ${userIdToken}`,
+      },
+      method: "POST",
     });
     return user;
   } catch (err) {
@@ -45,19 +51,13 @@ const signInWithGoogle = async () => {
   }
 };
 
-const logout = () => {
+const logout = (history) => {
   signOut(auth);
+  history.push("/login");
 };
 
 // const getIdTokenOfUser = () => {
 //   return getIdToken(auth);
 // }
 
-
-
-export {
-  auth,
-  useAuthState,
-  signInWithGoogle,
-  logout,
-};
+export { auth, useAuthState, signInWithGoogle, logout };
