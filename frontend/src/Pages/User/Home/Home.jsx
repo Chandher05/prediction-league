@@ -14,11 +14,14 @@ import Countdown from "./Countdown";
 import { logout } from "../../../Firebase/config";
 import { useEffect } from "react";
 import { useStoreState } from "easy-peasy";
+import { useStoreActions } from "easy-peasy";
+
 import { useState } from "react";
 
 export default function Home() {
   const [impact, setImpact] = useState(false);
   const authId = useStoreState((state) => state.authId);
+  const reset = useStoreActions((actions) => actions.reset);
   const history = useHistory();
   const navTo = (route) => {
     history.push(`/${route}`);
@@ -43,9 +46,8 @@ export default function Home() {
       });
   }, []);
 
-  console.log("Home page");
-
   function handleLogout() {
+    reset();
     logout(history);
   }
 

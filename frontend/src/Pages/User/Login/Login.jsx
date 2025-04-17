@@ -1,7 +1,15 @@
-import { Container, Heading, Stack, Text, Button } from "@chakra-ui/react";
+import {
+  Container,
+  Heading,
+  Stack,
+  Text,
+  Button,
+  Center,
+} from "@chakra-ui/react";
 import { useHistory, useLocation } from "react-router";
 
 import { signInWithGoogle } from "../../../Firebase/config";
+import { Illustration } from "../Home/Illustration";
 
 export default function GoogleLogin() {
   const history = useHistory();
@@ -44,6 +52,20 @@ export default function GoogleLogin() {
         >
           Login With Google
         </Button>
+        <Center
+          opacity={0.5}
+          position={"fixed"}
+          zIndex={-1}
+          w={"full"}
+
+          // w={"full"}
+          // h={"full"}
+        >
+          <Illustration
+          // height={{ sm: "5srem", lg: "10rem" }}÷
+          // mt={{ base: 0, sm: 0 }}
+          />
+        </Center>
       </Stack>
     </Container>
   );
