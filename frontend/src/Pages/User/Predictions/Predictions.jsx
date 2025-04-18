@@ -96,6 +96,7 @@ function Predictions() {
               <Th>Confidence</Th>
               <Th>Predicted Team</Th>
               <Th>Actual Winner</Th>
+              <Th>Predict</Th>
             </Tr>
           </Thead>
           {games && games.length > 0 ? (
@@ -110,9 +111,19 @@ function Predictions() {
                     <Tr id={game.gameNumber}>
                       <Td>{game.gameNumber}</Td>
                       <Td>{`${game.team1.shortName} vs ${game.team2.shortName}`}</Td>
-                      <Td>{`${game.confidence}${game.isImpact?" - IMP":""}`}</Td>
+                      <Td>{`${game.confidence}${
+                        game.isImpact ? " - IMP" : ""
+                      }`}</Td>
                       <Td>{game.predictedTeam.shortName}</Td>
                       <Td>{game.winner.shortName}</Td>
+                      <Td>
+                        <Button
+                          disabled={game.gameStarted}
+                          onClick={() => history.push(`/predict/${game.id}`)}
+                        >
+                          Predict
+                        </Button>
+                      </Td>
                     </Tr>
                   );
                 } else return <div>Not Found</div>;
