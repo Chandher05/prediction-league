@@ -34,6 +34,7 @@ import { useStoreState } from "easy-peasy";
 function Games() {
   const history = useHistory();
   const [games, setGames] = useState([]);
+  const [teams, setTeams] = useState([]);
   const authId = useStoreState((state) => state.authId);
 
   const getGames = useCallback(() => {
@@ -46,9 +47,24 @@ function Games() {
     });
   }, [authId]);
 
+  const getTeams = useCallback(() => {
+    fetch(process.env.REACT_APP_API_BE + "/teams/all", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) setTeams(await response.json());
+    });
+  }, [authId]);
+
   useEffect(() => {
     getGames();
   }, [getGames]);
+
+  useEffect(() => {
+    getTeams();
+  }, [getTeams]);
+
   const navToUser = () => {
     history.push("/admin/Users");
   };
@@ -56,7 +72,7 @@ function Games() {
     <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
       <HStack spacing={3} alignItems="justify-center">
         <Heading size="2xl">Games</Heading>
-        <AddGameModal onCloseCall={getGames}></AddGameModal>
+        <AddGameModal onCloseCall={getGames} teams={teams}></AddGameModal>
         <Button onClick={getGames}>Refresh</Button>
         <Button onClick={navToUser}>Users Table</Button>
       </HStack>
@@ -105,14 +121,17 @@ function Games() {
 
 export default Games;
 
-function AddGameModal({ onCloseCall }) {
+function AddGameModal({ onCloseCall, teams }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
+
+  const authId = useStoreState((state) => state.authId);
   const onSubmit = (data) => {
     fetch(process.env.REACT_APP_API_BE + "/game/add", {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`,
       },
       body: JSON.stringify(data),
     }).then(() => {
@@ -140,11 +159,21 @@ function AddGameModal({ onCloseCall }) {
 
               <FormControl mt={4}>
                 <FormLabel>Team 1</FormLabel>
-                <Input placeholder="RCB" {...register("team1")} />
+                <Select {...register("team1")}>
+                  <option value={null}></option>
+                  {teams.map((team) => {
+                    return <option value={team.teamId}>{team.fullName}</option>
+                  })}
+                </Select>
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Team 2</FormLabel>
-                <Input placeholder="DC" {...register("team2")} />
+                <Select {...register("team2")}>
+                  <option value={null}></option>
+                  {teams.map((team) => {
+                    return <option value={team.teamId}>{team.fullName}</option>
+                  })}
+                </Select>
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
