@@ -47,7 +47,6 @@ function Trends() {
             borderColor: randomCol,
           });
         }
-        console.log(datasets);
         setGraphData({
           labels: res.gameNumbers,
           datasets: datasets,

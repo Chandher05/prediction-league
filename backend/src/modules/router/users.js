@@ -12,5 +12,6 @@ router.get('/all', userController.allUsers);
 router.put('/update', userController.updateAdmin);
 router.put('/unsubscribe', userController.unsubscribeUser);
 router.put('/resubscribe', userController.resubscribeUser);
+router.post('/disable/impact', userController.disableImpact);
 
 module.exports = router;

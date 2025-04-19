@@ -302,3 +302,35 @@ exports.updateAdmin = async (req, res) => {
 			.send(error.message)
 	}
 }
+
+/**
+ * Disable impact for all users.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+ exports.disableImpact = async (req, res) => {
+	try {
+
+		await Users.updateMany(
+			{
+				isActive: true,
+			},
+			{
+				$set: {
+					impactRemaining: 0
+				}
+			}
+		)
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send("Disabled impact for all users")
+
+
+	} catch (error) {
+		console.log(`Error in game/disableImpact ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}

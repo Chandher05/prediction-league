@@ -44,9 +44,7 @@ export default function Impact() {
       })
         .then(async (res) => {
           if (res.status == 200) {
-            console.log("Impact is on");
             const data = await res.json();
-            console.log(data);
             setCurrConfidenceLevel(data.confidence);
             predictionForGame(data.predictedTeam._id);
             setOriginalPredictedTeamId(data.predictedTeam._id);
@@ -73,8 +71,6 @@ export default function Impact() {
             isClosable: true,
           });
           history.push("/");
-          console.log("error fetching....");
-          console.log(err);
         });
     };
     getGames();

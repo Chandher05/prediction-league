@@ -4,7 +4,7 @@ export const store = createStore(
   persist({
     authId: "guest",
     setAuthId: action((state, payload) => {
-      console.log("this is authId", payload.authId);
+      // console.log("this is authId", payload.authId);
       state.authId = payload.authId;
     }),
     setUserName: action((state, payload) => {

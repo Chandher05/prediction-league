@@ -28,7 +28,7 @@ import DateTime from "luxon/src/datetime";
 import { useHistory } from "react-router";
 import { useToast } from "@chakra-ui/react";
 import ViewPredictions from "../../../common/ViewPredictions";
-import { CheckIcon, CopyIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { CheckIcon, CopyIcon, DeleteIcon, EditIcon, RepeatIcon } from "@chakra-ui/icons";
 import { useStoreState } from "easy-peasy";
 
 function Games() {
@@ -65,7 +65,7 @@ function Games() {
         <Thead>
           <Tr>
             <Th>No.</Th>
-            <Th>id</Th>
+            {/* <Th>id</Th> */}
             <Th>Team 1</Th>
             <Th>Team 2</Th>
             <Th>Start Time</Th>
@@ -78,7 +78,7 @@ function Games() {
             return (
               <Tr key={game.gameNumber}>
                 <Td>{game.gameNumber}</Td>
-                <Td>{game.gameId}</Td>
+                {/* <Td>{game.gameId}</Td> */}
                 <Td>{game.team1.fullName}</Td>
                 <Td>{game.team2.fullName}</Td>
                 <Td>
@@ -88,10 +88,10 @@ function Games() {
                 </Td>
                 <Td>{game.winner.fullName}</Td>
                 <Td>
-                  <CopyLink id={game.gameId}></CopyLink>
-                  <ViewPredictions gameId={game.gameId}></ViewPredictions>
+                  <AutoUpdateWinner gameId={game.gameId}></AutoUpdateWinner>
                   <UpdateGameModal game={game}></UpdateGameModal>
-
+                  <ViewPredictions gameId={game.gameId}></ViewPredictions>
+                  <CopyLink id={game.gameId}></CopyLink>
                   <DeleteConfirmModal gameId={game.gameId}></DeleteConfirmModal>
                 </Td>
               </Tr>
@@ -109,7 +109,6 @@ function AddGameModal({ onCloseCall }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = (data) => {
-    console.log({ data });
     fetch(process.env.REACT_APP_API_BE + "/game/add", {
       method: "POST", // or 'PUT'
       headers: {
@@ -198,7 +197,7 @@ function UpdateGameModal({ game }) {
       gameNumber: game.gameNumber,
       team1: game.team1?._id,
       team2: game.team2?._id,
-      startTime: new Date(game?.startTime),
+      startTime: game?.startTime,
     },
   });
   const onSubmit = (data) => {
@@ -240,7 +239,7 @@ function UpdateGameModal({ game }) {
               </FormControl>*/}
               <FormControl mt={4}>
                 <FormLabel>Start Time</FormLabel>
-                <Input type="datetime-local" {...register("startTime")} />
+                <Input placeholder="Start Time" {...register("startTime")} />
               </FormControl>
               <FormControl mt={4}>
                 <FormLabel>Winner</FormLabel>
@@ -292,9 +291,55 @@ function CopyLink({ id }) {
   );
 }
 
+function AutoUpdateWinner({ gameId }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+
+  const authId = useStoreState((state) => state.authId);
+
+  const updateWinner = () => {
+    if (!gameId) return;
+    fetch(`${process.env.REACT_APP_API_BE}/game/update-winner/${gameId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) {
+        toast({
+          title: "Game Updated.",
+          description: "Game has been updated",
+          status: "sucess",
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "Game not updated",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose();
+      }
+    })
+  };
+
+  return (
+    <Button variant="ghost" onClick={updateWinner} ml={2}>
+      <RepeatIcon></RepeatIcon>
+    </Button>
+  );
+}
+
 function DeleteConfirmModal({ gameId }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
+  const authId = useStoreState((state) => state.authId);
 
   const delGame = () => {
     if (!gameId) return;
@@ -302,6 +347,7 @@ function DeleteConfirmModal({ gameId }) {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`,
       },
     }).then(async (response) => {
       if (response.ok) {

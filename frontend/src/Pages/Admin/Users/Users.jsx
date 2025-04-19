@@ -8,19 +8,18 @@ import {
   Th,
   Td,
   Button,
-  // FormControl,
-  // FormLabel,
-  // Input,
-  // Modal,
-  // ModalOverlay,
-  // ModalContent,
-  // ModalHeader,
-  // ModalFooter,
-  // ModalBody,
-  // ModalCloseButton,
-  // useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  Text
 } from "@chakra-ui/react";
 // import { useForm } from "react-hook-form";
+import { useToast } from "@chakra-ui/react";
 import { useHistory } from "react-router";
 import { useStoreState } from "easy-peasy";
 
@@ -50,6 +49,7 @@ function Users() {
         <Heading size="2xl">Users</Heading>
         {/* <AddUserModal></AddUserModal> */}
         <Button onClick={navToGame}>Games Table</Button>
+        <DisableImpact />
       </HStack>
 
       <Table variant="striped" size="sm" colorScheme="teal">
@@ -130,3 +130,70 @@ export default Users;
 //     </>
 //   );
 // }
+
+
+
+
+function DisableImpact() {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
+
+  const authId = useStoreState((state) => state.authId);
+
+  const disableImpact = () => {
+    fetch(`${process.env.REACT_APP_API_BE}/users/disable/impact`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) {
+        toast({
+          title: "Impact Disabled",
+          description: "Impact set to 0 for all users",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "Impact not disabled",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+        onClose();
+      }
+    });
+  };
+  return (
+    <>
+      <Button onClick={onOpen} colorScheme="red">Disable Impact Prediction</Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color="red">Disable Impact Prediction?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Text fontSize="xl">
+              Are you sure you want to disable impact prediction for all users?
+            </Text>
+            <Text color="red" fontSize="sm">
+              Note: This is not reversible
+            </Text>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={disableImpact}>
+              Disable
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
