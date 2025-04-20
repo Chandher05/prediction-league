@@ -15,5 +15,6 @@ module.exports = {
 		host: process.env.DB_HOST,
 		port: process.env.DB_DBPORT,
 		dialect: process.env.DB_DIALECT
-	}
+	},
+	PREDICTION_PASSWORD: process.env.PREDICTION_PASSWORD,
 }

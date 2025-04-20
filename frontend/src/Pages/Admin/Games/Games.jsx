@@ -35,6 +35,7 @@ function Games() {
   const history = useHistory();
   const [games, setGames] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [users, setUsers] = useState([]);
   const authId = useStoreState((state) => state.authId);
 
   const getGames = useCallback(() => {
@@ -57,6 +58,16 @@ function Games() {
     });
   }, [authId]);
 
+  const getUsers = useCallback(() => {
+    fetch(process.env.REACT_APP_API_BE + "/users/all", {
+      headers: {
+        Authorization: `Bearer ${authId}`,
+      },
+    }).then(async (response) => {
+      if (response.ok) setUsers(await response.json());
+    });
+  }, [authId]);
+
   useEffect(() => {
     getGames();
   }, [getGames]);
@@ -64,6 +75,10 @@ function Games() {
   useEffect(() => {
     getTeams();
   }, [getTeams]);
+
+  useEffect(() => {
+    getUsers();
+  }, [getUsers]);
 
   const navToUser = () => {
     history.push("/admin/Users");
@@ -75,6 +90,7 @@ function Games() {
         <AddGameModal onCloseCall={getGames} teams={teams}></AddGameModal>
         <Button onClick={getGames}>Refresh</Button>
         <Button onClick={navToUser}>Users Table</Button>
+        <AddPredictionModal users={users} games={games} teams={teams}></AddPredictionModal>
       </HStack>
 
       <Table variant="striped" size="small" colorScheme="teal">
@@ -416,6 +432,114 @@ function DeleteConfirmModal({ gameId }) {
             </Button>
             <Button onClick={onClose}>Cancel</Button>
           </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+
+
+function AddPredictionModal({ users, games, teams }) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { register, handleSubmit, reset } = useForm();
+
+  const toast = useToast();
+
+  const authId = useStoreState((state) => state.authId);
+  const onSubmit = (data) => {
+    fetch(process.env.REACT_APP_API_BE + "/prediction/admin/new", {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authId}`,
+      },
+      body: JSON.stringify(data),
+    })
+    .then(async (response) => {
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Prediction Added",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        reset();
+        onClose();
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not add prediction",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    });
+  };
+  return (
+    <>
+      <Button colorScheme="teal" mx onClick={onOpen}>
+        Add Prediction
+      </Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <ModalHeader>New Prediction</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <FormControl>
+                <FormLabel>User</FormLabel>
+                <Select {...register("userId")}>
+                  <option value={null}></option>
+                  {users.map((user) => {
+                    return <option value={user.mongoId}>{user.username}</option>
+                  })}
+                </Select>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>Game Number</FormLabel>
+                <Select {...register("gameId")}>
+                  <option value={null}></option>
+                  {games.map((game) => {
+                    return <option value={game.gameId}>{game.gameNumber + " - " + game.team1.fullName + " vs " + game.team2.fullName}</option>
+                  })}
+                </Select>
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Predicted Team</FormLabel>
+                <Select {...register("predictedTeamId")}>
+                  <option value={null}></option>
+                  {teams.map((team) => {
+                    return <option value={team.teamId}>{team.fullName}</option>
+                  })}
+                </Select>
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Confidence</FormLabel>
+                <Input
+                  pattern="^(5[1-9]|[6-9][0-9]|100|FH|L)$"
+                  {...register("confidence")}
+                  placeholder="51 - 100 or FH or L"
+                />
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Password</FormLabel>
+                <Input {...register("password")} />
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="blue" mr={3} type="submit">
+                Add Prediction
+              </Button>
+              <Button onClick={onClose}>Close</Button>
+            </ModalFooter>
+          </form>
         </ModalContent>
       </Modal>
     </>

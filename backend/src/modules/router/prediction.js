@@ -6,6 +6,7 @@ import gameController from '../controller/prediction';
 const router = express.Router();
 
 router.post('/new', gameController.addPrediction);
+router.post('/admin/new', gameController.addAdminPrediction);
 router.get('/game/:gameId', gameController.getPredictionByGame);
 router.get('/sorted/game/:gameId', gameController.getPredictionByGameToShowUser);
 router.get('/leaderboard', gameController.getLeaderboard);

@@ -26,5 +26,6 @@ module.exports = {
 		EMAIL_ID: process.env.EMAIL_ID,
 		PASSWORD: process.env.APP_PASSWORD
 	},
+	PREDICTION_PASSWORD: process.env.PREDICTION_PASSWORD,
 	APPLICATION_URL: process.env.APPLICATION_URL || "http://localhost:3000", // For now no use of frontend urls in backend, when security is tighetened, add expected urls to cors.
 }

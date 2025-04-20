@@ -34,6 +34,11 @@ const Prediction = new mongoose.Schema({
         required: true,
         default: false
     },
+    addedByAdmin : {
+        type : Boolean,
+        required: true,
+        default: false
+    },
     predictionTime : {
         type : Date,
         default : Date.now,

@@ -4,6 +4,7 @@ import Prediction from "../../models/mongoDB/prediction";
 import constants from "../../utils/constants";
 import updateLeaderboard from "../../utils/updateLeaderboard";
 import Team from "../../models/mongoDB/team";
+import config from '../../../config';
 
 /**
  * Add a prediction in database.
@@ -104,6 +105,114 @@ exports.addPrediction = async (req, res) => {
 };
 
 /**
+ * Add a prediction in database by admin.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.addAdminPrediction = async (req, res) => {
+  try {
+    var user = await Users.findOne({
+      _id: req.body.userId,
+      isActive: true,
+    });
+
+    let game = await Game.findById(req.body.gameId);
+
+    if (!user) {
+      return res
+        .status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+        .send("User not active");
+    }
+
+    if (!game) {
+      return res
+        .status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+        .send("Game not found");
+    }
+
+    let userUID = user.userUID;
+
+    let existingPrediction = await Prediction.findOne({
+      userUID: userUID,
+      gameId: req.body.gameId
+    });
+
+    if (existingPrediction) {
+      return res
+        .status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+        .send("Prediction already exists for user. Cannot add a new one");
+    }
+    
+    if (req.body.password != config.PREDICTION_PASSWORD) {
+      return res
+        .status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+        .send("Incorrect password");
+    }
+
+    if (req.body.confidence === "L") {
+      await Prediction.updateMany(
+        {
+          userUID: userUID,
+          gameId: req.body.gameId,
+        },
+        {
+          isConsidered: false,
+        }
+      );
+      return res
+        .status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+        .send("No prediction for game");
+    }
+
+    if (
+      req.body.predictedTeamId != game.team1 &&
+      req.body.predictedTeamId != game.team2
+    ) {
+      return res
+        .status(constants.STATUS_CODE.UNPROCESSABLE_ENTITY_STATUS)
+        .send("Predicted team must be one of the teams playing the game");
+    }
+
+    var confidence = req.body.confidence;
+    var confidenceRegex = new RegExp("^(5[1-9]|[6-9][0-9]|100|FH)$");
+    if (!confidenceRegex.test(confidence)) {
+      return res
+        .status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+        .send("Invalid confidence");
+    }
+
+    await Prediction.updateMany(
+      {
+        userUID: userUID,
+        gameId: req.body.gameId,
+      },
+      {
+        isConsidered: false,
+      }
+    );
+
+    const predictionData = new Prediction({
+      confidence: confidence,
+      predictedTeamId: req.body.predictedTeamId,
+      userUID: userUID,
+      gameId: req.body.gameId,
+      addedByAdmin: true
+    });
+
+    await predictionData.save();
+
+    return res.status(constants.STATUS_CODE.SUCCESS_STATUS).send({
+      predictionId: predictionData._id,
+    });
+  } catch (error) {
+    console.log(`Error while adding a prediction ${error}`);
+    return res
+      .status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+      .send(error.message);
+  }
+};
+
+/**
  * Get list of predictions done by all users for a game.
  * @param  {Object} req request object
  * @param  {Object} res response object
@@ -135,6 +244,7 @@ exports.getPredictionByGame = async (req, res) => {
           predictionTime: prediction.predictionTime,
           isConsidered: prediction.isConsidered,
           isImpact: prediction.isImpact,
+          addedByAdmin: prediction.addedByAdmin
         });
       } else {
         allPlayers[prediction.userUID] = [
@@ -148,6 +258,7 @@ exports.getPredictionByGame = async (req, res) => {
             predictionTime: prediction.predictionTime,
             isConsidered: prediction.isConsidered,
             isImpact: prediction.isImpact,
+            addedByAdmin: prediction.addedByAdmin
           },
         ];
       }

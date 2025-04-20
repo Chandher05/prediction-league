@@ -61,7 +61,9 @@ function ViewPredictions({ gameId }) {
                         {record.prediction.map((rec) => (
                           <p>{`${rec.predictedTeam.fullName} - ${
                             rec.confidence
-                          } ${rec.isImpact ? "- IMP" : ""} - ${rec.isConsidered ? "Yes" : "No"}`}</p>
+                          } ${rec.isImpact ? "- IMP" : ""} - ${rec.isConsidered ? "Yes" : "No"}
+                          ${rec.addedByAdmin ? " - ADMIN" : ""}
+                          `}</p>
                         ))}
                       </Td>
                     </Tr>
