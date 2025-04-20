@@ -72,7 +72,7 @@ function Countdown() {
 export default Countdown;
 
 const checkTime = (timeLeft) => {
-  if (timeLeft?.seconds == 0 && timeLeft?.minutes == 0 && timeLeft?.hours == 0)
+  if (timeLeft?.seconds === 0 && timeLeft?.minutes === 0 && timeLeft?.hours === 0)
     return false;
   return true;
 };

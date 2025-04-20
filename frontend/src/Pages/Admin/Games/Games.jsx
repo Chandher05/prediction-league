@@ -337,7 +337,7 @@ function CopyLink({ id }) {
 }
 
 function AutoUpdateWinner({ gameId }) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onClose } = useDisclosure();
   const toast = useToast();
 
   const authId = useStoreState((state) => state.authId);
