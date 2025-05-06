@@ -15,12 +15,12 @@ import Leaderboard from "../Pages/User/Leaderboard/Leaderboard";
 import PastGames from "../Pages/User/PastGames/Games";
 import Predict from "../Pages/User/Predict/Predict";
 import Predictions from "../Pages/User/Predictions/Predictions";
-import Trends from "../Pages/User/Trends/Trends";
-import Unsubscribe from "../common/Unsubscribe";
+// import Trends from "../Pages/User/Trends/Trends";
+// import Unsubscribe from "../common/Unsubscribe";
 import HallOfFame from "../Pages/User/HallOfFame";
 import { auth, logout } from "../Firebase/config";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useStoreActions, useStoreState } from "easy-peasy";
+import { useStoreActions } from "easy-peasy";
 import Impact from "../Pages/User/Impact/Impact";
 
 function Routes() {

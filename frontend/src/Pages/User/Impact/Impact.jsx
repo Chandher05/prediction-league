@@ -1,11 +1,8 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import {
   Button,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
-  Input,
   Stack,
   useColorModeValue,
   useToast,
@@ -32,8 +29,14 @@ export default function Impact() {
   const [selected, setSelected] = useState({});
   const [predictedTeamId, setPredictedTeamId] = useState({});
   const [originalPredictedTeamId, setOriginalPredictedTeamId] = useState({});
-  const { register, handleSubmit } = useForm();
+  const { handleSubmit } = useForm();
   const [currConfidenceLevel, setCurrConfidenceLevel] = useState(0);
+
+  const updateSelected = useCallback((game) => {
+    if (game.gameId !== selected.gameId) {
+      setSelected(game);
+    }
+  }, [selected]);
 
   useEffect(() => {
     const getGames = async () => {
@@ -43,7 +46,7 @@ export default function Impact() {
         },
       })
         .then(async (res) => {
-          if (res.status == 200) {
+          if (res.status === 200) {
             const data = await res.json();
             setCurrConfidenceLevel(data.confidence);
             predictionForGame(data.predictedTeam._id);
@@ -74,7 +77,8 @@ export default function Impact() {
         });
     };
     getGames();
-  }, [id, authId]);
+  }, [id, authId, history, toast, updateSelected]);
+
   const onSubmit = () => {
     const data = {
       gameId: selected?.gameId,
@@ -117,6 +121,7 @@ export default function Impact() {
         });
       });
   };
+
   const predictionForGame = (value) => {
     if (value === "Leave") {
       setPredictedTeamId(null);
@@ -125,11 +130,8 @@ export default function Impact() {
     }
   };
 
-  const updateSelected = (game) => {
-    if (game.gameId !== selected.gameId) {
-      setSelected(game);
-    }
-  };
+
+
   return (
     <Flex
       minH={"100vh"}
@@ -235,7 +237,7 @@ export default function Impact() {
                 />
               </HStack>
               <Text fontSize="xs" p="2">
-                Select {originalPredictedTeamId == selected.team1._id?selected.team2.fullName:selected.team1.fullName} and submit to switch teams
+                Select {originalPredictedTeamId === selected.team1._id ? selected.team2.fullName : selected.team1.fullName} and submit to switch teams
               </Text>
             </Box>
           ) : null}
@@ -247,7 +249,7 @@ export default function Impact() {
               _hover={{
                 bg: "blue.500",
               }}
-              disabled={originalPredictedTeamId == predictedTeamId?true:false}
+              disabled={originalPredictedTeamId === predictedTeamId ? true : false}
               type="submit"
             >
               Submit

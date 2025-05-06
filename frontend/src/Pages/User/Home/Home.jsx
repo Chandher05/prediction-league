@@ -35,7 +35,7 @@ export default function Home() {
       },
     })
       .then((res) => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           console.log("Impact is on");
           setImpact(true);
         }
@@ -44,7 +44,7 @@ export default function Home() {
         console.log("error fetching....");
         console.log(err);
       });
-  }, []);
+  }, [authId]);
 
   function handleLogout() {
     reset();
