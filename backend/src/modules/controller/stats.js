@@ -50,6 +50,7 @@ import constants from '../../utils/constants';
 					username: userObj[prediction.userUID].username,
 					predictedTeam: teamObj[prediction.predictedTeamId].fullName,
 					confidence: prediction.confidence,
+					predictionTime: prediction.predictionTime,
 					isConsidered: prediction.isConsidered
 				})
 			}
