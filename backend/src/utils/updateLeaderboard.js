@@ -79,6 +79,9 @@ var updateLeaderboard = async () => {
 							prediction = 50
 						}
 						freeHitsTakenByUser[user.userUID] += 1
+					} else if (prediction === "FH" && predictedTeam === winner.toString()) {			
+						prediction = 0
+						freeHitsTakenByUser[user.userUID] += 1
 					} else if (prediction === "FH") {			
 						prediction = 100
 						freeHitsTakenByUser[user.userUID] += 1
