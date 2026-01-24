@@ -1,7 +1,7 @@
 import requests
 import json
 
-api_key = ""
+api_key = "4169fd56-6b03-45c5-a225-b38ddfe877ec"
 series_ids = set([])
 
 teamCodes = {
@@ -256,6 +256,30 @@ teamCodes = {
     "shortName": "WF",
     "colorCode": "#000028",
     "colorDescription": "Red, white, and blue"
+  },
+  "Zimbabwe": {
+    "fullName": "Zimbabwe",
+    "shortName": "ZIM",
+    "colorCode": "#007749",
+    "colorDescription": "Green and yellow"
+  },
+  "United Arab Emirates": {
+    "fullName": "United Arab Emirates",
+    "shortName": "UAE",
+    "colorCode": "#FF0000",
+    "colorDescription": "Red, green, black and white"
+  },
+  "United States Of America": {
+    "fullName": "United States Of America",
+    "shortName": "USA",
+    "colorCode": "#B22234",
+    "colorDescription": "Red, white, and blue"
+  },
+  "Italy": {
+    "fullName": "Italy",
+    "shortName": "ITA",
+    "colorCode": "#008C45",
+    "colorDescription": "Green, white, and red"
   }
 }
 
