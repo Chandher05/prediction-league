@@ -1,7 +1,7 @@
 import requests
 import json
 
-api_key = "4169fd56-6b03-45c5-a225-b38ddfe877ec"
+api_key = ""
 series_ids = set([])
 
 teamCodes = {
