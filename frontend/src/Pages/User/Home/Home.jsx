@@ -65,7 +65,7 @@ export default function Home() {
           lineHeight={"110%"}
           className="neon"
         >
-          IPL {new Date().getFullYear()} <br />
+          T20 World Cup {new Date().getFullYear()} <br />
           <Text as={"span"} color={"red.600"} py={{ base: 20 }}>
             PREDICTION LEAGUE
           </Text>

@@ -188,7 +188,7 @@ export default function Predict() {
                 <div>
                   <Image
                     onClick={() => predictionForGame(selected.team1._id)}
-                    src={`${process.env.PUBLIC_URL}/Logo_IPL/${
+                    src={`${process.env.PUBLIC_URL}/Logo/${
                       selected.team1.shortName
                     }${
                       selected.team1._id === predictedTeamId
