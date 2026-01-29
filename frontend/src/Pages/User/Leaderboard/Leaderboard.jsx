@@ -21,6 +21,11 @@ function Leaderboard() {
 
   const [games, setGames] = useState([]);
   const [showStrategies, setShowStrategies] = useState(false);
+  const pageBg = useColorModeValue("gray.50", "transparent");
+  const backButtonColor = useColorModeValue("brand.600", "brand.200");
+  const adminRowBg = useColorModeValue("brand.100", "whiteAlpha.300");
+  const userRowBg = useColorModeValue("white", "whiteAlpha.100");
+  const rowTextColor = useColorModeValue("gray.800", "whiteAlpha.900");
   const getLeaderboard = useCallback(() => {
     fetch(process.env.REACT_APP_API_BE + "/prediction/leaderboard", {
       headers: {
@@ -37,12 +42,12 @@ function Leaderboard() {
     <Flex
       minH={"100vh"}
       justify={"center"}
-      bg={useColorModeValue("white", "gray.800")}
+      bg={pageBg}
     >
       <VStack w="full" h="full" p={4} spacing={10}>
         <HStack spacing={3} alignItems="justify-center">
           <Button
-            color="blue.300"
+            color={backButtonColor}
             borderRadius="10px"
             size="sm"
             onClick={() => history.push("/")}
@@ -72,8 +77,9 @@ function Leaderboard() {
           <Tbody>
             {games.map((row, index) => {
               if ((showStrategies && row.isAdmin) || !row.isAdmin) {
+                const rowBg = row.isAdmin ? adminRowBg : userRowBg;
                 return (
-                  <Tr backgroundColor={row.isAdmin ? "blue.400" : "blue.200"}>
+                  <Tr bg={rowBg} color={rowTextColor}>
                     <Td>{row.position}</Td>
                     <Td>{row.username}</Td>
                     <Td>{row.score.toFixed(7)}</Td>

@@ -5,6 +5,7 @@ import {
   Text,
   Button,
   Center,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useHistory, useLocation } from "react-router";
 
@@ -14,6 +15,9 @@ import { Illustration } from "../Home/Illustration";
 export default function GoogleLogin() {
   const history = useHistory();
   const location = useLocation();
+  const accentColor = useColorModeValue("brand.600", "brand.200");
+  const buttonBg = useColorModeValue("brand.600", "brand.300");
+  const buttonHover = useColorModeValue("brand.500", "brand.200");
 
   const signIn = async () => {
     await signInWithGoogle();
@@ -38,15 +42,15 @@ export default function GoogleLogin() {
           lineHeight={"110%"}
         >
           PREDICTION LEAGUE{" "}
-          <Text as={"span"} color={"blue.400"}>
+          <Text as={"span"} color={accentColor}>
             IPL 2024
           </Text>
         </Heading>
         <Button
           px={6}
-          colorScheme={"red"}
-          bg={"blue.400"}
-          _hover={{ bg: "blue.500" }}
+          colorScheme="brand"
+          bg={buttonBg}
+          _hover={{ bg: buttonHover }}
           onClick={signIn}
           size="lg"
         >

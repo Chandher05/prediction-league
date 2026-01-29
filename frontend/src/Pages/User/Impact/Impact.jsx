@@ -25,6 +25,13 @@ export default function Impact() {
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
+  const pageBg = useColorModeValue("gray.50", "surface");
+  const cardBg = useColorModeValue("white", "surfaceMuted");
+  const helperTextColor = useColorModeValue("gray.600", "gray.300");
+  const warningColor = useColorModeValue("orange.600", "orange.300");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const submitBg = useColorModeValue("brand.600", "brand.300");
+  const submitHover = useColorModeValue("brand.500", "brand.200");
 
   const [selected, setSelected] = useState({});
   const [predictedTeamId, setPredictedTeamId] = useState({});
@@ -137,13 +144,13 @@ export default function Impact() {
       minH={"100vh"}
       align={"center"}
       justify={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
+      bg={pageBg}
     >
       <Stack
         spacing={4}
         w={"full"}
         maxW={"md"}
-        bg={useColorModeValue("white", "gray.700")}
+        bg={cardBg}
         rounded={"xl"}
         boxShadow={"lg"}
         p={6}
@@ -165,7 +172,7 @@ export default function Impact() {
         <VStack>
           <Text
             align={"center"}
-            color={"grey.500"}
+            color={helperTextColor}
             fontSize={{ base: "md", md: "md" }}
           >
             Do you want to switch your team?
@@ -183,24 +190,28 @@ export default function Impact() {
           <Text fontSize="25px">{userName}</Text>
         </HStack>
         <VStack
-          style={{
-            justifyContent: "center",
-            border: "1px solid",
-            borderRadius: "10px",
-            padding: "10px",
-          }}
+          justify="center"
+          borderWidth="1px"
+          borderColor={borderColor}
+          borderRadius="10px"
+          p={4}
         >
           <Text fontSize={{ base: "md", md: "md" }}>
             Confidence Level: {currConfidenceLevel}
           </Text>
-          <Text align={"center"} color={"red.500"} fontSize={{ base: "xs" }}>
+          <Text align={"center"} color={warningColor} fontSize={{ base: "xs" }}>
             Warning: You confidence level remains same
           </Text>
         </VStack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           {selected.team1 && selected.team2 ? (
-            <Box borderWidth="1px" borderRadius="lg" m={2}>
+            <Box
+              borderWidth="1px"
+              borderRadius="lg"
+              m={2}
+              borderColor={borderColor}
+            >
               <HStack justifyContent="center">
                 <div>
                   <Image
@@ -236,7 +247,7 @@ export default function Impact() {
                   // }
                 />
               </HStack>
-              <Text fontSize="xs" p="2">
+              <Text fontSize="xs" p="2" color={helperTextColor}>
                 Select {originalPredictedTeamId === selected.team1._id ? selected.team2.fullName : selected.team1.fullName} and submit to switch teams
               </Text>
             </Box>
@@ -244,10 +255,10 @@ export default function Impact() {
 
           <Stack spacing={6} mt={5}>
             <Button
-              bg={"blue.400"}
+              bg={submitBg}
               color={"white"}
               _hover={{
-                bg: "blue.500",
+                bg: submitHover,
               }}
               disabled={originalPredictedTeamId === predictedTeamId ? true : false}
               type="submit"

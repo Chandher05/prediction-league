@@ -1,16 +1,11 @@
 .neon {
-  color: #2638ab;
+  color: #9ecbff;
   text-shadow:
-    0 0 5px #fff,
-    0 0 10px #fff,
-    0 0 20px #fff,
-    0 0 40px rgb(0, 174, 255),
-    0 0 80px rgb(0, 174, 255),
-    0 0 90px rgb(0, 174, 255),
-    0 0 100px rgb(0, 174, 255),
-    0 0 150px rgb(0, 174, 255);
+    0 0 10px rgba(158, 203, 255, 0.85),
+    0 0 20px rgba(68, 132, 244, 0.5),
+    0 0 40px rgba(14, 116, 144, 0.35);
 }
 
 #root {
-  background-color: linear-gradient(#e66465, #9198e5)!;
+  min-height: 100vh;
 }

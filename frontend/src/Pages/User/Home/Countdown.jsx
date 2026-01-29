@@ -81,67 +81,42 @@ function CountDownClock({ timeLeft, nextGame, color }) {
   return (
     <Center>
       <Box
-        minW={"350px"}
-        maxW={"500px"}
         w={"full"}
+        maxW={{ base: "full", sm: "480px" }}
         bg={useColorModeValue(`${color}.200`, "gray.800")}
         boxShadow={"2xl"}
-        rounded={"md"}
+        rounded={{ base: "xl", md: "2xl" }}
         overflow={"hidden"}
       >
         <Stack
           textAlign={"center"}
-          p={2}
+          p={{ base: 3, md: 4 }}
           color={useColorModeValue("gray.800", "white")}
           align={"center"}
+          spacing={4}
         >
           <Text
-            fontSize={"sm"}
+            fontSize={{ base: "xs", sm: "sm" }}
             fontWeight={500}
             bg={useColorModeValue(`${color}.50`, `${color}.900`)}
-            p={2}
-            px={3}
+            px={{ base: 3, md: 4 }}
+            py={2}
+            rounded="full"
             color={`${color}.500`}
-            // rounded={"full"}
           >
-            No. {nextGame?.gameNumber} :{" "}
-            {`${nextGame?.team1.fullName} vs ${nextGame?.team2.fullName}`}
+            No. {nextGame?.gameNumber} : {`${nextGame?.team1.fullName} vs ${nextGame?.team2.fullName}`}
           </Text>
           {checkTime(timeLeft) && (
             <Stack
-              direction={"row"}
-              align={"center"}
+              direction={{ base: "column", sm: "row" }}
+              align={{ base: "stretch", sm: "center" }}
               justify={"center"}
-              spacing={5}
+              spacing={{ base: 3, sm: 5 }}
+              w="full"
             >
-              <VStack spacing={0} p={0}>
-                <Text fontSize="4xl" fontWeight={700}>
-                  {timeLeft.hours < 10 ? `0${timeLeft.hours}` : timeLeft.hours}
-                </Text>
-                <Text fontSize="md" fontWeight={500}>
-                  hours
-                </Text>
-              </VStack>{" "}
-              <VStack spacing={0} p={0}>
-                <Text fontSize="4xl" fontWeight={700}>
-                  {timeLeft.minutes < 10
-                    ? `0${timeLeft.minutes}`
-                    : timeLeft.minutes}
-                </Text>
-                <Text fontSize="md" fontWeight={500}>
-                  minutes
-                </Text>
-              </VStack>
-              <VStack spacing={0} p={0}>
-                <Text fontSize="4xl" fontWeight={700}>
-                  {timeLeft.seconds < 10
-                    ? `0${timeLeft.seconds || "0"}`
-                    : timeLeft.seconds}
-                </Text>
-                <Text fontSize="md" fontWeight={500}>
-                  seconds
-                </Text>
-              </VStack>
+              <TimeBlock label="hours" value={timeLeft.hours} />
+              <TimeBlock label="minutes" value={timeLeft.minutes} />
+              <TimeBlock label="seconds" value={timeLeft.seconds} />
             </Stack>
           )}
         </Stack>
@@ -149,3 +124,23 @@ function CountDownClock({ timeLeft, nextGame, color }) {
     </Center>
   );
 }
+
+const TimeBlock = ({ label, value }) => {
+  const displayValue = value ?? 0;
+  const padded = displayValue < 10 ? `0${displayValue}` : displayValue;
+  return (
+    <VStack
+      spacing={0}
+      p={{ base: 2, sm: 0 }}
+      flex={1}
+      minW={{ base: "full", sm: "auto" }}
+    >
+      <Text fontSize={{ base: "3xl", sm: "4xl" }} fontWeight={700}>
+        {padded}
+      </Text>
+      <Text fontSize="md" fontWeight={500} textTransform="capitalize">
+        {label}
+      </Text>
+    </VStack>
+  );
+};

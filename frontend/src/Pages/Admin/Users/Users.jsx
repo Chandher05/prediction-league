@@ -16,7 +16,8 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Text
+  Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 // import { useForm } from "react-hook-form";
 import { useToast } from "@chakra-ui/react";
@@ -137,6 +138,7 @@ export default Users;
 function DisableImpact() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const warningColor = useColorModeValue("red.600", "red.300");
 
   const authId = useStoreState((state) => state.authId);
 
@@ -175,13 +177,13 @@ function DisableImpact() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader color="red">Disable Impact Prediction?</ModalHeader>
+          <ModalHeader color={warningColor}>Disable Impact Prediction?</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <Text fontSize="xl">
               Are you sure you want to disable impact prediction for all users?
             </Text>
-            <Text color="red" fontSize="sm">
+            <Text color={warningColor} fontSize="sm">
               Note: This is not reversible
             </Text>
           </ModalBody>

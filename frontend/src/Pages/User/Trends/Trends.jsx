@@ -6,6 +6,7 @@ import {
   HStack,
   Button,
   Heading,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
@@ -18,6 +19,8 @@ function Trends() {
   const [graphData, setGraphData] = useState({});
   const [loaded, setLoaded] = useState(false);
   const authId = useStoreState((state) => state.authId);
+  const infoColor = useColorModeValue("brand.600", "brand.200");
+  const spinnerColor = useColorModeValue("brand.500", "brand.200");
 
   function getRandomColor() {
     var letters = "0123456789ABCDEF".split("");
@@ -88,7 +91,7 @@ function Trends() {
           Trends
         </Heading>
       </HStack>
-      <Text fontSize="2xl" color="blue.600">
+      <Text fontSize="2xl" color={infoColor}>
         {" "}
         Best to be viewed on bigger screens.
       </Text>
@@ -96,7 +99,7 @@ function Trends() {
     </Box>
   ) : (
     <Center h="100vh">
-      <Spinner thickness="4px" color="blue.500" size="xl" />
+      <Spinner thickness="4px" color={spinnerColor} size="xl" />
     </Center>
   );
 }
