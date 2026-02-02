@@ -1,6 +1,14 @@
-import { Heading, VStack, HStack, Flex } from "@chakra-ui/layout";
-
-import { Button } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  HStack,
+  SimpleGrid,
+  Stack,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 
 import { useHistory } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -8,6 +16,10 @@ import FameCard from "./FameCard";
 
 function HallOfFame() {
   const history = useHistory();
+  const pageBg = useColorModeValue("gray.50", "gray.800");
+  const surface = useColorModeValue("white", "surfaceMuted");
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
+  const mutedText = useColorModeValue("gray.600", "gray.300");
   const getWinners = [
     {
       winners: ["🥇Himavarshith", "🥈Jayasurya Pinaki", "🥉Gurumoorthy Baskar"],
@@ -46,29 +58,51 @@ function HallOfFame() {
     },
   ];
   return (
-    <Flex minH={"100vh"} justify={"center"}>
-      <VStack w="full" h="full" p={4} spacing={10} bg={"blue.200"}>
-        <HStack spacing={3} alignItems="justify-center">
-          <Button
-            color="blue.300"
-            borderRadius="10px"
-            borderColor={"blue.100"}
-            size="sm"
-            onClick={() => history.push("/")}
+    <Box minH="100vh" bg={pageBg}>
+      <Container maxW="6xl" px={{ base: 4, md: 8 }} py={{ base: 10, md: 14 }}>
+        <Stack spacing={{ base: 8, md: 10 }}>
+          <Stack
+            spacing={6}
+            bg={surface}
+            borderWidth="1px"
+            borderColor={borderColor}
+            rounded="3xl"
+            p={{ base: 6, md: 8 }}
+            boxShadow="2xl"
           >
-            <ArrowBackIcon></ArrowBackIcon>
-          </Button>
-          <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
-            Hall Of Fame
-          </Heading>
-        </HStack>
-        {getWinners.map(({ winners, year, event }) => {
-          return (
-            <FameCard winners={winners} year={year} event={event}></FameCard>
-          );
-        })}
-      </VStack>
-    </Flex>
+            <HStack spacing={3} alignItems="center">
+              <Button
+                colorScheme="brand"
+                borderRadius="10px"
+                size="sm"
+                variant="outline"
+                onClick={() => history.push("/")}
+              >
+                <ArrowBackIcon></ArrowBackIcon>
+              </Button>
+              <Stack spacing={1}>
+                <Heading lineHeight={1.1} fontSize={{ base: "2xl", md: "3xl" }}>
+                  Hall Of Fame
+                </Heading>
+                <Text color={mutedText}>
+                  Historic winners and podium finishes from past tournaments.
+                </Text>
+              </Stack>
+            </HStack>
+          </Stack>
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+            {getWinners.map(({ winners, year, event }) => (
+              <FameCard
+                key={`${event}-${year}`}
+                winners={winners}
+                year={year}
+                event={event}
+              ></FameCard>
+            ))}
+          </SimpleGrid>
+        </Stack>
+      </Container>
+    </Box>
   );
 }
 

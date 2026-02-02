@@ -28,7 +28,7 @@ export default function Predict() {
   const [showConfidence, setConfidence] = useState(true);
   const [selected, setSelected] = useState({});
   const [predictedTeamId, setPredictedTeamId] = useState({});
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
@@ -104,12 +104,16 @@ export default function Predict() {
       });
   };
   const predictionForGame = (value) => {
-    if (value === "Leave") {
+    setPredictedTeamId(value);
+  };
+
+  const toggleFH = () => {
+    if (showConfidence) {
       setConfidence(false);
-      setPredictedTeamId(null);
+      setValue("confidence", "FH");
     } else {
       setConfidence(true);
-      setPredictedTeamId(value);
+      setValue("confidence", "");
     }
   };
 
@@ -118,8 +122,32 @@ export default function Predict() {
       setSelected(game);
       setConfidence(true);
       setPredictedTeamId(null);
+      setValue("confidence", "");
     }
   };
+
+  const IPL_TEAMS = new Set([
+    "CSK",
+    "DC",
+    "GG",
+    "GT",
+    "KKR",
+    "LSG",
+    "MI",
+    "PBKS",
+    "RCB",
+    "RR",
+    "SRH",
+    "UPW",
+  ]);
+
+  const getTeamLogoPath = (shortName, isSelected = false) => {
+    const folder = IPL_TEAMS.has(shortName) ? "Logo_IPL" : "Logo";
+    return `${process.env.PUBLIC_URL}/${folder}/${shortName}${
+      isSelected ? " - Selected" : ""
+    }.png`;
+  };
+
   return (
     <Flex
       minH={"100vh"}
@@ -183,53 +211,87 @@ export default function Predict() {
           </HStack>
 
           {selected.team1 && selected.team2 ? (
-            <Box borderWidth="1px" borderRadius="lg" m={2}>
-              <HStack justifyContent="center">
-                <div>
-                  <Image
-                    onClick={() => predictionForGame(selected.team1._id)}
-                    src={`${process.env.PUBLIC_URL}/Logo/${
-                      selected.team1.shortName
-                    }${
+            <Box borderWidth="1px" borderRadius="lg" m={2} boxShadow="sm">
+              <Box px={{ base: 3, md: 4 }} py={{ base: 4, md: 5 }}>
+                <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
+                  <Box
+                    bg={"white"}
+                    flex="1"
+                    borderWidth="2px"
+                    borderColor={
                       selected.team1._id === predictedTeamId
-                        ? " - Selected"
-                        : ""
-                    }.png`}
-                    alt={selected.team1.shortName}
-                    width="100px"
-                    // border={"2px"}
-                    // borderColor={
-                    //   selected.team1._id === predictedTeamId && "green.400"
-                    // }
-                  />
-                </div>
-
-                <Image
-                  onClick={() => predictionForGame("Leave")}
-                  src={`${process.env.PUBLIC_URL}/Logo_IPL/Leave${
-                    showConfidence ? "" : " - Selected"
-                  }.png`}
-                  alt={selected.team2.shortName}
-                  height="100px"
-                />
-
-                <Image
-                  onClick={() => predictionForGame(selected.team2._id)}
-                  src={`${process.env.PUBLIC_URL}/Logo_IPL/${
-                    selected.team2.shortName
-                  }${
-                    selected.team2._id === predictedTeamId ? " - Selected" : ""
-                  }.png`}
-                  alt={selected.team2.shortName}
-                  width="100px"
-                  // border={"2px"}
-                  // borderColor={
-                  //   selected.team2._id === predictedTeamId && "green.400"
-                  // }
-                />
-              </HStack>
+                        ? "green.400"
+                        : "gray.200"
+                    }
+                    borderRadius="xl"
+                    p={4}
+                    cursor="pointer"
+                    transition="transform 0.15s ease, box-shadow 0.15s ease"
+                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                    onClick={() => predictionForGame(selected.team1._id)}
+                  >
+                    <Stack align="center" spacing={3}>
+                      <Image
+                        src={getTeamLogoPath(
+                          selected.team1.shortName,
+                          selected.team1._id === predictedTeamId,
+                        )}
+                        alt={selected.team1.shortName}
+                        width={{ base: "96px", md: "110px" }}
+                        borderRadius="md"
+                        border="1px solid"
+                        borderColor={
+                          selected.team1._id === predictedTeamId
+                            ? "green.400"
+                            : "gray.300"
+                        }
+                      />
+                      <Text fontSize="sm" color="gray.700">
+                        {selected.team1.fullName || selected.team1.shortName}
+                      </Text>
+                    </Stack>
+                  </Box>
+                  <Box
+                    flex="1"
+                    bg={"white"}
+                    borderWidth="2px"
+                    borderColor={
+                      selected.team2._id === predictedTeamId
+                        ? "green.400"
+                        : "gray.200"
+                    }
+                    borderRadius="xl"
+                    p={4}
+                    cursor="pointer"
+                    transition="transform 0.15s ease, box-shadow 0.15s ease"
+                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                    onClick={() => predictionForGame(selected.team2._id)}
+                  >
+                    <Stack align="center" spacing={3}>
+                      <Image
+                        src={getTeamLogoPath(
+                          selected.team2.shortName,
+                          selected.team2._id === predictedTeamId,
+                        )}
+                        alt={selected.team2.shortName}
+                        width={{ base: "96px", md: "110px" }}
+                        borderRadius="md"
+                        border="1px solid"
+                        borderColor={
+                          selected.team2._id === predictedTeamId
+                            ? "green.400"
+                            : "gray.300"
+                        }
+                      />
+                      <Text fontSize="sm" color="gray.700">
+                        {selected.team2.fullName || selected.team2.shortName}
+                      </Text>
+                    </Stack>
+                  </Box>
+                </Stack>
+              </Box>
               <Text fontSize="xs" p="2">
-                Click on the above option
+                Click on a team to lock in your pick.
               </Text>
             </Box>
           ) : null}
@@ -238,11 +300,21 @@ export default function Predict() {
           <FormControl>
             <FormLabel>Confidence</FormLabel>
             <Input
-              pattern="^(5[1-9]|[6-9][0-9]|100|FH|L)$"
+              pattern="^(5[1-9]|[6-9][0-9]|100|FH)$"
               {...register("confidence")}
               disabled={!showConfidence}
-              placeholder="51 - 100 or FH or L"
+              placeholder={showConfidence ? "51 - 100 or FH" : "FH"}
             />
+            <Button
+              mt={3}
+              w="full"
+              size="md"
+              variant={showConfidence ? "outline" : "solid"}
+              colorScheme="purple"
+              onClick={toggleFH}
+            >
+              {showConfidence ? "Use Free Hit" : "Free Hit Selected"}
+            </Button>
           </FormControl>
           {/* )} */}
 

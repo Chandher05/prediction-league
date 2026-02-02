@@ -29,7 +29,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
 
 // use cors to allow cross origin resource sharing
-app.use(cors({ origin: "*", credentials: false }));
+app.use(
+  cors({
+    origin: "*",
+    credentials: false,
+    allowedHeaders: [
+      "Origin",
+      "Accept",
+      "Content-Type",
+      "X-Requested-With",
+      "Authorization",
+    ],
+  })
+);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -39,9 +51,12 @@ app.use((req, res, next) => {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
   res.setHeader("Cache-Control", "no-cache");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
   next();
 });
 
@@ -55,7 +70,13 @@ admin.initializeApp({
 var checkAuth = async (req, res, next) => {
   try {
     let authHeader = req.headers.authorization;
-    let authToken = authHeader.substring(7, authHeader.length);
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Missing or invalid authorization header");
+    }
+    let authToken = authHeader.substring(7);
+    if (!authToken) {
+      return res.status(401).send("Missing token");
+    }
     let decodedToken = await admin.auth().verifyIdToken(authToken);
     const uid = decodedToken.uid;
     let userRecord = await admin.auth().getUser(uid);

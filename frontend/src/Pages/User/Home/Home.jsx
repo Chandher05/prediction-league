@@ -11,6 +11,7 @@ import {
   Stack,
   Tag,
   Text,
+  Tooltip,
   useColorModeValue,
 } from "@chakra-ui/react";
 import {
@@ -33,6 +34,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [impact, setImpact] = useState(false);
+  const [impactMessage, setImpactMessage] = useState("Impact window is closed");
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
@@ -85,22 +87,30 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log("calling impact------------");
-    fetch(`${process.env.REACT_APP_API_BE}/game/impact/active`, {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    })
-      .then((res) => {
+    const checkImpact = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_API_BE}/game/impact/active`,
+          {
+            headers: {
+              Authorization: `Bearer ${authId}`,
+            },
+          },
+        );
         if (res.status === 200) {
-          console.log("Impact is on");
           setImpact(true);
+          setImpactMessage("Impact window is open");
+          return;
         }
-      })
-      .catch((err) => {
-        console.log("error fetching....");
-        console.log(err);
-      });
+        const message = await res.text();
+        setImpact(false);
+        setImpactMessage(message || "Impact window is closed");
+      } catch (err) {
+        setImpact(false);
+        setImpactMessage("Impact availability could not be checked");
+      }
+    };
+    checkImpact();
   }, [authId]);
 
   function handleLogout() {
@@ -109,26 +119,24 @@ export default function Home() {
   }
 
   return (
-    <Container
-      maxW={"6xl"}
-      px={{ base: 4, md: 8 }}
-      py={{ base: 12, md: 16 }}
-    >
-      <Stack spacing={{ base: 12, md: 16 }}>
+    <Container maxW={"6xl"} px={{ base: 4, md: 8 }} py={{ base: 8, md: 16 }}>
+      <Stack spacing={{ base: 8, md: 16 }}>
         <Flex
           direction={{ base: "column", lg: "row" }}
-          align={{ base: "stretch", lg: "stretch" }}
-          gap={{ base: 10, lg: 16 }}
+          align="center"
+          justify="center"
+          gap={{ base: 8, lg: 16 }}
         >
           <Stack
             flex="1"
-            spacing={6}
-            textAlign={{ base: "center", lg: "left" }}
-            align={{ base: "stretch", lg: "flex-start" }}
+            spacing={{ base: 5, md: 6 }}
+            p={{ base: 2 }}
+            textAlign="center"
+            align="center"
           >
             <Tag
               w={{ base: "fit-content", lg: "auto" }}
-              alignSelf={{ base: "center", lg: "flex-start" }}
+              alignSelf="center"
               size="lg"
               colorScheme="brand"
               variant="subtle"
@@ -143,78 +151,89 @@ export default function Home() {
             >
               T20 Prediction League
               <br />
-              <Text as="span" color={heroHighlight}>
-                Own the next over
+              <Text as="span" color={heroHighlight} fontSize={{ base: "xl" }}>
+                Fortune favours the brave
               </Text>
             </Heading>
             <Text color={mutedText} fontSize={{ base: "md", md: "lg" }}>
               Lock in your picks before the first ball, chase the leaderboard,
               and earn bragging rights all season long.
             </Text>
+            {impact && (
+              <Tag
+                colorScheme="green"
+                size="lg"
+                variant="subtle"
+                alignSelf="center"
+              >
+                Impact window is open
+              </Tag>
+            )}
             <Stack
-              direction={{ base: "column", md: "row" }}
+              direction="column"
               spacing={{ base: 3, md: 4 }}
-              justify={{ base: "center", lg: "flex-start" }}
-              w={{ base: "full", md: "auto" }}
-              pb={{ base: 6, md: 0 }}
+              justify="center"
+              align="stretch"
+              w="full"
+              pb={{ base: 4, md: 0 }}
+              pt={{ base: 2, md: 0 }}
+              px={{ base: 4, md: 0 }}
             >
               <Button
-                px={8}
+                px={{ base: 6, md: 8 }}
                 colorScheme="brand"
                 bg={primaryCtaBg}
                 _hover={{ bg: primaryCtaHover }}
                 onClick={() => navTo("predict")}
                 size="lg"
-                w={{ base: "full", md: "auto" }}
+                w="full"
               >
                 Predict next game
               </Button>
               <Button
-                px={8}
+                px={{ base: 6, md: 8 }}
                 variant="outline"
                 colorScheme="brand"
                 borderColor={surfaceSubtle}
                 onClick={() => navTo("predictions")}
                 size="lg"
-                w={{ base: "full", md: "auto" }}
+                w="full"
               >
                 Review picks
               </Button>
-            </Stack>
-            {impact && (
-              <Stack
-                direction={{ base: "column", md: "row" }}
-                spacing={{ base: 3, md: 4 }}
-                justify={{ base: "center", lg: "flex-start" }}
-                align={{ base: "stretch", md: "center" }}
+              <Tooltip
+                label={
+                  impact
+                    ? "You can change your impact prediction now."
+                    : impactMessage
+                }
+                placement="top"
+                hasArrow
               >
-                <Tag
-                  colorScheme="green"
-                  size="lg"
-                  variant="subtle"
-                  alignSelf={{ base: "center", md: "flex-start" }}
-                >
-                  Impact window is open
-                </Tag>
-                <Button
-                  leftIcon={<RepeatIcon />}
-                  colorScheme="green"
-                  variant="ghost"
-                  onClick={() => navTo("impact")}
-                  w={{ base: "full", md: "auto" }}
-                >
-                  Edit impact pick
-                </Button>
-              </Stack>
-            )}
+                <Box w="full">
+                  <Button
+                    leftIcon={<RepeatIcon />}
+                    colorScheme={impact ? "brand" : "gray"}
+                    variant="outline"
+                    px={{ base: 6, md: 8 }}
+                    onClick={() => navTo("impact")}
+                    w="full"
+                    size="lg"
+                    isDisabled={!impact}
+                  >
+                    Edit impact pick
+                  </Button>
+                </Box>
+              </Tooltip>
+            </Stack>
           </Stack>
-          <Box flex="1" w="full">
+          <Stack flex="1" w="full" p={{ base: 2 }} align="center">
             <Box
               bg={surface}
               borderWidth="1px"
               borderColor={borderColor}
               rounded="3xl"
-              p={{ base: 6, md: 8 }}
+              p={{ base: 5, md: 8 }}
               position="relative"
               overflow="hidden"
               boxShadow="2xl"
@@ -234,7 +253,10 @@ export default function Home() {
                 <Text color={mutedText} fontSize="sm">
                   Predictions lock a few minutes before the first ball.
                 </Text>
-                <Countdown />
+                <Countdown
+                  impactAvailable={impact}
+                  impactMessage={impactMessage}
+                />
               </Stack>
               <Box
                 position="absolute"
@@ -246,10 +268,10 @@ export default function Home() {
                 <Illustration />
               </Box>
             </Box>
-          </Box>
+          </Stack>
         </Flex>
 
-        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 5, md: 6 }}>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 6 }}>
           {quickActions.map((card) => (
             <Box
               key={card.key}
@@ -257,18 +279,13 @@ export default function Home() {
               borderWidth="1px"
               borderColor={borderColor}
               rounded="2xl"
-              p={{ base: 5, md: 6 }}
+              p={{ base: 4, md: 6 }}
               boxShadow="xl"
               h="full"
             >
               <Stack spacing={4} h="full">
                 <HStack spacing={4} align="center">
-                  <Box
-                    p={3}
-                    rounded="full"
-                    bg={surfaceSubtle}
-                    color={accent}
-                  >
+                  <Box p={3} rounded="full" bg={surfaceSubtle} color={accent}>
                     <Icon as={card.icon} boxSize={5} />
                   </Box>
                   <Heading size="md">{card.title}</Heading>
@@ -295,7 +312,7 @@ export default function Home() {
           borderWidth="1px"
           borderColor={borderColor}
           rounded="2xl"
-          p={{ base: 5, md: 6 }}
+          p={{ base: 4, md: 6 }}
           boxShadow="xl"
         >
           <Flex
