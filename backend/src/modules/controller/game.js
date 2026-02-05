@@ -111,14 +111,33 @@ exports.scheduledGames = async (req, res) => {
 			teamObj[team._id] = team
 		}
 
-		let allGames
-		allGames = await Game.find({
-			startTime: {
-				$gt: new Date()
+		let now = new Date();
+		let allGames = [];
+		let daysCompleted = 0;
+
+		for (let i = 0; i < 7; i++) {
+			let startOfDay = new Date(now);
+			startOfDay.setDate(startOfDay.getDate() + i);
+			startOfDay.setHours(0, 0, 0, 0);
+
+			let endOfDay = new Date(startOfDay);
+			endOfDay.setHours(23, 59, 59, 999);
+
+			const games = await Game.find({
+				startTime: {
+				$gte: startOfDay,
+				$lte: endOfDay,
+				},
+			}).sort('startTime');
+
+			if (games.length > 0) {
+				allGames.push(...games);
+				daysCompleted += 1;
 			}
-		})
-		.sort('startTime')
-		.limit(2)
+			if (daysCompleted == 2) {
+				break;
+			}
+		}
 
 		let gameData = []
 		for (var game of allGames) {
