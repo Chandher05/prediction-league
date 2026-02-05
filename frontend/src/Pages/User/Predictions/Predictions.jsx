@@ -25,23 +25,21 @@ import {
 import { useStoreState } from "easy-peasy";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
+import { ApiError, apiRequest } from "../../../api/client";
 
 function Predictions() {
   const history = useHistory();
   const toast = useToast();
   const [games, setGames] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [allTeams, setAllTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
   const authId = useStoreState((state) => state.authId);
 
   const getPredictions = useCallback(() => {
-    fetch(`${process.env.REACT_APP_API_BE}/prediction/user`, {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) {
-        const result = await response.json();
+    setIsLoading(true);
+    apiRequest("/prediction/user")
+      .then((result) => {
         let allTeamsFromResponse = new Set(["Show all"]);
 
         for (var game of result.predictions) {
@@ -51,16 +49,20 @@ function Predictions() {
         setAllTeams(Array.from(allTeamsFromResponse));
         setSelectedTeam("Show all");
         setGames(result.predictions);
-      } else {
+      })
+      .catch((error) => {
         toast({
           title: "Something went wrong",
-          description: "Contact us for help if the issue persists.",
+          description:
+            error instanceof ApiError
+              ? error.message
+              : "Contact us for help if the issue persists.",
           status: "error",
           duration: 2000,
           isClosable: true,
         });
-      }
-    });
+      })
+      .finally(() => setIsLoading(false));
   }, [authId, toast]);
 
   useEffect(() => {
@@ -244,7 +246,15 @@ function Predictions() {
                   );
                 })}
               </Tbody>
-            ) : null}
+            ) : (
+              <Tbody>
+                <Tr>
+                  <Td colSpan={6}>
+                    {isLoading ? "Loading predictions..." : "No predictions found"}
+                  </Td>
+                </Tr>
+              </Tbody>
+            )}
           </Table>
         </TableContainer>
       </VStack>

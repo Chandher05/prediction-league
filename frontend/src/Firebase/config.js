@@ -8,6 +8,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
+import { API_BASE } from "../api/client";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -32,13 +33,10 @@ const auth = getAuth(app);
 const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
-    console.log(res);
     const user = await res.user;
 
     const userIdToken = await user.getIdToken();
-
-    console.log({ userIdToken });
-    fetch(`${process.env.REACT_APP_API_BE}/users/login`, {
+    fetch(`${API_BASE}/users/login`, {
       headers: {
         Authorization: `Bearer ${userIdToken}`,
       },

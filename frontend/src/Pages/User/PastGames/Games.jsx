@@ -21,44 +21,53 @@ import {
   Stack,
   HStack,
   Heading,
+  useToast,
 } from "@chakra-ui/react";
 import { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import ViewPredictions from "./ViewPredictions";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useStoreState } from "easy-peasy";
+import { ApiError, apiRequest } from "../../../api/client";
 
 function PastGames() {
   const history = useHistory();
+  const toast = useToast();
   const authId = useStoreState((state) => state.authId);
   const [games, setGames] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [allTeams, setAllTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
 
   useEffect(() => {
     const getGames = async () => {
-      fetch(process.env.REACT_APP_API_BE + "/game/completed", {
-        headers: {
-          Authorization: `Bearer ${authId}`,
-        },
-      }).then(async (response) => {
-        if (response.ok) {
-          const completedGames = await response.json();
+      setIsLoading(true);
+      try {
+        const completedGames = await apiRequest("/game/completed");
+        let allTeamsFromResponse = new Set(["Show all"]);
 
-          let allTeamsFromResponse = new Set(["Show all"]);
-
-          for (var game of completedGames) {
-            allTeamsFromResponse.add(game.team1.fullName);
-            allTeamsFromResponse.add(game.team2.fullName);
-          }
-          setAllTeams(Array.from(allTeamsFromResponse));
-          setSelectedTeam("Show all");
-          setGames(completedGames);
+        for (var game of completedGames) {
+          allTeamsFromResponse.add(game.team1.fullName);
+          allTeamsFromResponse.add(game.team2.fullName);
         }
-      });
+        setAllTeams(Array.from(allTeamsFromResponse));
+        setSelectedTeam("Show all");
+        setGames(completedGames);
+      } catch (error) {
+        toast({
+          title: "Could not load past games",
+          description:
+            error instanceof ApiError ? error.message : "Please try again.",
+          status: "error",
+          duration: 2500,
+          isClosable: true,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
     getGames();
-  }, [authId]);
+  }, [authId, toast]);
 
   const filteredGames = useMemo(() => {
     if (!games || games.length === 0) return [];
@@ -66,7 +75,7 @@ function PastGames() {
     return games.filter(
       (game) =>
         selectedTeam === game.team1.fullName ||
-        selectedTeam === game.team2.fullName
+        selectedTeam === game.team2.fullName,
     );
   }, [games, selectedTeam]);
 
@@ -165,23 +174,31 @@ function PastGames() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredGames
-                  .map((game) => (
-                    <Tr key={game.gameId || game.gameNumber}>
-                      <Td fontWeight="semibold">{game.gameNumber}</Td>
-                      <Td>{game.team1.fullName}</Td>
-                      <Td>{game.team2.fullName}</Td>
-                      <Td>
-                        <Tag size="sm" colorScheme="green" variant="subtle">
-                          {game.winner.fullName}
-                        </Tag>
-                      </Td>
-                      <Td>
-                        <ViewPredictions gameId={game.gameId}></ViewPredictions>
-                      </Td>
-                    </Tr>
-                  ))
-                  .reverse()}
+                {filteredGames.length > 0 ? (
+                  filteredGames
+                    .map((game) => (
+                      <Tr key={game.gameId || game.gameNumber}>
+                        <Td fontWeight="semibold">{game.gameNumber}</Td>
+                        <Td>{game.team1.fullName}</Td>
+                        <Td>{game.team2.fullName}</Td>
+                        <Td>
+                          <Tag size="sm" colorScheme="green" variant="subtle">
+                            {game.winner.fullName}
+                          </Tag>
+                        </Td>
+                        <Td>
+                          <ViewPredictions gameId={game.gameId}></ViewPredictions>
+                        </Td>
+                      </Tr>
+                    ))
+                    .reverse()
+                ) : (
+                  <Tr>
+                    <Td colSpan={5}>
+                      {isLoading ? "Loading games..." : "No games found"}
+                    </Td>
+                  </Tr>
+                )}
               </Tbody>
             </Table>
           </TableContainer>

@@ -22,6 +22,11 @@ function HallOfFame() {
   const mutedText = useColorModeValue("gray.600", "gray.300");
   const getWinners = [
     {
+      winners: ["🥇Chandher Shekar", "🥈Jayasurya Pinaki", "🥉Abhishek Gupta"],
+      year: "2025",
+      event: "IPL",
+    },
+    {
       winners: ["🥇Himavarshith", "🥈Jayasurya Pinaki", "🥉Gurumoorthy Baskar"],
       year: "2024",
       event: "IPL",

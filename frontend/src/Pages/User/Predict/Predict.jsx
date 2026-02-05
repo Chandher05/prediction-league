@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useStoreState } from "easy-peasy";
+import { ApiError, apiRequest } from "../../../api/client";
 
 export default function Predict() {
   const history = useHistory();
@@ -25,6 +26,7 @@ export default function Predict() {
   let { id } = useParams();
 
   const [games, setGames] = useState([]);
+  const [isLoadingGames, setIsLoadingGames] = useState(false);
   const [showConfidence, setConfidence] = useState(true);
   const [selected, setSelected] = useState({});
   const [predictedTeamId, setPredictedTeamId] = useState({});
@@ -32,33 +34,27 @@ export default function Predict() {
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
+  const helperTextColor = useColorModeValue("gray.600", "gray.300");
 
   useEffect(() => {
     const getGames = () => {
+      setIsLoadingGames(true);
       if (id) {
-        fetch(process.env.REACT_APP_API_BE + `/game/id/${id}`, {
-          headers: {
-            Authorization: `Bearer ${authId}`,
-          },
-        }).then(async (response) => {
-          if (response.ok) {
-            const res = await response.json();
+        apiRequest(`/game/id/${id}`)
+          .then((res) => {
             setGames([res]);
             if (res) setSelected(res);
-          }
-        });
+          })
+          .catch(() => {})
+          .finally(() => setIsLoadingGames(false));
       } else {
-        fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
-          headers: {
-            Authorization: `Bearer ${authId}`,
-          },
-        }).then(async (response) => {
-          if (response.ok) {
-            const games = await response.json();
-            setGames(games);
-            if (games[0]) setSelected(games[0]);
-          }
-        });
+        apiRequest("/game/scheduled")
+          .then((gamesData) => {
+            setGames(gamesData || []);
+            if (gamesData?.[0]) setSelected(gamesData[0]);
+          })
+          .catch(() => {})
+          .finally(() => setIsLoadingGames(false));
       }
     };
     getGames();
@@ -66,22 +62,12 @@ export default function Predict() {
   const onSubmit = (data) => {
     data["gameId"] = selected?.gameId;
     data["predictedTeamId"] = selected ? predictedTeamId : "";
-    data["confidence"] = showConfidence ? data["confidence"] : "L";
-    fetch(process.env.REACT_APP_API_BE + "/prediction/new", {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-      body: JSON.stringify(data),
+    data["confidence"] = showConfidence ? data["confidence"] : "FH";
+    apiRequest("/prediction/new", {
+      method: "POST",
+      body: data,
     })
-      .then((response) => {
-        if (response.ok) {
-          return response;
-        }
-        throw response;
-      })
-      .then((data) => {
+      .then(() => {
         toast({
           title: "You have predicted the future",
           description: "May the force be with you!",
@@ -96,7 +82,9 @@ export default function Predict() {
           title: "Something went wrong.",
           // Custom error message from server
           description:
-            "Please try again or contact us for help if the issue persists.",
+            e instanceof ApiError && e.message
+              ? e.message
+              : "Please try again or contact us for help if the issue persists.",
           status: "error",
           duration: 2000,
           isClosable: true,
@@ -209,6 +197,11 @@ export default function Predict() {
               );
             })}
           </HStack>
+          {isLoadingGames && (
+            <Text fontSize="sm" color={helperTextColor} p={2}>
+              Loading games...
+            </Text>
+          )}
 
           {selected.team1 && selected.team2 ? (
             <Box borderWidth="1px" borderRadius="lg" m={2} boxShadow="sm">

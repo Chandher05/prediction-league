@@ -11,6 +11,7 @@ import { useStoreState } from "easy-peasy";
 
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import { apiRequest } from "../../../api/client";
 
 function Countdown({ impactAvailable, impactMessage }) {
   const authId = useStoreState((state) => state.authId);
@@ -29,20 +30,15 @@ function Countdown({ impactAvailable, impactMessage }) {
   };
 
   useEffect(() => {
-    console.log("backend api", process.env.REACT_APP_API_BE);
-    fetch(process.env.REACT_APP_API_BE + "/game/scheduled", {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          const games = await response.json();
-
-          setNextGame(games[0]);
-        }
-      })
-      .catch((e) => console.log(e));
+    const fetchGames = async () => {
+      try {
+        const games = await apiRequest("/game/scheduled");
+        setNextGame(games?.[0] || null);
+      } catch (error) {
+        setNextGame(null);
+      }
+    };
+    fetchGames();
   }, [authId]);
   useEffect(() => {
     const intervalTimeCountdownClock = () => {
@@ -55,7 +51,8 @@ function Countdown({ impactAvailable, impactMessage }) {
       );
     };
     intervalTimeCountdownClock();
-    setInterval(intervalTimeCountdownClock, 1000);
+    const timer = setInterval(intervalTimeCountdownClock, 1000);
+    return () => clearInterval(timer);
   }, [nextGame]);
   return (
     <Box p="2">
