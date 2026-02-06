@@ -38,6 +38,27 @@ export default function Impact() {
   const [originalPredictedTeamId, setOriginalPredictedTeamId] = useState({});
   const { handleSubmit } = useForm();
   const [currConfidenceLevel, setCurrConfidenceLevel] = useState(0);
+  const IPL_TEAMS = new Set([
+    "CSK",
+    "DC",
+    "GG",
+    "GT",
+    "KKR",
+    "LSG",
+    "MI",
+    "PBKS",
+    "RCB",
+    "RR",
+    "SRH",
+    "UPW",
+  ]);
+
+  const getTeamLogoPath = (shortName, isSelected = false) => {
+    const folder = IPL_TEAMS.has(shortName) ? "Logo_IPL" : "Logo";
+    return `${process.env.PUBLIC_URL}/${folder}/${shortName}${
+      isSelected ? " - Selected" : ""
+    }.png`;
+  };
 
   const updateSelected = useCallback((game) => {
     if (game.gameId !== selected.gameId) {
@@ -216,13 +237,10 @@ export default function Impact() {
                 <div>
                   <Image
                     onClick={() => predictionForGame(selected.team1._id)}
-                    src={`${process.env.PUBLIC_URL}/Logo_IPL/${
-                      selected.team1.shortName
-                    }${
+                    src={getTeamLogoPath(
+                      selected.team1.shortName,
                       selected.team1._id === predictedTeamId
-                        ? " - Selected"
-                        : ""
-                    }.png`}
+                    )}
                     alt={selected.team1.shortName}
                     width="100px"
                     // border={"2px"}
@@ -234,11 +252,10 @@ export default function Impact() {
 
                 <Image
                   onClick={() => predictionForGame(selected.team2._id)}
-                  src={`${process.env.PUBLIC_URL}/Logo_IPL/${
-                    selected.team2.shortName
-                  }${
-                    selected.team2._id === predictedTeamId ? " - Selected" : ""
-                  }.png`}
+                  src={getTeamLogoPath(
+                    selected.team2.shortName,
+                    selected.team2._id === predictedTeamId
+                  )}
                   alt={selected.team2.shortName}
                   width="100px"
                   // border={"2px"}

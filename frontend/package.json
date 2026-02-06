@@ -10,6 +10,8 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "baseline-browser-mapping": "^2.9.19",
+    "caniuse-lite": "^1.0.30001767",
     "chart.js": "^3.6.0",
     "easy-peasy": "^5.0.4",
     "firebase": "^9.6.7",
@@ -25,9 +27,9 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
-    "test": "NODE_OPTIONS=--openssl-legacy-provider react-scripts test",
+    "start": "react-scripts start",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

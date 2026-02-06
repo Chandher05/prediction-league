@@ -26,6 +26,7 @@ import { Illustration } from "./Illustration";
 import Countdown from "./Countdown";
 
 import { logout } from "../../../Firebase/config";
+import { ApiError, apiRequest } from "../../../api/client";
 import { useEffect } from "react";
 import { useStoreState } from "easy-peasy";
 import { useStoreActions } from "easy-peasy";
@@ -89,24 +90,15 @@ export default function Home() {
   useEffect(() => {
     const checkImpact = async () => {
       try {
-        const res = await fetch(
-          `${process.env.REACT_APP_API_BE}/game/impact/active`,
-          {
-            headers: {
-              Authorization: `Bearer ${authId}`,
-            },
-          },
-        );
-        if (res.status === 200) {
-          setImpact(true);
-          setImpactMessage("Impact window is open");
-          return;
-        }
-        const message = await res.text();
-        setImpact(false);
-        setImpactMessage(message || "Impact window is closed");
+        await apiRequest("/game/impact/active");
+        setImpact(true);
+        setImpactMessage("Impact window is open");
       } catch (err) {
         setImpact(false);
+        if (err instanceof ApiError) {
+          setImpactMessage(err.message || "Impact window is closed");
+          return;
+        }
         setImpactMessage("Impact availability could not be checked");
       }
     };

@@ -2,6 +2,7 @@ import { Heading, VStack, HStack, Text } from "@chakra-ui/layout";
 import { useForm } from "react-hook-form";
 
 import {
+  Box,
   Table,
   Thead,
   Tbody,
@@ -23,6 +24,14 @@ import {
   Input,
   useClipboard,
   Select,
+  TableContainer,
+  Container,
+  Tag,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import DateTime from "luxon/src/datetime";
@@ -85,54 +94,100 @@ function Games() {
     history.push("/admin/Users");
   };
   return (
-    <VStack w="full" h="full" p={10} spacing={10} alignItems="flex-start">
-      <HStack spacing={3} alignItems="justify-center">
-        <Heading size="2xl">Games</Heading>
-        <AddGameModal onCloseCall={getGames} teams={teams}></AddGameModal>
-        <Button onClick={getGames}>Refresh</Button>
-        <Button onClick={navToUser}>Users Table</Button>
-        <AddPredictionModal users={users} games={games} teams={teams}></AddPredictionModal>
-      </HStack>
+    <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.800")}>
+      <Container maxW="7xl" px={{ base: 4, md: 8 }} py={{ base: 8, md: 10 }}>
+        <VStack w="full" spacing={6} alignItems="flex-start">
+          <HStack
+            w="full"
+            spacing={3}
+            justify="space-between"
+            flexWrap="wrap"
+            alignItems="center"
+          >
+            <Heading size="2xl">Games</Heading>
+            <HStack spacing={2} flexWrap="wrap">
+              <AddGameModal onCloseCall={getGames} teams={teams}></AddGameModal>
+              <Button onClick={getGames}>Refresh</Button>
+              <Button onClick={navToUser}>Users Table</Button>
+              <AddPredictionModal
+                users={users}
+                games={games}
+                teams={teams}
+              ></AddPredictionModal>
+            </HStack>
+          </HStack>
 
-      <Table variant="striped" size="small" colorScheme="teal">
-        <Thead>
-          <Tr>
-            <Th>No.</Th>
-            {/* <Th>id</Th> */}
-            <Th>Team 1</Th>
-            <Th>Team 2</Th>
-            <Th>Start Time</Th>
-            <Th>Winner</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {games.map((game) => {
-            return (
-              <Tr key={game.gameNumber}>
-                <Td>{game.gameNumber}</Td>
-                {/* <Td>{game.gameId}</Td> */}
-                <Td>{game.team1.fullName}</Td>
-                <Td>{game.team2.fullName}</Td>
-                <Td>
-                  {DateTime.fromISO(game.startTime, { zone: "utc" })
-                    .toLocal()
-                    .toLocaleString(DateTime.DATETIME_SHORT)}
-                </Td>
-                <Td>{game.winner.fullName}</Td>
-                <Td>
-                  <AutoUpdateWinner gameId={game.gameId}></AutoUpdateWinner>
-                  <UpdateGameModal game={game}></UpdateGameModal>
-                  <ViewPredictions gameId={game.gameId}></ViewPredictions>
-                  <CopyLink id={game.gameId}></CopyLink>
-                  <DeleteConfirmModal gameId={game.gameId}></DeleteConfirmModal>
-                </Td>
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
-    </VStack>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4} w="full">
+            <Stat bg={useColorModeValue("white", "gray.900")} p={4} borderRadius="xl" boxShadow="md">
+              <StatLabel>Total Games</StatLabel>
+              <StatNumber>{games.length}</StatNumber>
+              <StatHelpText>All fixtures</StatHelpText>
+            </Stat>
+            <Stat bg={useColorModeValue("white", "gray.900")} p={4} borderRadius="xl" boxShadow="md">
+              <StatLabel>Teams</StatLabel>
+              <StatNumber>{teams.length}</StatNumber>
+              <StatHelpText>Available teams</StatHelpText>
+            </Stat>
+            <Stat bg={useColorModeValue("white", "gray.900")} p={4} borderRadius="xl" boxShadow="md">
+              <StatLabel>Users</StatLabel>
+              <StatNumber>{users.length}</StatNumber>
+              <StatHelpText>Registered users</StatHelpText>
+            </Stat>
+          </SimpleGrid>
+
+          <TableContainer
+            w="full"
+            bg={useColorModeValue("white", "gray.900")}
+            borderRadius="xl"
+            boxShadow="md"
+            overflowX="auto"
+          >
+            <Table variant="simple" size="sm">
+              <Thead bg={useColorModeValue("gray.100", "gray.700")}>
+                <Tr>
+                  <Th>No.</Th>
+                  <Th>Team 1</Th>
+                  <Th>Team 2</Th>
+                  <Th>Start Time</Th>
+                  <Th>Winner</Th>
+                  <Th>Actions</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {games.map((game) => {
+                  return (
+                    <Tr key={game.gameId || game.gameNumber}>
+                      <Td fontWeight="semibold">{game.gameNumber}</Td>
+                      <Td>{game.team1.fullName}</Td>
+                      <Td>{game.team2.fullName}</Td>
+                      <Td>
+                        {DateTime.fromISO(game.startTime, { zone: "utc" })
+                          .toLocal()
+                          .toLocaleString(DateTime.DATETIME_SHORT)}
+                      </Td>
+                      <Td>
+                        <Tag size="sm" colorScheme="green" variant="subtle">
+                          {game.winner.fullName}
+                        </Tag>
+                      </Td>
+                      <Td>
+                        <HStack spacing={1}>
+                          <AutoUpdateWinner gameId={game.gameId}></AutoUpdateWinner>
+                          <UpdateGameModal game={game}></UpdateGameModal>
+                          <ViewPredictions gameId={game.gameId}></ViewPredictions>
+                          <CopyLink id={game.gameId}></CopyLink>
+                          <DeleteConfirmModal gameId={game.gameId}></DeleteConfirmModal>
+                        </HStack>
+                      </Td>
+                    </Tr>
+                  );
+                })}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </VStack>
+      </Container>
+    </Box>
   );
 }
 
