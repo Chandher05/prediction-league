@@ -83,7 +83,7 @@ async function buildLeaderboardImage(rows) {
 
   ctx.fillStyle = "#1e3a8a";
   ctx.font = "bold 54px Arial";
-  ctx.fillText("Prediction League T20 League", 56, 86);
+  ctx.fillText("Prediction League T20", 56, 86);
 
   ctx.fillStyle = "#2563eb";
   ctx.font = "bold 36px Arial";
