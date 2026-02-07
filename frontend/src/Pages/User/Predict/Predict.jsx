@@ -4,6 +4,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  Avatar,
   Heading,
   Input,
   Stack,
@@ -13,6 +14,7 @@ import {
   Image,
   Text,
   Box,
+  Select,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
@@ -30,7 +32,7 @@ export default function Predict() {
   const [showConfidence, setConfidence] = useState(true);
   const [selected, setSelected] = useState({});
   const [predictedTeamId, setPredictedTeamId] = useState({});
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue, getValues } = useForm();
   const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
@@ -62,7 +64,9 @@ export default function Predict() {
   const onSubmit = (data) => {
     data["gameId"] = selected?.gameId;
     data["predictedTeamId"] = selected ? predictedTeamId : "";
-    data["confidence"] = showConfidence ? data["confidence"] : "FH";
+    data["confidence"] = showConfidence
+      ? data["confidence"]
+      : data["confidence"] || "FH";
     apiRequest("/prediction/new", {
       method: "POST",
       body: data,
@@ -92,7 +96,18 @@ export default function Predict() {
       });
   };
   const predictionForGame = (value) => {
+    setConfidence(true);
     setPredictedTeamId(value);
+    const current = getValues("confidence");
+    if (current === "L" || current === "FH") {
+      setValue("confidence", "");
+    }
+  };
+
+  const selectLeave = () => {
+    setConfidence(false);
+    setPredictedTeamId(null);
+    setValue("confidence", "L");
   };
 
   const toggleFH = () => {
@@ -131,10 +146,11 @@ export default function Predict() {
 
   const getTeamLogoPath = (shortName, isSelected = false) => {
     const folder = IPL_TEAMS.has(shortName) ? "Logo_IPL" : "Logo";
-    return `${process.env.PUBLIC_URL}/${folder}/${shortName}${
-      isSelected ? " - Selected" : ""
-    }.png`;
+    return `${process.env.PUBLIC_URL}/${folder}/${shortName}.png`;
   };
+
+  const getLeaveLogoPath = (isSelected = false) =>
+    `${process.env.PUBLIC_URL}/Logo/Leave${isSelected ? " - Selected" : ""}.png`;
 
   return (
     <Flex
@@ -168,35 +184,30 @@ export default function Predict() {
         </HStack>
 
         <HStack justifyContent="center">
-          <Image
-            boxSize="40px"
-            borderRadius="full"
-            src={photoURL}
-            alt="Profile photo"
-            border={"2px"}
-          />
+          <Avatar name={userName} src={photoURL} size="sm" />
           <Text fontSize="25px">{userName}</Text>
         </HStack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <HStack>
-            {games.map((game, index) => {
-              return (
-                <Button
-                  colorScheme={
-                    selected.gameId === game.gameId ? "blue" : "teal"
-                  }
-                  w="100%"
-                  p={4}
-                  color="white"
-                  onClick={() => updateSelected(game)}
-                >
-                  Game {game.gameNumber} - {game.team1.shortName} v{" "}
-                  {game.team2.shortName}{" "}
-                </Button>
-              );
-            })}
-          </HStack>
+          <FormControl>
+            <FormLabel>Select game</FormLabel>
+            <Select
+              value={selected?.gameId || ""}
+              onChange={(e) => {
+                const next = games.find((g) => String(g.gameId) === e.target.value);
+                if (next) updateSelected(next);
+              }}
+            >
+              <option value="" disabled>
+                Choose a game
+              </option>
+              {games.map((game) => (
+                <option key={game.gameId || game.gameNumber} value={game.gameId}>
+                  {`Game ${game.gameNumber} - ${game.team1.shortName} vs ${game.team2.shortName}`}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
           {isLoadingGames && (
             <Text fontSize="sm" color={helperTextColor} p={2}>
               Loading games...
@@ -206,7 +217,8 @@ export default function Predict() {
           {selected.team1 && selected.team2 ? (
             <Box borderWidth="1px" borderRadius="lg" m={2} boxShadow="sm">
               <Box px={{ base: 3, md: 4 }} py={{ base: 4, md: 5 }}>
-                <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
+                <Stack spacing={4}>
+                  <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
                   <Box
                     bg={"white"}
                     flex="1"
@@ -281,6 +293,22 @@ export default function Predict() {
                       </Text>
                     </Stack>
                   </Box>
+                  </Stack>
+                  <Button
+                    variant="outline"
+                    colorScheme={
+                      !showConfidence && predictedTeamId === null ? "green" : "gray"
+                    }
+                    borderWidth="2px"
+                    borderColor={
+                      !showConfidence && predictedTeamId === null
+                        ? "green.400"
+                        : "gray.200"
+                    }
+                    onClick={selectLeave}
+                  >
+                    Leave
+                  </Button>
                 </Stack>
               </Box>
               <Text fontSize="xs" p="2">
@@ -305,6 +333,7 @@ export default function Predict() {
               variant={showConfidence ? "outline" : "solid"}
               colorScheme="purple"
               onClick={toggleFH}
+              isDisabled={getValues("confidence") === "L"}
             >
               {showConfidence ? "Use Free Hit" : "Free Hit Selected"}
             </Button>

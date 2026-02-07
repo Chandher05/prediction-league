@@ -2,3 +2,5 @@
 /.env
 /package-lock.json
 /serviceAccountKey.json
+
+.env.live

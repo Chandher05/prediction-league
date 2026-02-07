@@ -125,7 +125,7 @@ exports.scheduledGames = async (req, res) => {
 
 			const games = await Game.find({
 				startTime: {
-				$gte: startOfDay,
+				$gte: now,
 				$lte: endOfDay,
 				},
 			}).sort('startTime');
