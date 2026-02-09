@@ -118,16 +118,15 @@ exports.scheduledGames = async (req, res) => {
 		for (let i = 0; i < 7; i++) {
 			let startOfDay = new Date(now);
 			startOfDay.setDate(startOfDay.getDate() + i);
-			startOfDay.setHours(0, 0, 0, 0);
 
-			let endOfDay = new Date(startOfDay);
-			endOfDay.setHours(23, 59, 59, 999);
+			let endOfDay = new Date(now);
+			endOfDay.setDate(endOfDay.getDate() + i + 1);
 
 			const games = await Game.find({
 				startTime: {
-				$gte: now,
-				$lte: endOfDay,
-				},
+					$gt: startOfDay,
+					$lt: endOfDay,
+				}
 			}).sort('startTime');
 
 			if (games.length > 0) {
