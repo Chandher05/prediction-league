@@ -187,7 +187,12 @@ function PastGames() {
                           </Tag>
                         </Td>
                         <Td>
-                          <ViewPredictions gameId={game.gameId}></ViewPredictions>
+                          <ViewPredictions
+                            gameId={game.gameId}
+                            gameNumber={game.gameNumber}
+                            team1Name={game.team1?.fullName}
+                            team2Name={game.team2?.fullName}
+                          ></ViewPredictions>
                         </Td>
                       </Tr>
                     ))

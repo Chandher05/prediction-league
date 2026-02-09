@@ -219,80 +219,136 @@ export default function Predict() {
               <Box px={{ base: 3, md: 4 }} py={{ base: 4, md: 5 }}>
                 <Stack spacing={4}>
                   <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
-                  <Box
-                    bg={"white"}
-                    flex="1"
-                    borderWidth="2px"
-                    borderColor={
-                      selected.team1._id === predictedTeamId
-                        ? "green.400"
-                        : "gray.200"
-                    }
-                    borderRadius="xl"
-                    p={4}
-                    cursor="pointer"
-                    transition="transform 0.15s ease, box-shadow 0.15s ease"
-                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-                    onClick={() => predictionForGame(selected.team1._id)}
-                  >
-                    <Stack align="center" spacing={3}>
-                      <Image
-                        src={getTeamLogoPath(
-                          selected.team1.shortName,
-                          selected.team1._id === predictedTeamId,
-                        )}
-                        alt={selected.team1.shortName}
-                        width={{ base: "96px", md: "110px" }}
-                        borderRadius="md"
-                        border="1px solid"
-                        borderColor={
-                          selected.team1._id === predictedTeamId
-                            ? "green.400"
-                            : "gray.300"
-                        }
-                      />
-                      <Text fontSize="sm" color="gray.700">
-                        {selected.team1.fullName || selected.team1.shortName}
-                      </Text>
-                    </Stack>
-                  </Box>
-                  <Box
-                    flex="1"
-                    bg={"white"}
-                    borderWidth="2px"
-                    borderColor={
-                      selected.team2._id === predictedTeamId
-                        ? "green.400"
-                        : "gray.200"
-                    }
-                    borderRadius="xl"
-                    p={4}
-                    cursor="pointer"
-                    transition="transform 0.15s ease, box-shadow 0.15s ease"
-                    _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
-                    onClick={() => predictionForGame(selected.team2._id)}
-                  >
-                    <Stack align="center" spacing={3}>
-                      <Image
-                        src={getTeamLogoPath(
-                          selected.team2.shortName,
-                          selected.team2._id === predictedTeamId,
-                        )}
-                        alt={selected.team2.shortName}
-                        width={{ base: "96px", md: "110px" }}
-                        borderRadius="md"
-                        border="1px solid"
-                        borderColor={
-                          selected.team2._id === predictedTeamId
-                            ? "green.400"
-                            : "gray.300"
-                        }
-                      />
-                      <Text fontSize="sm" color="gray.700">
-                        {selected.team2.fullName || selected.team2.shortName}
-                      </Text>
-                    </Stack>
-                  </Box>
+                    <Box
+                      bg={"white"}
+                      flex="1"
+                      position="relative"
+                      borderWidth="2px"
+                      borderColor={
+                        selected.team1._id === predictedTeamId
+                          ? "green.500"
+                          : "gray.200"
+                      }
+                      boxShadow={
+                        selected.team1._id === predictedTeamId
+                          ? "0 0 0 3px rgba(56, 161, 105, 0.35), 0 8px 24px rgba(56, 161, 105, 0.18)"
+                          : "sm"
+                      }
+                      bgColor={
+                        selected.team1._id === predictedTeamId
+                          ? "green.50"
+                          : "white"
+                      }
+                      borderRadius="xl"
+                      p={4}
+                      cursor="pointer"
+                      transition="transform 0.15s ease, box-shadow 0.15s ease"
+                      _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                      onClick={() => predictionForGame(selected.team1._id)}
+                    >
+                      {selected.team1._id === predictedTeamId && (
+                        <Text
+                          position="absolute"
+                          top={2}
+                          right={2}
+                          fontSize="xs"
+                          fontWeight="700"
+                          bg="green.500"
+                          color="white"
+                          px={2}
+                          py={1}
+                          borderRadius="full"
+                          letterSpacing="0.02em"
+                        >
+                          Selected
+                        </Text>
+                      )}
+                      <Stack align="center" spacing={3}>
+                        <Image
+                          src={getTeamLogoPath(
+                            selected.team1.shortName,
+                            selected.team1._id === predictedTeamId,
+                          )}
+                          alt={selected.team1.shortName}
+                          width={{ base: "96px", md: "110px" }}
+                          borderRadius="md"
+                          border="1px solid"
+                          borderColor={
+                            selected.team1._id === predictedTeamId
+                              ? "green.400"
+                              : "gray.300"
+                          }
+                        />
+                        <Text fontSize="sm" color="gray.700">
+                          {selected.team1.fullName || selected.team1.shortName}
+                        </Text>
+                      </Stack>
+                    </Box>
+                    <Box
+                      flex="1"
+                      bg={"white"}
+                      position="relative"
+                      borderWidth="2px"
+                      borderColor={
+                        selected.team2._id === predictedTeamId
+                          ? "green.500"
+                          : "gray.200"
+                      }
+                      boxShadow={
+                        selected.team2._id === predictedTeamId
+                          ? "0 0 0 3px rgba(56, 161, 105, 0.35), 0 8px 24px rgba(56, 161, 105, 0.18)"
+                          : "sm"
+                      }
+                      bgColor={
+                        selected.team2._id === predictedTeamId
+                          ? "green.50"
+                          : "white"
+                      }
+                      borderRadius="xl"
+                      p={4}
+                      cursor="pointer"
+                      transition="transform 0.15s ease, box-shadow 0.15s ease"
+                      _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
+                      onClick={() => predictionForGame(selected.team2._id)}
+                    >
+                      {selected.team2._id === predictedTeamId && (
+                        <Text
+                          position="absolute"
+                          top={2}
+                          right={2}
+                          fontSize="xs"
+                          fontWeight="700"
+                          bg="green.500"
+                          color="white"
+                          px={2}
+                          py={1}
+                          borderRadius="full"
+                          letterSpacing="0.02em"
+                        >
+                          Selected
+                        </Text>
+                      )}
+                      <Stack align="center" spacing={3}>
+                        <Image
+                          src={getTeamLogoPath(
+                            selected.team2.shortName,
+                            selected.team2._id === predictedTeamId,
+                          )}
+                          alt={selected.team2.shortName}
+                          width={{ base: "96px", md: "110px" }}
+                          borderRadius="md"
+                          border="1px solid"
+                          borderColor={
+                            selected.team2._id === predictedTeamId
+                              ? "green.400"
+                              : "gray.300"
+                          }
+                        />
+                        <Text fontSize="sm" color="gray.700">
+                          {selected.team2.fullName || selected.team2.shortName}
+                        </Text>
+                      </Stack>
+                    </Box>
                   </Stack>
                   <Button
                     variant="outline"

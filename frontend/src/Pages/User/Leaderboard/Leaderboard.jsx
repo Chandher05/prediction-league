@@ -55,8 +55,8 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
 async function buildLeaderboardImage(rows) {
   const columns = [
     { key: "position", label: "#", width: 80 },
-    { key: "username", label: "Name", width: 390 },
-    { key: "score", label: "Score", width: 180 },
+    { key: "username", label: "Name", width: 320 },
+    { key: "score", label: "Score", width: 250 },
     { key: "freeHitsRemaining", label: "FH", width: 120 },
     { key: "impactRemaining", label: "IMP", width: 120 },
     { key: "leavesRemaining", label: "L", width: 120 },
@@ -137,7 +137,7 @@ async function buildLeaderboardImage(rows) {
     const values = [
       row.position,
       row.username || "-",
-      Number(row.score || 0).toFixed(3),
+      Number(row.score || 0).toFixed(7),
       row.freeHitsRemaining,
       row.impactRemaining,
       row.leavesRemaining,
@@ -148,7 +148,7 @@ async function buildLeaderboardImage(rows) {
     ctx.font = "22px Arial";
     values.forEach((value, valueIndex) => {
       const text = String(value ?? "-");
-      const limit = valueIndex === 1 ? 24 : 8;
+      const limit = valueIndex === 1 ? 20 : valueIndex === 2 ? 12 : 8;
       const trimmed =
         text.length > limit ? `${text.slice(0, Math.max(limit - 1, 1))}...` : text;
       if (valueIndex === 0 && Number(value) <= 3) {

@@ -41,6 +41,7 @@ function Users() {
     getUsers();
   }, [getUsers]);
 
+
   const navToGame = () => {
     history.push("/admin/Games");
   };

@@ -11,7 +11,6 @@ import {
   Button,
   useToast,
   useColorModeValue,
-  Select,
   TableContainer,
   Tag,
   Text,
@@ -20,7 +19,6 @@ import {
   StatLabel,
   StatNumber,
   StatHelpText,
-  Box,
 } from "@chakra-ui/react";
 import { useStoreState } from "easy-peasy";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -32,22 +30,13 @@ function Predictions() {
   const toast = useToast();
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [allTeams, setAllTeams] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState([]);
+  const [showAllGames, setShowAllGames] = useState(false);
   const authId = useStoreState((state) => state.authId);
 
   const getPredictions = useCallback(() => {
     setIsLoading(true);
     apiRequest("/prediction/user")
       .then((result) => {
-        let allTeamsFromResponse = new Set(["Show all"]);
-
-        for (var game of result.predictions) {
-          allTeamsFromResponse.add(game.team1.fullName);
-          allTeamsFromResponse.add(game.team2.fullName);
-        }
-        setAllTeams(Array.from(allTeamsFromResponse));
-        setSelectedTeam("Show all");
         setGames(result.predictions);
       })
       .catch((error) => {
@@ -71,13 +60,9 @@ function Predictions() {
 
   const filteredGames = useMemo(() => {
     if (!games || games.length === 0) return [];
-    if (selectedTeam === "Show all") return games;
-    return games.filter(
-      (game) =>
-        selectedTeam === game.team1.fullName ||
-        selectedTeam === game.team2.fullName
-    );
-  }, [games, selectedTeam]);
+    if (showAllGames) return games;
+    return games.filter((game) => !game.gameStarted);
+  }, [games, showAllGames]);
 
   const stats = useMemo(() => {
     const total = games?.length || 0;
@@ -153,20 +138,14 @@ function Predictions() {
         </SimpleGrid>
 
         <HStack w="full" justify="space-between" spacing={4}>
-          <Box flex="1">
-            <Select
-              value={selectedTeam}
-              onChange={(e) => setSelectedTeam(e.target.value)}
-              bg={useColorModeValue("white", "gray.900")}
-              borderRadius="lg"
-            >
-              {allTeams.map((team) => (
-                <option key={team} value={team}>
-                  {team}
-                </option>
-              ))}
-            </Select>
-          </Box>
+          <Button
+            size="sm"
+            variant="outline"
+            colorScheme="blue"
+            onClick={() => setShowAllGames((prev) => !prev)}
+          >
+            {showAllGames ? "Show Unfinished Only" : "Show All Games"}
+          </Button>
           <Tag
             size="lg"
             borderRadius="full"
