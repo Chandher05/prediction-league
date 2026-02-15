@@ -22,11 +22,11 @@ async function parseResponse(response) {
   return response.text();
 }
 
-async function getFreshToken() {
+async function getFreshToken(forceRefresh = false) {
   const user = auth.currentUser;
   if (!user) return null;
   try {
-    return await user.getIdToken();
+    return await user.getIdToken(forceRefresh);
   } catch (error) {
     return null;
   }
@@ -67,8 +67,18 @@ async function apiRequest(path, options = {}) {
     }
   }
 
-  const response = await fetch(`${API_BASE}${path}`, requestOptions);
-  const data = await parseResponse(response);
+  let response = await fetch(`${API_BASE}${path}`, requestOptions);
+  let data = await parseResponse(response);
+
+  // If the backend rejected a stale token, force-refresh once before logging out.
+  if (response.status === 401 && authRequired) {
+    const refreshedToken = await getFreshToken(true);
+    if (refreshedToken) {
+      requestHeaders.Authorization = `Bearer ${refreshedToken}`;
+      response = await fetch(`${API_BASE}${path}`, requestOptions);
+      data = await parseResponse(response);
+    }
+  }
 
   if (!response.ok) {
     if (response.status === 401 && redirectOn401) {

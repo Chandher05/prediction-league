@@ -136,7 +136,7 @@ function PrivateGoogleRoute({ children, ...rest }) {
     return "loading";
   }
   if (error) {
-    logout(auth);
+    logout();
     return "Something has gone wrong";
   }
 

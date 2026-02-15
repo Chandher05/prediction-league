@@ -7,16 +7,21 @@ import {
   Button,
   HStack,
   Tag,
+  Alert,
+  AlertIcon,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 
-import { signInWithGoogle } from "../../../Firebase/config";
+import { auth, signInWithGoogle, useAuthState } from "../../../Firebase/config";
 import { Illustration } from "../Home/Illustration";
 
 export default function GoogleLogin() {
   const history = useHistory();
   const location = useLocation();
+  const [user, loading] = useAuthState(auth);
+  const [loginError, setLoginError] = useState("");
   const accentColor = useColorModeValue("brand.600", "brand.200");
   const buttonBg = useColorModeValue("brand.600", "brand.300");
   const buttonHover = useColorModeValue("brand.500", "brand.200");
@@ -25,12 +30,22 @@ export default function GoogleLogin() {
   const borderColor = useColorModeValue("gray.200", "whiteAlpha.200");
   const mutedText = useColorModeValue("gray.600", "gray.300");
 
+  useEffect(() => {
+    if (!loading && user) {
+      if (location.state?.from) {
+        history.replace(location.state.from);
+      } else {
+        history.replace("/");
+      }
+    }
+  }, [history, loading, location.state, user]);
+
   const signIn = async () => {
-    await signInWithGoogle();
-    if (location.state?.from) {
-      history.push(location.state.from);
-    } else {
-      history.push("/");
+    try {
+      setLoginError("");
+      await signInWithGoogle();
+    } catch (error) {
+      setLoginError(error.message || "Login failed. Please try again.");
     }
   };
 
@@ -73,6 +88,12 @@ export default function GoogleLogin() {
           <Text color={mutedText} fontSize={{ base: "md", md: "lg" }} maxW="lg">
             Sign in to submit your picks, track your rank, and join the season race.
           </Text>
+          {loginError ? (
+            <Alert status="error" borderRadius="md">
+              <AlertIcon />
+              {loginError}
+            </Alert>
+          ) : null}
           <Button
             px={8}
             w={{ base: "full", sm: "auto" }}
@@ -91,6 +112,9 @@ export default function GoogleLogin() {
             <Text>•</Text>
             <Text>One-click login</Text>
           </HStack>
+          <Text color={mutedText} fontSize="xs">
+            Version 1.0.0
+          </Text>
         </Stack>
       </Container>
       <Box

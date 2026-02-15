@@ -30,32 +30,52 @@ const googleProvider = new GoogleAuthProvider();
 
 const auth = getAuth(app);
 
+const registerUserSession = async (user) => {
+  const userIdToken = await user.getIdToken(true);
+  const response = await fetch(`${API_BASE}/users/login`, {
+    headers: {
+      Authorization: `Bearer ${userIdToken}`,
+    },
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to create user session");
+  }
+};
+
 const signInWithGoogle = async () => {
   try {
     const res = await signInWithPopup(auth, googleProvider);
     const user = await res.user;
 
-    const userIdToken = await user.getIdToken();
-    fetch(`${API_BASE}/users/login`, {
-      headers: {
-        Authorization: `Bearer ${userIdToken}`,
-      },
-      method: "POST",
-    });
+    await registerUserSession(user);
     return user;
   } catch (err) {
     console.error(err);
-    alert(err.message);
+    throw err;
   }
 };
 
 const logout = (history) => {
-  signOut(auth);
-  history.push("/login");
+  signOut(auth).finally(() => {
+    if (history && typeof history.push === "function") {
+      history.push("/login");
+      return;
+    }
+    if (window.location.pathname !== "/login") {
+      window.location.assign("/login");
+    }
+  });
 };
 
 // const getIdTokenOfUser = () => {
 //   return getIdToken(auth);
 // }
 
-export { auth, useAuthState, signInWithGoogle, logout };
+export {
+  auth,
+  useAuthState,
+  signInWithGoogle,
+  logout,
+};
