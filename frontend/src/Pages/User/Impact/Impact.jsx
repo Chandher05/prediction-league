@@ -16,13 +16,13 @@ import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useStoreState } from "easy-peasy";
+import { apiRequest } from "../../../api/client";
 
 export default function Impact() {
   const history = useHistory();
   const toast = useToast();
   let { id } = useParams();
 
-  const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
   const pageBg = useColorModeValue("gray.50", "surface");
@@ -68,44 +68,25 @@ export default function Impact() {
 
   useEffect(() => {
     const getGames = async () => {
-      fetch(`${process.env.REACT_APP_API_BE}/game/impact/active`, {
-        headers: {
-          Authorization: `Bearer ${authId}`,
-        },
-      })
-        .then(async (res) => {
-          if (res.status === 200) {
-            const data = await res.json();
-            setCurrConfidenceLevel(data.confidence);
-            predictionForGame(data.predictedTeam._id);
-            setOriginalPredictedTeamId(data.predictedTeam._id);
-            updateSelected(data.game);
-          } else {
-            toast({
-              title: "Oops. You can't submit an Impact prediction now",
-              // Custom error message from server
-              description: "Maybe wait for the game to start.",
-              status: "error",
-              duration: 5000,
-              isClosable: true,
-            });
-            history.push("/");
-          }
-        })
-        .catch((err) => {
-          toast({
-            title: "Oops. You can't submit an Impact player now",
-            // Custom error message from server
-            description: "Maybe wait for the game to start.",
-            status: "error",
-            duration: 2000,
-            isClosable: true,
-          });
-          history.push("/");
+      try {
+        const data = await apiRequest("/game/impact/active");
+        setCurrConfidenceLevel(data.confidence);
+        predictionForGame(data.predictedTeam._id);
+        setOriginalPredictedTeamId(data.predictedTeam._id);
+        updateSelected(data.game);
+      } catch (err) {
+        toast({
+          title: "Oops. You can't submit an Impact player now",
+          description: "Maybe wait for the game to start.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
         });
+        history.push("/");
+      }
     };
     getGames();
-  }, [id, authId, history, toast, updateSelected]);
+  }, [id, history, toast, updateSelected]);
 
   const onSubmit = () => {
     const data = {
@@ -113,21 +94,11 @@ export default function Impact() {
       predictedTeamId: predictedTeamId,
       confidence: currConfidenceLevel || "",
     };
-    fetch(process.env.REACT_APP_API_BE + "/prediction/impact", {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-      body: JSON.stringify(data),
+    apiRequest("/prediction/impact", {
+      method: "POST",
+      body: data,
     })
-      .then((response) => {
-        if (response.ok) {
-          return response;
-        }
-        throw response;
-      })
-      .then((data) => {
+      .then(() => {
         toast({
           title: "You have made a dangerous change!",
           description: "Wish you luck!",
@@ -137,7 +108,7 @@ export default function Impact() {
         });
         history.push("/");
       })
-      .catch((e) => {
+      .catch(() => {
         toast({
           title: "Something went wrong.",
           // Custom error message from server

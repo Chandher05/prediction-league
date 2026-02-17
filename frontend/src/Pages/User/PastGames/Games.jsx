@@ -27,13 +27,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import ViewPredictions from "./ViewPredictions";
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { useStoreState } from "easy-peasy";
 import { ApiError, apiRequest } from "../../../api/client";
 
 function PastGames() {
   const history = useHistory();
   const toast = useToast();
-  const authId = useStoreState((state) => state.authId);
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [allTeams, setAllTeams] = useState([]);
@@ -67,7 +65,7 @@ function PastGames() {
       }
     };
     getGames();
-  }, [authId, toast]);
+  }, [toast]);
 
   const filteredGames = useMemo(() => {
     if (!games || games.length === 0) return [];

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
+  AlertIcon,
   Button,
   Flex,
   FormControl,
@@ -15,15 +17,17 @@ import {
   Text,
   Box,
   Select,
+  ScaleFade,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
-import { useHistory, useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useStoreState } from "easy-peasy";
 import { ApiError, apiRequest } from "../../../api/client";
 
 export default function Predict() {
   const history = useHistory();
+  const location = useLocation();
   const toast = useToast();
   let { id } = useParams();
 
@@ -31,9 +35,10 @@ export default function Predict() {
   const [isLoadingGames, setIsLoadingGames] = useState(false);
   const [showConfidence, setConfidence] = useState(true);
   const [selected, setSelected] = useState({});
-  const [predictedTeamId, setPredictedTeamId] = useState({});
-  const { register, handleSubmit, setValue, getValues } = useForm();
-  const authId = useStoreState((state) => state.authId);
+  const [predictedTeamId, setPredictedTeamId] = useState(null);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [isSubmittingPrediction, setIsSubmittingPrediction] = useState(false);
+  const { register, handleSubmit, setValue, getValues, watch } = useForm();
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
   const helperTextColor = useColorModeValue("gray.600", "gray.300");
@@ -60,25 +65,58 @@ export default function Predict() {
       }
     };
     getGames();
-  }, [id, authId]);
+  }, [id]);
+  const currentConfidence = watch("confidence");
+  const canSubmitPrediction =
+    Boolean(selected?.gameId) &&
+    (Boolean(predictedTeamId) || currentConfidence === "L");
+
   const onSubmit = (data) => {
+    if (!canSubmitPrediction) {
+      toast({
+        title: "Select a team first",
+        description: "Choose a team before submitting your prediction.",
+        status: "warning",
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
     data["gameId"] = selected?.gameId;
     data["predictedTeamId"] = selected ? predictedTeamId : "";
     data["confidence"] = showConfidence
       ? data["confidence"]
       : data["confidence"] || "FH";
+    const predictedTeamName =
+      predictedTeamId === selected?.team1?._id
+        ? selected?.team1?.shortName
+        : predictedTeamId === selected?.team2?._id
+          ? selected?.team2?.shortName
+          : "Leave";
+    const matchLabel = `${selected?.team1?.shortName || "-"} vs ${selected?.team2?.shortName || "-"}`;
+    const predictionLabel = `${predictedTeamName} (${data["confidence"] || "-"})`;
+    setIsSubmittingPrediction(true);
     apiRequest("/prediction/new", {
       method: "POST",
       body: data,
     })
       .then(() => {
         toast({
-          title: "You have predicted the future",
-          description: "May the force be with you!",
+          title: "Prediction saved",
+          description: `${matchLabel}: ${predictionLabel}`,
           status: "success",
-          duration: 3000,
+          duration: 7000,
           isClosable: true,
         });
+        if (location.state?.returnTo) {
+          history.push(location.state.returnTo);
+          return;
+        }
+        if (location.state?.source === "home") {
+          setShowSuccessAnimation(true);
+          setTimeout(() => setShowSuccessAnimation(false), 2200);
+          return;
+        }
         history.push("/");
       })
       .catch((e) => {
@@ -93,6 +131,9 @@ export default function Predict() {
           duration: 2000,
           isClosable: true,
         });
+      })
+      .finally(() => {
+        setIsSubmittingPrediction(false);
       });
   };
   const predictionForGame = (value) => {
@@ -189,6 +230,14 @@ export default function Predict() {
         </HStack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          <ScaleFade initialScale={0.96} in={showSuccessAnimation}>
+            {showSuccessAnimation ? (
+              <Alert status="success" borderRadius="md" mb={3}>
+                <AlertIcon />
+                Prediction confirmed
+              </Alert>
+            ) : null}
+          </ScaleFade>
           <FormControl>
             <FormLabel>Select game</FormLabel>
             <Select
@@ -404,6 +453,9 @@ export default function Predict() {
                 bg: "blue.500",
               }}
               type="submit"
+              isDisabled={!canSubmitPrediction || isSubmittingPrediction}
+              isLoading={isSubmittingPrediction}
+              loadingText="Submitting"
             >
               Submit
             </Button>

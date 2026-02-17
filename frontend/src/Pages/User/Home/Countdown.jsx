@@ -7,15 +7,12 @@ import {
   VStack,
   Tag,
 } from "@chakra-ui/react";
-import { useStoreState } from "easy-peasy";
 
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 import { apiRequest } from "../../../api/client";
 
 function Countdown({ impactAvailable, impactMessage }) {
-  const authId = useStoreState((state) => state.authId);
-
   const [nextGame, setNextGame] = useState(null);
   const [timeLeft, setTimeLeft] = useState({});
 
@@ -39,7 +36,7 @@ function Countdown({ impactAvailable, impactMessage }) {
       }
     };
     fetchGames();
-  }, [authId]);
+  }, []);
   useEffect(() => {
     const intervalTimeCountdownClock = () => {
       if (!nextGame?.startTime) return;

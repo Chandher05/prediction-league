@@ -12,13 +12,12 @@ import { useCallback, useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useHistory } from "react-router";
-import { useStoreState } from "easy-peasy";
+import { apiRequest } from "../../../api/client";
 
 function Trends() {
   const history = useHistory();
   const [graphData, setGraphData] = useState({});
   const [loaded, setLoaded] = useState(false);
-  const authId = useStoreState((state) => state.authId);
   const infoColor = useColorModeValue("brand.600", "brand.200");
   const spinnerColor = useColorModeValue("brand.500", "brand.200");
 
@@ -31,13 +30,8 @@ function Trends() {
     return color;
   }
   const getLeaderboard = useCallback(() => {
-    fetch(process.env.REACT_APP_API_BE + "/prediction/graph", {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) {
-        const res = await response.json();
+    apiRequest("/prediction/graph")
+      .then((res) => {
         const datasets = [];
         for (let key in res.userScores) {
           let randomCol = getRandomColor();
@@ -55,9 +49,9 @@ function Trends() {
           datasets: datasets,
         });
         setLoaded(true);
-      }
-    });
-  }, [authId]);
+      })
+      .catch(() => setLoaded(true));
+  }, []);
   const options = {
     plugins: {
       tooltip: {

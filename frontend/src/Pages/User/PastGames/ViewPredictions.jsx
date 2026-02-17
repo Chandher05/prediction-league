@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/modal";
 import { useToast } from "@chakra-ui/react";
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table";
-import { useStoreState } from "easy-peasy";
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../../api/client";
 
@@ -161,14 +160,13 @@ function ViewPredictions({ gameId, gameNumber, team1Name, team2Name }) {
   const toast = useToast();
   const [predictions, setPredictions] = useState([]);
   const [isSharing, setIsSharing] = useState(false);
-  const authId = useStoreState((state) => state.authId);
 
   useEffect(() => {
     if (!gameId || !isOpen) return;
     apiRequest(`/prediction/sorted/game/${gameId}`)
       .then((data) => setPredictions(data))
       .catch(() => setPredictions([]));
-  }, [gameId, isOpen, authId]);
+  }, [gameId, isOpen]);
 
   const sharePredictions = async () => {
     if (!predictions.length) return;

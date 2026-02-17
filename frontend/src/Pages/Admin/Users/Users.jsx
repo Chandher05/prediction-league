@@ -22,21 +22,16 @@ import {
 // import { useForm } from "react-hook-form";
 import { useToast } from "@chakra-ui/react";
 import { useHistory } from "react-router";
-import { useStoreState } from "easy-peasy";
+import { apiRequest } from "../../../api/client";
 
 function Users() {
   const history = useHistory();
   const [users, setUsers] = useState([]);
-  const authId = useStoreState((state) => state.authId);
   const getUsers = useCallback(() => {
-    fetch(process.env.REACT_APP_API_BE + "/users/all", {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) setUsers(await response.json());
-    });
-  }, [authId]);
+    apiRequest("/users/all")
+      .then((data) => setUsers(data))
+      .catch(() => setUsers([]));
+  }, []);
   useEffect(() => {
     getUsers();
   }, [getUsers]);
@@ -141,17 +136,11 @@ function DisableImpact() {
   const toast = useToast();
   const warningColor = useColorModeValue("red.600", "red.300");
 
-  const authId = useStoreState((state) => state.authId);
-
   const disableImpact = () => {
-    fetch(`${process.env.REACT_APP_API_BE}/users/disable/impact`, {
+    apiRequest("/users/disable/impact", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) {
+    })
+      .then(() => {
         toast({
           title: "Impact Disabled",
           description: "Impact set to 0 for all users",
@@ -160,7 +149,8 @@ function DisableImpact() {
           isClosable: true,
         });
         onClose();
-      } else {
+      })
+      .catch(() => {
         toast({
           title: "Error",
           description: "Impact not disabled",
@@ -169,8 +159,7 @@ function DisableImpact() {
           isClosable: true,
         });
         onClose();
-      }
-    });
+      });
   };
   return (
     <>

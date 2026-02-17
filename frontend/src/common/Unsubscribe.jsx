@@ -1,19 +1,15 @@
 import { Center, VStack, Heading, useToast, Button } from "@chakra-ui/react";
-import { useStoreState } from "easy-peasy";
+import { apiRequest } from "../api/client";
 
 import React, { useEffect } from "react";
 
 function Unsubscribe() {
-  const authId = useStoreState((state) => state.authId);
   const toast = useToast();
   // const [nextGame, setNextGame] = useState(null);
 
   useEffect(() => {
-    fetch(process.env.REACT_APP_API_BE + "/users/unsubscribe", {
+    apiRequest("/users/unsubscribe", {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
     })
       .then(() => {
         toast({
@@ -33,14 +29,11 @@ function Unsubscribe() {
           isClosable: true,
         });
       });
-  }, [authId, toast]);
+  }, [toast]);
 
   const resubscribe = () => {
-    fetch(process.env.REACT_APP_API_BE + "/users/resubscribe", {
+    apiRequest("/users/resubscribe", {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
     })
       .then(() => {
         toast({

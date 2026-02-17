@@ -23,7 +23,6 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { useStoreState } from "easy-peasy";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import { ApiError, apiRequest } from "../../../api/client";
@@ -174,7 +173,6 @@ async function buildLeaderboardImage(rows) {
 function Leaderboard() {
   const history = useHistory();
   const toast = useToast();
-  const authId = useStoreState((state) => state.authId);
 
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -200,7 +198,7 @@ function Leaderboard() {
         });
       })
       .finally(() => setIsLoading(false));
-  }, [authId, toast]);
+  }, [toast]);
 
   useEffect(() => {
     getLeaderboard();

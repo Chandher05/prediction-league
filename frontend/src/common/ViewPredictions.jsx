@@ -12,23 +12,18 @@ import {
 } from "@chakra-ui/modal";
 import { Table, Tbody, Td, Tfoot, Th, Thead, Tr } from "@chakra-ui/table";
 import { useEffect, useState } from "react";
-import { useStoreState } from "easy-peasy";
+import { apiRequest } from "../api/client";
 
 function ViewPredictions({ gameId }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [predictions, setPredictions] = useState([]);
-  const authId = useStoreState((state) => state.authId);
 
   useEffect(() => {
     if (!gameId || !isOpen) return;
-    fetch(`${process.env.REACT_APP_API_BE}/prediction/game/${gameId}`, {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) setPredictions(await response.json());
-    });
-  }, [gameId, isOpen, authId]);
+    apiRequest(`/prediction/game/${gameId}`)
+      .then((data) => setPredictions(data))
+      .catch(() => setPredictions([]));
+  }, [gameId, isOpen]);
 
   return (
     <>

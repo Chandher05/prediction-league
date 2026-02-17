@@ -20,7 +20,6 @@ import {
   StatNumber,
   StatHelpText,
 } from "@chakra-ui/react";
-import { useStoreState } from "easy-peasy";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import { ApiError, apiRequest } from "../../../api/client";
@@ -31,7 +30,6 @@ function Predictions() {
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showAllGames, setShowAllGames] = useState(false);
-  const authId = useStoreState((state) => state.authId);
 
   const getPredictions = useCallback(() => {
     setIsLoading(true);
@@ -52,7 +50,7 @@ function Predictions() {
         });
       })
       .finally(() => setIsLoading(false));
-  }, [authId, toast]);
+  }, [toast]);
 
   useEffect(() => {
     getPredictions();
@@ -216,7 +214,12 @@ function Predictions() {
                           colorScheme="blue"
                           variant={game.gameStarted ? "ghost" : "solid"}
                           isDisabled={game.gameStarted}
-                          onClick={() => history.push(`/predict/${game.id}`)}
+                          onClick={() =>
+                            history.push({
+                              pathname: `/predict/${game.id || game.gameId}`,
+                              state: { returnTo: "/predictions" },
+                            })
+                          }
                         >
                           {game.gameStarted ? "Locked" : "Predict"}
                         </Button>

@@ -36,7 +36,6 @@ import { useState } from "react";
 export default function Home() {
   const [impact, setImpact] = useState(false);
   const [impactMessage, setImpactMessage] = useState("Impact window is closed");
-  const authId = useStoreState((state) => state.authId);
   const userName = useStoreState((state) => state.userName);
   const photoURL = useStoreState((state) => state?.photoURL);
   const reset = useStoreActions((actions) => actions.reset);
@@ -103,7 +102,7 @@ export default function Home() {
       }
     };
     checkImpact();
-  }, [authId]);
+  }, []);
 
   function handleLogout() {
     reset();
@@ -176,7 +175,12 @@ export default function Home() {
                 colorScheme="brand"
                 bg={primaryCtaBg}
                 _hover={{ bg: primaryCtaHover }}
-                onClick={() => navTo("predict")}
+                onClick={() =>
+                  history.push({
+                    pathname: "/predict",
+                    state: { source: "home" },
+                  })
+                }
                 size="lg"
                 w="full"
               >

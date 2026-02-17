@@ -39,44 +39,31 @@ import { useHistory } from "react-router";
 import { useToast } from "@chakra-ui/react";
 import ViewPredictions from "../../../common/ViewPredictions";
 import { CheckIcon, CopyIcon, DeleteIcon, EditIcon, RepeatIcon } from "@chakra-ui/icons";
-import { useStoreState } from "easy-peasy";
+import { apiRequest } from "../../../api/client";
 
 function Games() {
   const history = useHistory();
   const [games, setGames] = useState([]);
   const [teams, setTeams] = useState([]);
   const [users, setUsers] = useState([]);
-  const authId = useStoreState((state) => state.authId);
 
   const getGames = useCallback(() => {
-    fetch(process.env.REACT_APP_API_BE + "/game/all", {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) setGames(await response.json());
-    });
-  }, [authId]);
+    apiRequest("/game/all")
+      .then((data) => setGames(data))
+      .catch(() => setGames([]));
+  }, []);
 
   const getTeams = useCallback(() => {
-    fetch(process.env.REACT_APP_API_BE + "/teams/all", {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) setTeams(await response.json());
-    });
-  }, [authId]);
+    apiRequest("/teams/all")
+      .then((data) => setTeams(data))
+      .catch(() => setTeams([]));
+  }, []);
 
   const getUsers = useCallback(() => {
-    fetch(process.env.REACT_APP_API_BE + "/users/all", {
-      headers: {
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) setUsers(await response.json());
-    });
-  }, [authId]);
+    apiRequest("/users/all")
+      .then((data) => setUsers(data))
+      .catch(() => setUsers([]));
+  }, []);
 
   useEffect(() => {
     getGames();
@@ -197,15 +184,10 @@ function AddGameModal({ onCloseCall, teams }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { register, handleSubmit, reset } = useForm();
 
-  const authId = useStoreState((state) => state.authId);
   const onSubmit = (data) => {
-    fetch(process.env.REACT_APP_API_BE + "/game/add", {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-      body: JSON.stringify(data),
+    apiRequest("/game/add", {
+      method: "POST",
+      body: data,
     }).then(() => {
       reset();
       onCloseCall();
@@ -287,7 +269,6 @@ function AddGameModal({ onCloseCall, teams }) {
 function UpdateGameModal({ game }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const authId = useStoreState((state) => state.authId);
   const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       // startTime: toDatetimeLocal(game.startTime) || '',
@@ -302,13 +283,9 @@ function UpdateGameModal({ game }) {
     },
   });
   const onSubmit = (data) => {
-    fetch(process.env.REACT_APP_API_BE + "/game/update", {
-      method: "PUT", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-      body: JSON.stringify(data),
+    apiRequest("/game/update", {
+      method: "PUT",
+      body: data,
     });
     onClose();
     reset();
@@ -396,18 +373,12 @@ function AutoUpdateWinner({ gameId }) {
   const { onClose } = useDisclosure();
   const toast = useToast();
 
-  const authId = useStoreState((state) => state.authId);
-
   const updateWinner = () => {
     if (!gameId) return;
-    fetch(`${process.env.REACT_APP_API_BE}/game/update-winner/${gameId}`, {
+    apiRequest(`/game/update-winner/${gameId}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) {
+    })
+      .then(() => {
         toast({
           title: "Game Updated.",
           description: "Game has been updated",
@@ -416,7 +387,8 @@ function AutoUpdateWinner({ gameId }) {
           isClosable: true,
         });
         onClose();
-      } else {
+      })
+      .catch(() => {
         toast({
           title: "Error",
           description: "Game not updated",
@@ -425,8 +397,7 @@ function AutoUpdateWinner({ gameId }) {
           isClosable: true,
         });
         onClose();
-      }
-    })
+      });
   };
 
   return (
@@ -441,18 +412,11 @@ function DeleteConfirmModal({ gameId }) {
   const toast = useToast();
   const warningColor = useColorModeValue("red.600", "red.300");
 
-  const authId = useStoreState((state) => state.authId);
-
   const delGame = () => {
     if (!gameId) return;
-    fetch(`${process.env.REACT_APP_API_BE}/game/delete/${gameId}`, {
+    apiRequest(`/game/delete/${gameId}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-    }).then(async (response) => {
-      if (response.ok) {
+    }).then(() => {
         toast({
           title: "Game Deleted.",
           description: "Game has been deleted",
@@ -461,7 +425,6 @@ function DeleteConfirmModal({ gameId }) {
           isClosable: true,
         });
         onClose();
-      }
     });
   };
   return (
@@ -503,18 +466,12 @@ function AddPredictionModal({ users, games, teams }) {
 
   const toast = useToast();
 
-  const authId = useStoreState((state) => state.authId);
   const onSubmit = (data) => {
-    fetch(process.env.REACT_APP_API_BE + "/prediction/admin/new", {
-      method: "POST", // or 'PUT'
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authId}`,
-      },
-      body: JSON.stringify(data),
+    apiRequest("/prediction/admin/new", {
+      method: "POST",
+      body: data,
     })
-    .then(async (response) => {
-      if (response.ok) {
+    .then(() => {
         toast({
           title: "Success",
           description: "Prediction Added",
@@ -524,7 +481,8 @@ function AddPredictionModal({ users, games, teams }) {
         });
         reset();
         onClose();
-      } else {
+      })
+      .catch(() => {
         toast({
           title: "Error",
           description: "Could not add prediction",
@@ -532,8 +490,7 @@ function AddPredictionModal({ users, games, teams }) {
           duration: 9000,
           isClosable: true,
         });
-      }
-    });
+      });
   };
   return (
     <>
