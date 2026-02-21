@@ -232,31 +232,15 @@ exports.addGame = async (req, res) => {
 				.send("Game number already exists")
 		}
 
-		// if (req.body.winner != req.body.team1 && req.body.winner != req.body.team2 && req.body.winner != "") {
-		// 	return res
-		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-		// 		.send("Winner is required in request. Winner must be blank or from one of the teams playing the game")
-		// }
+		var existingGame = await Game.find({
+			cricApiMatchId: req.body.cricApiMatchId
+		})
 
-
-		// if (req.body.battingFirst != req.body.team1 && req.body.battingFirst != req.body.team2 && req.body.battingFirst != "") {
-		// 	return res
-		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-		// 		.send("Team batting first is required in request. Team batting first must be blank or from one of the teams playing the game")
-		// }
-
-
-		// if (req.body.toss != req.body.team1 && req.body.toss != req.body.team2 && req.body.toss != "") {
-		// 	return res
-		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-		// 		.send("Team winning toss is required in request. Team winning toss must be blank or from one of the teams playing the game")
-		// }
-
-		// if (req.body.winner != "" && (req.body.battingFirst == "" || req.body.toss == "")) {
-		// 	return res
-		// 		.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
-		// 		.send("Team winning toss and batting first must not be blank if winner is provided")
-		// }
+		if (existingGame.length > 0) {
+			return res
+				.status(constants.STATUS_CODE.CONFLICT_ERROR_STATUS)
+				.send("Game API ID already exists")
+		}
 
 		if (req.body.team1 == req.body.team2) {
 			return res

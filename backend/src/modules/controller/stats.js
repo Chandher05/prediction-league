@@ -21,10 +21,18 @@ import constants from '../../utils/constants';
 
 		let allUsers
 		allUsers = await Users.find()
+		
+		allUsers.sort(function (a, b) {
+		return a.totalScore - b.totalScore;
+		});
 
+		let leaderboardData = [];
 		let userObj = {}
 		for (var user of allUsers) {
 			userObj[user.userUID] = user
+			if (!user.isAdmin) {
+				leaderboardData.push(user.username);
+			}
 		}
 
 		let allGames
@@ -67,7 +75,8 @@ import constants from '../../utils/constants';
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send({
 				requestTime: new Date(),
-				predictionData: returnData
+				predictionData: returnData,
+				leaderboard: leaderboardData
 			})
 	} catch (error) {
 		console.log(`Error while adding user ${error}`)
