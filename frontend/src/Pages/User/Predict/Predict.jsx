@@ -13,6 +13,7 @@ import {
   useColorModeValue,
   useToast,
   HStack,
+  Link,
   Image,
   Text,
   Box,
@@ -485,6 +486,16 @@ export default function Predict() {
             >
               Submit
             </Button>
+            <Text fontSize="xs" p="2">
+              NOTE: If you are unable to submit a prediction here, please use this form instead. Using the form after submitting a prediction will not be considered. {" "}
+              <Link
+                href="https://forms.gle/9Z8PkgzRQX5GfrP88"
+                isExternal
+                color="blue.500"
+              >
+                Open form
+              </Link>
+            </Text>
           </Stack>
         </form>
       </Stack>
