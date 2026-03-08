@@ -118,6 +118,7 @@ exports.allUsers = async (req, res) => {
 			userData.push({
 				mongoId: user._id,
 				username: user.username,
+				email: user.email,
 				isAdmin: user.isAdmin,
 				isActive: user.isActive
 			})

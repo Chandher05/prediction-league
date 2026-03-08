@@ -509,7 +509,7 @@ function AddPredictionModal({ users, games, teams }) {
                 <Select {...register("userId")}>
                   <option value={null}></option>
                   {users.map((user) => {
-                    return <option value={user.mongoId}>{user.username}</option>
+                    return <option value={user.mongoId}>{user.username} - {user.email}</option>
                   })}
                 </Select>
               </FormControl>
