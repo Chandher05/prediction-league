@@ -51,7 +51,7 @@ function drawRoundedRect(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
-async function buildLeaderboardImage(rows) {
+async function buildLeaderboardImage(rows, lastCompletedGame) {
   const columns = [
     { key: "position", label: "#", width: 80 },
     { key: "username", label: "Name", width: 320 },
@@ -86,11 +86,21 @@ async function buildLeaderboardImage(rows) {
 
   ctx.fillStyle = "#2563eb";
   ctx.font = "bold 36px Arial";
-  ctx.fillText("Leaderboard Snapshot", 56, 132);
+  ctx.fillText("Leaderboard Snapshot after Match " + lastCompletedGame, 56, 132);
 
   ctx.fillStyle = "#64748b";
   ctx.font = "24px Arial";
-  ctx.fillText(`Generated on ${new Date().toLocaleString()}`, 56, 170);
+  const generatedOn = new Date().toLocaleString("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Kolkata",
+  });
+  ctx.fillText(`Generated on ${generatedOn} (IST)`, 56, 170);
 
   const tableX = 56;
   const tableY = 198;
@@ -175,6 +185,7 @@ function Leaderboard() {
   const toast = useToast();
 
   const [games, setGames] = useState([]);
+  const [completedGames, setCompletedGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showStrategies, setShowStrategies] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -200,14 +211,57 @@ function Leaderboard() {
       .finally(() => setIsLoading(false));
   }, [toast]);
 
+  const getGames = async () => {
+    setIsLoading(true);
+    try {
+      const completedGames = await apiRequest("/game/completed");
+      let allTeamsFromResponse = new Set(["Show all"]);
+
+      for (var game of completedGames) {
+        allTeamsFromResponse.add(game.team1.fullName);
+        allTeamsFromResponse.add(game.team2.fullName);
+      }
+      setCompletedGames(completedGames);
+    } catch (error) {
+      toast({
+        title: "Could not load past games",
+        description:
+          error instanceof ApiError ? error.message : "Please try again.",
+        status: "error",
+        duration: 2500,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     getLeaderboard();
+    getGames();
   }, [getLeaderboard]);
 
   const visibleRows = useMemo(
     () => games.filter((row) => (showStrategies ? true : !row.isAdmin)),
     [games, showStrategies]
   );
+
+  const getLastCompletedGame = useMemo(() => {
+    if (!completedGames || completedGames.length === 0) return null;
+    let last = null;
+    for (const game of completedGames) {
+      if (game?.winner?.fullName) {
+        if (!last || (game.gameNumber || 0) > (last.gameNumber || 0)) {
+          last = game;
+        }
+      }
+    }
+    if (!last) return null;
+    const num = last.gameNumber;
+    const teamA = last.team1?.shortName || last.team1?.fullName || "-";
+    const teamB = last.team2?.shortName || last.team2?.fullName || "-";
+    return `${num} (${teamA} vs ${teamB})`;
+  }, [completedGames]);
 
   const topPlayer = visibleRows[0];
   const avgScore =
@@ -222,7 +276,7 @@ function Leaderboard() {
     if (visibleRows.length === 0) return;
     setIsSharing(true);
     try {
-      const blob = await buildLeaderboardImage(visibleRows);
+      const blob = await buildLeaderboardImage(visibleRows, getLastCompletedGame);
       if (!blob) throw new Error("Could not create image");
       const file = new File([blob], "leaderboard.png", { type: "image/png" });
       const shareText = "Prediction League leaderboard update";
@@ -270,7 +324,7 @@ function Leaderboard() {
   const handleDownloadImage = async () => {
     if (visibleRows.length === 0) return;
     try {
-      const blob = await buildLeaderboardImage(visibleRows);
+      const blob = await buildLeaderboardImage(visibleRows, getLastCompletedGame);
       if (!blob) throw new Error("Could not create image");
       downloadBlob(blob, "leaderboard.png");
     } catch (error) {
@@ -304,14 +358,14 @@ function Leaderboard() {
               </Heading>
             </HStack>
             <HStack>
-              <Button
+              {/* <Button
                 size="sm"
                 variant="outline"
                 colorScheme="blue"
                 onClick={() => setShowStrategies(!showStrategies)}
               >
                 {showStrategies ? "Hide Strategies" : "Show Strategies"}
-              </Button>
+              </Button> */}
               <Button
                 size="sm"
                 colorScheme="green"
@@ -341,7 +395,6 @@ function Leaderboard() {
             >
               <StatLabel>Players</StatLabel>
               <StatNumber>{visibleRows.length}</StatNumber>
-              <StatHelpText>Visible in table</StatHelpText>
             </Stat>
             <Stat
               bg={cardBg}
@@ -351,9 +404,6 @@ function Leaderboard() {
             >
               <StatLabel>Top Player</StatLabel>
               <StatNumber fontSize="xl">{topPlayer?.username || "-"}</StatNumber>
-              <StatHelpText>
-                {topPlayer ? `#${topPlayer.position}` : "No data"}
-              </StatHelpText>
             </Stat>
             <Stat
               bg={cardBg}
@@ -363,7 +413,6 @@ function Leaderboard() {
             >
               <StatLabel>Average Score</StatLabel>
               <StatNumber>{avgScore}</StatNumber>
-              <StatHelpText>Across visible rows</StatHelpText>
             </Stat>
           </SimpleGrid>
 

@@ -71,6 +71,35 @@ export default function Predict() {
     Boolean(selected?.gameId) &&
     (Boolean(predictedTeamId) || currentConfidence === "L");
 
+  const isBetween70And100 = (value) => {
+    const num = Number(value);
+    return Number.isInteger(num) && num >= 70 && num <= 100;
+  };
+
+  const getRandomDescription = (confidence) => {
+    let description = [
+        "Future you is either proud or embarrassed.",
+        "May the force be with you!",
+        "The odds are in. Now we wait for reality to grade you.",
+        "Confidence submitted. Accuracy pending.",
+        "The future is now under pressure to cooperate.",
+        "Reality is preparing its response."
+      ]
+    if (isBetween70And100(confidence)) {
+      description = [
+        "Strong opinions about a future that hasn't happened yet. Respect.", 
+        "This will either age like fine wine or unrefrigerated milk.", 
+        "That's either brilliant foresight or legendary overconfidence.", 
+        "This prediction may become prophecy… or a meme.", 
+        "A bold forecast has entered the timeline. Good luck.", 
+        "Either genius or chaos. Time will reveal which."
+      ]
+    }
+    // Return random description
+    const randomIndex = Math.floor(Math.random() * description.length);
+    return description[randomIndex];
+  }
+
   const onSubmit = (data) => {
     if (!canSubmitPrediction) {
       toast({
@@ -102,8 +131,8 @@ export default function Predict() {
     })
       .then(() => {
         toast({
-          title: "Prediction saved",
-          description: `${matchLabel}: ${predictionLabel}`,
+          title: `Prediction saved for ${matchLabel}`,
+          description:  getRandomDescription(data["confidence"]),
           status: "success",
           duration: 7000,
           isClosable: true,
@@ -189,9 +218,6 @@ export default function Predict() {
     const folder = IPL_TEAMS.has(shortName) ? "Logo_IPL" : "Logo";
     return `${process.env.PUBLIC_URL}/${folder}/${shortName}.png`;
   };
-
-  const getLeaveLogoPath = (isSelected = false) =>
-    `${process.env.PUBLIC_URL}/Logo/Leave${isSelected ? " - Selected" : ""}.png`;
 
   return (
     <Flex

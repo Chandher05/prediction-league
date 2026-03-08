@@ -53,7 +53,7 @@ function Countdown({ impactAvailable, impactMessage }) {
   }, [nextGame]);
   return (
     <Box p="2">
-      {nextGame && (
+      {nextGame ? (
         <CountDownClock
           timeLeft={timeLeft}
           nextGame={nextGame}
@@ -61,6 +61,8 @@ function Countdown({ impactAvailable, impactMessage }) {
           impactAvailable={impactAvailable}
           impactMessage={impactMessage}
         ></CountDownClock>
+      ) : (
+        <PlaceholderClock impactAvailable={impactAvailable} impactMessage={impactMessage} />
       )}
     </Box>
   );
@@ -129,6 +131,52 @@ function CountDownClock({
                 <TimeBlock label="seconds" value={timeLeft.seconds} />
               </Stack>
             )}
+          </Stack>
+        </Box>
+      </Center>
+      {!impactAvailable && (
+        <Tag size="sm" colorScheme="gray" variant="subtle" px={3} py={1}>
+          <Text fontSize="xs" color={impactTextColor}>
+            {impactMessage || "Impact window is closed"}
+          </Text>
+        </Tag>
+      )}
+    </Stack>
+  );
+}
+
+function PlaceholderClock({ impactAvailable, impactMessage }) {
+  const impactTextColor = useColorModeValue("gray.600", "gray.300");
+  return (
+    <Stack spacing={3} align="center" p={{ base: 2 }}>
+      <Center w="full" px={{ base: 3, sm: 4 }}>
+        <Box
+          w={"full"}
+          maxW={{ base: "full", sm: "480px" }}
+          bg={useColorModeValue("gray.50", "gray.800")}
+          boxShadow={"2xl"}
+          rounded={{ base: "xl", md: "2xl" }}
+          overflow={"hidden"}
+          minH={{ base: "120px", sm: "140px" }}
+        >
+          <Stack
+            textAlign={"center"}
+            p={{ base: 3, md: 4 }}
+            color={useColorModeValue("gray.800", "white")}
+            align={"center"}
+            spacing={4}
+          >
+            <Text
+              fontSize={{ base: "xs", sm: "sm" }}
+              fontWeight={500}
+              bg={useColorModeValue("gray.100", "gray.900")}
+              px={{ base: 3, md: 4 }}
+              py={2}
+              rounded="full"
+              color={useColorModeValue("gray.500", "gray.400")}
+            >
+              {/* Empty placeholder to preserve layout */}
+            </Text>
           </Stack>
         </Box>
       </Center>

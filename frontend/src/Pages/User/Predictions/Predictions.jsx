@@ -30,6 +30,7 @@ function Predictions() {
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showAllGames, setShowAllGames] = useState(false);
+  const [showAdvancedStats, setShowAdvancedStats] = useState(false);
 
   const getPredictions = useCallback(() => {
     setIsLoading(true);
@@ -66,14 +67,56 @@ function Predictions() {
     const total = games?.length || 0;
     let correct = 0;
     let pending = 0;
+    let predictedGames = 0;
+    let leavesRemaining = 7;
+    let freehitRemaining = 2;
+    let totalConfidenceWhenCorrect = 0;
+    let totalConfidenceWhenWrong = 0;
     for (const game of games || []) {
       if (!game.gameStarted) {
         pending += 1;
       } else if (game.predictedTeam?.shortName === game.winner?.shortName) {
         correct += 1;
+        if (game.confidence == "FH") {
+          totalConfidenceWhenCorrect += 100;
+        } else {
+          totalConfidenceWhenCorrect += Number(game.confidence);
+        }
+      } else {
+        if (game.confidence == "FH") {
+          totalConfidenceWhenWrong += 50;
+        } else if (game.confidence != "L") {
+          totalConfidenceWhenWrong += Number(game.confidence);
+        }
+      }
+
+      if (game.confidence != "L") {
+        predictedGames += 1;
+      } else if (leavesRemaining > 0) {
+        leavesRemaining -= 1;
+      }
+      if (game.confidence == "FH" && freehitRemaining > 0) {
+        freehitRemaining -= 1;
       }
     }
-    return { total, correct, pending };
+    
+    const totalOverallConfidence = totalConfidenceWhenCorrect + totalConfidenceWhenWrong;
+
+    let avgConfidenceWhenCorrect = "N/A";
+    let avgConfidenceWhenWrong = "N/A";
+    let avgOverallConfidence = "N/A";
+    let predictionAccuracy = "N/A";
+    if (predictedGames > 0) {
+      predictionAccuracy = ((correct / predictedGames) * 100).toFixed(2) + "%";
+      avgOverallConfidence = (totalOverallConfidence / predictedGames).toFixed(2);
+    }
+    if (correct > 0) {
+      avgConfidenceWhenCorrect = (totalConfidenceWhenCorrect / correct).toFixed(2);
+    }
+    if ((predictedGames - correct) > 0) {
+      avgConfidenceWhenWrong = (totalConfidenceWhenWrong / (predictedGames - correct)).toFixed(2);
+    }
+    return { total, leavesRemaining, pending, predictedGames, predictionAccuracy, correct, avgConfidenceWhenCorrect, avgConfidenceWhenWrong, avgOverallConfidence, freehitRemaining };
   }, [games]);
 
   return (
@@ -109,30 +152,59 @@ function Predictions() {
           </VStack>
         </HStack>
 
-        <SimpleGrid
-          columns={{ base: 1, md: 3 }}
-          spacing={4}
-          w="full"
-          p={4}
-          bg={useColorModeValue("white", "gray.900")}
-          borderRadius="xl"
-          boxShadow="md"
-        >
+          <SimpleGrid
+            columns={{ base: 1, md: 3 }}
+            spacing={4}
+            w="full"
+            p={4}
+            bg={useColorModeValue("white", "gray.900")}
+            borderRadius="xl"
+            boxShadow="md"
+          >
           <Stat>
-            <StatLabel>Total Predictions</StatLabel>
-            <StatNumber>{stats.total}</StatNumber>
-            <StatHelpText>All time</StatHelpText>
-          </Stat>
-          <Stat>
-            <StatLabel>Correct Picks</StatLabel>
-            <StatNumber>{stats.correct}</StatNumber>
-            <StatHelpText>Completed games</StatHelpText>
-          </Stat>
-          <Stat>
-            <StatLabel>Pending</StatLabel>
+            <StatLabel>Pending Games</StatLabel>
             <StatNumber>{stats.pending}</StatNumber>
             <StatHelpText>Not started yet</StatHelpText>
           </Stat>
+          <Stat>
+            <StatLabel>Leaves Remaining</StatLabel>
+            <StatNumber>{stats.leavesRemaining}</StatNumber>
+            <StatHelpText>Games you can skip without affecting your score</StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel>Free hits remaining</StatLabel>
+            <StatNumber>{stats.freehitRemaining}</StatNumber>
+            <StatHelpText>Number of free hits you can use</StatHelpText>
+          </Stat>
+        {showAdvancedStats && (
+          <>
+          <Stat>
+            <StatLabel>Games Predicted</StatLabel>
+            <StatNumber>{stats.predictedGames}</StatNumber>
+            <StatHelpText>Total number of games you have made predictions for</StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel>Prediction accuracy</StatLabel>
+            <StatNumber>{stats.predictionAccuracy} ({stats.correct} out of {stats.predictedGames})</StatNumber>
+            <StatHelpText>Your predictions that have been correct</StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel>Average confidence (Overall)</StatLabel>
+            <StatNumber>{stats.avgOverallConfidence}</StatNumber>
+            <StatHelpText>Average confidence level across all predictions</StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel>Average confidence (Correct)</StatLabel>
+            <StatNumber>{stats.avgConfidenceWhenCorrect}</StatNumber>
+            <StatHelpText>Average confidence level for predictions that were correct</StatHelpText>
+          </Stat>
+          <Stat>
+            <StatLabel>Average confidence (Wrong)</StatLabel>
+            <StatNumber>{stats.avgConfidenceWhenWrong}</StatNumber>
+            <StatHelpText>Average confidence level for predictions that were incorrect</StatHelpText>
+          </Stat>
+          </>
+        )}
         </SimpleGrid>
 
         <HStack w="full" justify="space-between" spacing={4}>
@@ -143,6 +215,14 @@ function Predictions() {
             onClick={() => setShowAllGames((prev) => !prev)}
           >
             {showAllGames ? "Show Unfinished Only" : "Show All Games"}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            colorScheme="blue"
+            onClick={() => setShowAdvancedStats((prev) => !prev)}
+          >
+            {showAdvancedStats ? "Hide advanced stats" : "Show advanced stats"}
           </Button>
           <Tag
             size="lg"

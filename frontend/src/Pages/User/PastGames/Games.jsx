@@ -103,32 +103,6 @@ function PastGames() {
             </HStack>
           </Stack>
 
-          <SimpleGrid
-            columns={{ base: 1, md: 3 }}
-            spacing={4}
-            w="full"
-            p={4}
-            bg={useColorModeValue("white", "gray.900")}
-            borderRadius="xl"
-            boxShadow="md"
-          >
-            <Stat>
-              <StatLabel>Completed Games</StatLabel>
-              <StatNumber>{games.length}</StatNumber>
-              <StatHelpText>All time</StatHelpText>
-            </Stat>
-            <Stat>
-              <StatLabel>Teams Filtered</StatLabel>
-              <StatNumber>{filteredGames.length}</StatNumber>
-              <StatHelpText>Currently shown</StatHelpText>
-            </Stat>
-            <Stat>
-              <StatLabel>Teams in List</StatLabel>
-              <StatNumber>{Math.max(allTeams.length - 1, 0)}</StatNumber>
-              <StatHelpText>Unique teams</StatHelpText>
-            </Stat>
-          </SimpleGrid>
-
           <HStack w="full" justify="space-between" spacing={4}>
             <Box flex="1">
               <Select
