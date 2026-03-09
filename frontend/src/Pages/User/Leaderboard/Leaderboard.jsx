@@ -8,7 +8,6 @@ import {
   SimpleGrid,
   Stack,
   Stat,
-  StatHelpText,
   StatLabel,
   StatNumber,
   Table,
@@ -187,7 +186,8 @@ function Leaderboard() {
   const [games, setGames] = useState([]);
   const [completedGames, setCompletedGames] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showStrategies, setShowStrategies] = useState(false);
+  // const [showStrategies, setShowStrategies] = useState(false);
+  const showStrategies = false;
   const [isSharing, setIsSharing] = useState(false);
   const cardBg = useColorModeValue("white", "gray.900");
   const pageBg = useColorModeValue("gray.50", "gray.800");
@@ -211,7 +211,7 @@ function Leaderboard() {
       .finally(() => setIsLoading(false));
   }, [toast]);
 
-  const getGames = async () => {
+  const getGames = useCallback(async () => {
     setIsLoading(true);
     try {
       const completedGames = await apiRequest("/game/completed");
@@ -234,12 +234,12 @@ function Leaderboard() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     getLeaderboard();
     getGames();
-  }, [getLeaderboard]);
+  }, [getLeaderboard, getGames]);
 
   const visibleRows = useMemo(
     () => games.filter((row) => (showStrategies ? true : !row.isAdmin)),

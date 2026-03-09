@@ -77,25 +77,25 @@ function Predictions() {
         pending += 1;
       } else if (game.predictedTeam?.shortName === game.winner?.shortName) {
         correct += 1;
-        if (game.confidence == "FH") {
+        if (game.confidence === "FH") {
           totalConfidenceWhenCorrect += 100;
         } else {
           totalConfidenceWhenCorrect += Number(game.confidence);
         }
       } else {
-        if (game.confidence == "FH") {
+        if (game.confidence === "FH") {
           totalConfidenceWhenWrong += 50;
-        } else if (game.confidence != "L") {
+        } else if (game.confidence !== "L") {
           totalConfidenceWhenWrong += Number(game.confidence);
         }
       }
 
-      if (game.confidence != "L") {
+      if (game.confidence !== "L") {
         predictedGames += 1;
       } else if (leavesRemaining > 0) {
         leavesRemaining -= 1;
       }
-      if (game.confidence == "FH" && freehitRemaining > 0) {
+      if (game.confidence === "FH" && freehitRemaining > 0) {
         freehitRemaining -= 1;
       }
     }

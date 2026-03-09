@@ -117,14 +117,7 @@ export default function Predict() {
     data["confidence"] = showConfidence
       ? data["confidence"]
       : data["confidence"] || "FH";
-    const predictedTeamName =
-      predictedTeamId === selected?.team1?._id
-        ? selected?.team1?.shortName
-        : predictedTeamId === selected?.team2?._id
-          ? selected?.team2?.shortName
-          : "Leave";
     const matchLabel = `${selected?.team1?.shortName || "-"} vs ${selected?.team2?.shortName || "-"}`;
-    const predictionLabel = `${predictedTeamName} (${data["confidence"] || "-"})`;
     setIsSubmittingPrediction(true);
     apiRequest("/prediction/new", {
       method: "POST",
