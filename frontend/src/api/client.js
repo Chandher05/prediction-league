@@ -1,9 +1,5 @@
-import { auth } from "../Firebase/config";
-
-const API_BASE = (
-  process.env.REACT_APP_API_BE ||
-  "https://observant-creation-production.up.railway.app"
-).replace(/\/+$/, "");
+import { auth, authReady } from "../Firebase/config";
+import { API_BASE } from "./config";
 
 class ApiError extends Error {
   constructor(status, message, data) {
@@ -23,6 +19,7 @@ async function parseResponse(response) {
 }
 
 async function getFreshToken(forceRefresh = false) {
+  await authReady;
   const user = auth.currentUser;
   if (!user) return null;
   try {
@@ -94,4 +91,4 @@ async function apiRequest(path, options = {}) {
   return data;
 }
 
-export { API_BASE, ApiError, apiRequest };
+export { ApiError, apiRequest };

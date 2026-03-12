@@ -3,12 +3,15 @@ import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 import {
+  browserLocalPersistence,
   GoogleAuthProvider,
   getAuth,
+  onIdTokenChanged,
+  setPersistence,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { API_BASE } from "../api/client";
+import { API_BASE } from "../api/config";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -29,9 +32,16 @@ const app = initializeApp(firebaseConfig);
 const googleProvider = new GoogleAuthProvider();
 
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch(() => {});
+
+let resolveAuthReady;
+const authReady = new Promise((resolve) => {
+  resolveAuthReady = resolve;
+});
+let didResolveAuthReady = false;
 
 const registerUserSession = async (user) => {
-  const userIdToken = await user.getIdToken(true);
+  const userIdToken = await user.getIdToken();
   const response = await fetch(`${API_BASE}/users/login`, {
     headers: {
       Authorization: `Bearer ${userIdToken}`,
@@ -43,6 +53,24 @@ const registerUserSession = async (user) => {
     throw new Error("Unable to create user session");
   }
 };
+
+onIdTokenChanged(auth, async (user) => {
+  if (!didResolveAuthReady) {
+    didResolveAuthReady = true;
+    resolveAuthReady(user ?? null);
+  }
+
+  if (!user) {
+    return;
+  }
+
+  try {
+    await registerUserSession(user);
+  } catch (error) {
+    // Keep users signed in even if session sync is temporarily unavailable.
+    console.warn("Unable to sync backend session", error);
+  }
+});
 
 const signInWithGoogle = async () => {
   try {
@@ -75,6 +103,8 @@ const logout = (history) => {
 
 export {
   auth,
+  authReady,
+  registerUserSession,
   useAuthState,
   signInWithGoogle,
   logout,
