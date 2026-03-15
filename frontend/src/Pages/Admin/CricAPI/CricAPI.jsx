@@ -101,7 +101,7 @@ export default function CricAPI() {
                 }
               }}
             >
-              Validate Teams
+              Validate and Add Teams
             </Button>
             {/* Add Selected Games button moved below table — shows when selections exist */}
           </HStack>
