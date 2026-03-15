@@ -1,4 +1,4 @@
-import { Box, Container, Heading, VStack, HStack, Button, Select, FormControl, FormLabel, useToast, Checkbox, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Spinner } from "@chakra-ui/react";
+import { Box, Container, Heading, VStack, HStack, Button, Select, FormControl, FormLabel, useToast, Checkbox, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Spinner, Input } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { apiRequest } from "../../../api/client";
@@ -44,8 +44,8 @@ export default function CricAPI() {
             <Heading size="lg">Cric API</Heading>
             <Button onClick={() => history.push('/admin/Games')}>Back to Games</Button>
           </HStack>
-          <HStack spacing={2} flexWrap="full">
-            <FormControl w="200px">
+          <HStack spacing={2} flexWrap="wrap">
+            <FormControl>
               <FormLabel>Series</FormLabel>
               <Select value={selected} onChange={(e) => setSelected(e.target.value)}>
                 <option value="">Select series</option>
@@ -56,6 +56,16 @@ export default function CricAPI() {
                 ))}
               </Select>
             </FormControl>
+            <FormControl>
+              <FormLabel>Series ID</FormLabel>
+              <Input
+                placeholder="Enter or edit series id"
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+              />
+            </FormControl>
+          </HStack>
+          <HStack spacing={2} flexWrap="wrap">
             <Button
               colorScheme="blue"
               isLoading={loadingGames}
