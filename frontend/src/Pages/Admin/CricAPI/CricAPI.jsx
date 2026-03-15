@@ -22,6 +22,19 @@ export default function CricAPI() {
       .catch(() => setSeries([]));
   }, []);
 
+  // Derived values for select-all checkbox
+  const selectableIds = games.filter((g) => !g.inDB).map((g) => g.matchId);
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedMatches.has(id));
+  const someSelected = selectableIds.some((id) => selectedMatches.has(id));
+  const isIndeterminate = someSelected && !allSelected;
+
+  const handleSelectAll = (checked) => {
+    const next = new Set(selectedMatches);
+    if (checked) selectableIds.forEach((id) => next.add(id));
+    else selectableIds.forEach((id) => next.delete(id));
+    setSelectedMatches(next);
+  };
+
   return (
     <Box minH="100vh">
       <Container maxW="4xl" py={8}>
@@ -43,8 +56,6 @@ export default function CricAPI() {
                 ))}
               </Select>
             </FormControl>
-          {/* </HStack>
-          <HStack spacing={2} flexWrap="wrap"> */}
             <Button
               colorScheme="blue"
               isLoading={loadingGames}
@@ -104,9 +115,16 @@ export default function CricAPI() {
             <Box mt={4} w="full" p={4} borderRadius="md" boxShadow="sm">
               <TableContainer mt={3}>
                 <Table variant="simple" size="sm">
-                  <Thead bg="gray.100">
+                  <Thead bg="gray.700">
                     <Tr>
-                      <Th></Th>
+                      <Th>
+                        <Checkbox
+                          isChecked={allSelected}
+                          isIndeterminate={isIndeterminate}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          isDisabled={selectableIds.length === 0}
+                        />
+                      </Th>
                       <Th>No.</Th>
                       <Th>Team 1</Th>
                       <Th>Team 2</Th>

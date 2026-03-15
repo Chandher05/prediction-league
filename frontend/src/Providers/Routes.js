@@ -7,6 +7,7 @@ import {
   // useLocation
 } from "react-router-dom";
 import Games from "../Pages/Admin/Games/Games";
+import CricAPI from "../Pages/Admin/CricAPI/CricAPI";
 import Login from "../Pages/Admin/Login/Login";
 import User from "../Pages/Admin/Users/Users";
 import Home from "../Pages/User/Home/Home";
@@ -37,6 +38,9 @@ function Routes() {
         </PrivateRoute>
         <PrivateRoute authenticated={authenticated} path="/admin/Games">
           <Games></Games>
+        </PrivateRoute>
+        <PrivateRoute authenticated={authenticated} path="/admin/CricAPI">
+          <CricAPI />
         </PrivateRoute>
         <PrivateGoogleRoute path="/admin">
           <Login handleAuth={handleAuth}></Login>
