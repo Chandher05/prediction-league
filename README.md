@@ -12,8 +12,14 @@ The project is to make it entertaining to follow a league by having to fight it 
 Frontend ENV
 ```
 REACT_APP_PUBLIC_URL=https://prediction-league.netlify.app/
-REACT_APP_API_BE=https://prediction-league-production.up.railway.app/
+REACT_APP_API_BE=https://observant-creation-production.up.railway.app
 REACT_APP_ADMIN_PASSWORD=
+REACT_APP_FIREBASE_API_KEY=
+REACT_APP_FIREBASE_AUTH_DOMAIN=
+REACT_APP_FIREBASE_PROJECT_ID=
+REACT_APP_FIREBASE_STORAGE_BUCKET=
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=
+REACT_APP_FIREBASE_APP_ID=
 ```
 
 Backend ENV
@@ -21,7 +27,15 @@ Backend ENV
 MONGODB_URL=
 PORT=8000
 CRICAPI_KEY=
+PREDICTION_PASSWORD=
 ```
+
+## Load data using admin page
+1. Redeploy backend by changing DB name or mongo url
+2. Login to Admin Page
+3. Select series to be loaded
+4. Validate and Add Teams
+5. Add all games
 
 ## Load data using cric api
 1. Create database on atlas
