@@ -83,10 +83,11 @@ var checkAuth = async (req, res, next) => {
     let decodedToken = await admin.auth().verifyIdToken(authToken);
     const uid = decodedToken.uid;
     let userRecord = await admin.auth().getUser(uid);
-    // ensure uid exists in Users collection
+    // ensure uid exists in Users collection unless this is the users/login route
     try {
+      const path = req.path || "";
       const userExists = await Users.findOne({ userUID: uid });
-      if (!userExists) {
+      if (!userExists && !path.includes("/users/login")) {
         return res.status(401).send('User not found in Users collection');
       }
     } catch (e) {
