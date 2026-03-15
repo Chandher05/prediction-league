@@ -4,8 +4,7 @@ module.exports = {
 	session: process.env.SESSION,
 	token: process.env.TOKEN,
 	cricapi: {
-		key: process.env.CRICAPI_KEY,
-		series_id: process.env.SERIES_ID
+		key: process.env.CRICAPI_KEY
 	},
 	database: {
 		mongoDbUrl: process.env.MONGODB_URL,

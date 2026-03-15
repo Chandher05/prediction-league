@@ -115,7 +115,7 @@ exports.scheduledGames = async (req, res) => {
 		let allGames = [];
 		let daysCompleted = 0;
 
-		for (let i = 0; i < 7; i++) {
+		for (let i = 0; i < 30; i++) {
 			let startOfDay = new Date(now);
 			startOfDay.setDate(startOfDay.getDate() + i);
 			startOfDay.setHours(0, 0, 0, 0);
@@ -469,98 +469,6 @@ exports.deleteGame = async (req, res) => {
 
 	} catch (error) {
 		console.log(`Error game/startGame ${error}`)
-		return res
-			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
-			.send(error.message)
-	}
-}
-
-
-	
-/**
- * Update schedule with cricapi.
- * @param  {Object} req request object
- * @param  {Object} res response object
- */
-exports.updateSchedule = async (req, res) => {
-	try {
-
-		let allTeams
-		allTeams = await Team.find()
-
-		let teamObj = {}
-		for (var team of allTeams) {
-			teamObj[team.fullName] = team._id
-		}
-
-		let allGames
-		allGames = await Game.find().sort('startTime')
-
-		let gameData = {}
-		for (var game of allGames) {
-			gameData[game.cricApiMatchId] = {
-				gameId: game._id,
-				startTime: game.startTime
-			}
-		}
-
-		var response = await axios.get('https://api.cricapi.com/v1/series_info?apikey=' + config.cricapi.key + '&id=' + config.cricapi.series_id);
-		if (response.status != 200) {
-			return res
-				.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
-				.send("Cricapi failed with status " + response.status)
-		}
-		var api_response = response.data
-		var all_matches = {}
-
-		for (var game of api_response["data"]["matchList"]) {
-			
-			var team1 = teamObj[game["teams"][0]]
-			if (team1 === undefined) {
-				return res
-					.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
-					.send(game["teams"][0] + " team not available in database")
-			}
-			var team2 = teamObj[game["teams"][1]]
-			if (team2 === undefined) {
-				return res
-					.status(constants.STATUS_CODE.BAD_REQUEST_ERROR_STATUS)
-					.send(game["teams"][1] + " team not available in database")
-			}
-			if (team1 != team2) {
-				all_matches[game["dateTimeGMT"]] = {
-					"team1": team1,
-					"team2": team2,
-					"startTime": game["dateTimeGMT"] + ".000Z",
-					"cricApiMatchId": game["id"]
-				}
-			}
-		}
-
-		const sortedStartTimes = Object.keys(all_matches).sort()
-		var index = 1
-		for (var startTime of sortedStartTimes) {
-			var gameObj = all_matches[startTime]
-			var dbData = gameData[gameObj["cricApiMatchId"]]
-			index += 1
-			if (dbData === undefined) {
-				gameObj["gameNumber"] = index
-				gameObj["battingFirst"] = null
-				gameObj["toss"] = null
-				gameObj["winner"] = null
-				var dbObj = new Game(gameObj)
-				await dbObj.save()
-			}
-		}
-		
-		allGames = await Game.find().sort('startTime')
-
-		return res
-			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
-			.send(allGames)
-
-	} catch (error) {
-		console.log(`Error in adding a game ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)

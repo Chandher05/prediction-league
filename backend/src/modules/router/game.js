@@ -12,7 +12,6 @@ router.get('/completed', gameController.completedGames);
 router.post('/add', gameController.addGame);
 router.put('/update', gameController.updateGame);
 router.delete('/delete/:gameId', gameController.deleteGame);
-router.post('/update-schedule', gameController.updateSchedule);
 router.put('/update-winner/:gameId', gameController.updateWinner);
 router.get('/impact/active', gameController.isImpactActive);
 

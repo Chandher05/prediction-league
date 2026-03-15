@@ -80,6 +80,10 @@ function Games() {
   const navToUser = () => {
     history.push("/admin/Users");
   };
+
+  const navToCricApi = () => {
+    history.push("/admin/CricAPI");
+  };
   return (
     <Box minH="100vh" bg={useColorModeValue("gray.50", "gray.800")}>
       <Container maxW="7xl" px={{ base: 4, md: 8 }} py={{ base: 8, md: 10 }}>
@@ -95,6 +99,7 @@ function Games() {
             <HStack spacing={2} flexWrap="wrap">
               <AddGameModal onCloseCall={getGames} teams={teams}></AddGameModal>
               <Button onClick={getGames}>Refresh</Button>
+              <Button onClick={navToCricApi}>Cric API</Button>
               <Button onClick={navToUser}>Users Table</Button>
               <AddPredictionModal
                 users={users}

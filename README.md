@@ -21,7 +21,6 @@ Backend ENV
 MONGODB_URL=
 PORT=8000
 CRICAPI_KEY=
-SERIES_ID=
 ```
 
 ## Load data using cric api

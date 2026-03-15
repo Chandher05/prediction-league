@@ -14,9 +14,12 @@ const gameRouter = require("../src/modules/router/game");
 const predictionRouter = require("../src/modules/router/prediction");
 const teamsRouter = require("../src/modules/router/teams");
 const statsRouter = require("../src/modules/router/stats");
+const cricapiRouter = require("../src/modules/router/cricapi");
 
 // database connections
 require("../src/models/mongoDB/index");
+// load user model to validate authenticated uid
+const Users = require("../src/models/mongoDB/users").default || require("../src/models/mongoDB/users");
 
 const app = express();
 const { port } = config;
@@ -80,6 +83,16 @@ var checkAuth = async (req, res, next) => {
     let decodedToken = await admin.auth().verifyIdToken(authToken);
     const uid = decodedToken.uid;
     let userRecord = await admin.auth().getUser(uid);
+    // ensure uid exists in Users collection
+    try {
+      const userExists = await Users.findOne({ userUID: uid });
+      if (!userExists) {
+        return res.status(401).send('User not found in Users collection');
+      }
+    } catch (e) {
+      console.log('Error checking Users collection', e);
+      return res.status(500).send('Internal server error');
+    }
     req.body.userUID = uid;
     req.body.email = userRecord.email;
     req.body.username = userRecord.displayName;
@@ -97,6 +110,7 @@ app.use("/users", usersRouter);
 app.use("/game", gameRouter);
 app.use("/prediction", predictionRouter);
 app.use("/teams", teamsRouter);
+app.use("/cricapi", cricapiRouter);
 
 // Send email cron job
 // require('../src/utils/sendMail');

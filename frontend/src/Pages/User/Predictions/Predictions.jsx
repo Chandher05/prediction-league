@@ -85,18 +85,20 @@ function Predictions() {
       } else {
         if (game.confidence === "FH") {
           totalConfidenceWhenWrong += 50;
-        } else if (game.confidence !== "L") {
+        } else if (game.confidence !== "L" && game.confidence !== "-") {
           totalConfidenceWhenWrong += Number(game.confidence);
         }
       }
 
-      if (game.confidence !== "L") {
-        predictedGames += 1;
-      } else if (leavesRemaining > 0) {
-        leavesRemaining -= 1;
-      }
-      if (game.confidence === "FH" && freehitRemaining > 0) {
-        freehitRemaining -= 1;
+      if (game.winner && game.winner.shortName) {
+        if (game.confidence !== "L" && game.confidence !== "-") {
+          predictedGames += 1;
+        } else if (leavesRemaining > 0) {
+          leavesRemaining -= 1;
+        }
+        if (game.confidence === "FH" && freehitRemaining > 0) {
+          freehitRemaining -= 1;
+        }
       }
     }
     
