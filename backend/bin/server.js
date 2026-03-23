@@ -1,4 +1,3 @@
-import cors from "cors";
 import config from "../config/index";
 // const config = require('../config/index');
 // const cors = require('cors')('use strict');
@@ -32,29 +31,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
 
 // use cors to allow cross origin resource sharing
-app.use(
-  cors({
-    origin: "*",
-    credentials: false,
-    allowedHeaders: [
-      "Origin",
-      "Accept",
-      "Content-Type",
-      "X-Requested-With",
-      "Authorization",
-    ],
-  })
-);
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Credentials", "false");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET,HEAD,OPTIONS,POST,PUT,DELETE"
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers"
+    "Origin, Accept, X-Requested-With, Content-Type, Authorization, Access-Control-Request-Method, Access-Control-Request-Headers"
   );
   res.setHeader("Cache-Control", "no-cache");
   if (req.method === "OPTIONS") {
