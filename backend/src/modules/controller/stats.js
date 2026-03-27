@@ -85,3 +85,103 @@ import constants from '../../utils/constants';
 			.send(error.message)
 	}
 }
+
+/**
+ * Get leaderboard.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getLeaderboard = async (req, res) => {
+  try {
+    let allUsers = await Users.find({
+      isActive: true,
+    });
+
+    allUsers.sort(function (a, b) {
+      return a.totalScore - b.totalScore;
+    });
+
+    let leaderboardData = [];
+    let playerPosition = 1;
+    for (var obj of allUsers) {
+      if (obj.isAdmin) {
+        leaderboardData.push({
+          position: null,
+          username: obj.username,
+          score: obj.totalScore,
+          freeHitsRemaining: null,
+          leavesRemaining: null,
+          impactRemaining: null,
+          isAdmin: true,
+        });
+      } else {
+        leaderboardData.push({
+          position: playerPosition,
+          username: obj.username,
+          score: obj.totalScore,
+          freeHitsRemaining: obj.freeHitsRemaining,
+          leavesRemaining: obj.leavesRemaining,
+          impactRemaining: obj.impactRemaining,
+          isAdmin: false,
+        });
+        playerPosition += 1;
+      }
+    }
+
+    return res
+      .status(constants.STATUS_CODE.ACCEPTED_STATUS)
+      .send(leaderboardData);
+  } catch (error) {
+    console.log(`Error game/startGame ${error}`);
+    return res
+      .status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+      .send(error.message);
+  }
+};
+
+/**
+ * Get list of games that have not started in database.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.scheduledGames = async (req, res) => {
+	try {
+
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
+		// Return games starting within the next two hours
+		const now = new Date();
+		const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+		const games = await Game.find({
+			startTime: {
+				$gt: now,
+				$lte: twoHoursLater,
+			}
+		}).sort('startTime');
+
+		const gameData = games.map((game) => ({
+			gameId: game._id,
+			gameNumber: game.gameNumber,
+			team1: teamObj[game.team1],
+			team2: teamObj[game.team2],
+			startTime: game.startTime,
+		}));
+
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(gameData)
+	} catch (error) {
+		console.log(`Error while getting scheduled game ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
