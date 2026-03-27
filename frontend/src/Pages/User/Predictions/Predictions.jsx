@@ -68,7 +68,7 @@ function Predictions() {
     let correct = 0;
     let pending = 0;
     let predictedGames = 0;
-    let leavesRemaining = 7;
+    let leavesRemaining = 5;
     let freehitRemaining = 2;
     let totalConfidenceWhenCorrect = 0;
     let totalConfidenceWhenWrong = 0;
