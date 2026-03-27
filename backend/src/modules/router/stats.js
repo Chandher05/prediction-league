@@ -8,5 +8,6 @@ const router = express.Router();
 router.get('/get/predictions', statsController.getData);
 router.get('/leaderboard', statsController.getLeaderboard);
 router.get('/next-game', statsController.scheduledGames);
+router.get('/current-game-predictions', statsController.currentGamePredictions);
 
 module.exports = router;

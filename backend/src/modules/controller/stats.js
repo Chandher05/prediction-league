@@ -185,3 +185,104 @@ exports.scheduledGames = async (req, res) => {
 			.send(error.message)
 	}
 }
+
+/**
+ * Get list of games that have not started in database.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.currentGamePredictions = async (req, res) => {
+	try {
+
+		let allTeams
+		allTeams = await Team.find()
+
+		let teamObj = {}
+		for (var team of allTeams) {
+			teamObj[team._id] = team
+		}
+
+		// Find games that started within the last two hours
+		const now = new Date()
+		const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000)
+
+		// Find one game that started within the last two hours (assume at most one)
+		const game = await Game.findOne({
+			startTime: {
+				$gte: twoHoursAgo,
+				$lte: now,
+			},
+		}).sort('startTime')
+
+		// Load users to map usernames
+		const allUsers = await Users.find()
+		const userObj = {}
+		for (const u of allUsers) {
+			userObj[u.userUID] = u
+		}
+
+		if (!game) {
+			return res
+				.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+				.send({})
+		}
+
+		const predictions = await Prediction.find({
+			gameId: game._id,
+			isStrategy: false,
+			isConsidered: true,
+		})
+
+		// Group predictions into team1/team2 and FH buckets, then sort
+		let team1 = []
+		let team2 = []
+		let team1FH = []
+		let team2FH = []
+
+		for (const pred of predictions) {
+			const entry = {
+				username: (userObj[pred.userUID] && userObj[pred.userUID].username) || pred.userUID,
+				prediction: {
+					confidence: pred.confidence,
+					predictedTeam: teamObj[pred.predictedTeamId] ? teamObj[pred.predictedTeamId] : {},
+					predictionTime: pred.predictionTime,
+					isConsidered: pred.isConsidered,
+				},
+			}
+
+			if (pred.predictedTeamId.toString() == game.team1.toString()) {
+				if (pred.confidence == "FH") team1FH.push(entry)
+				else team1.push(entry)
+			} else {
+				if (pred.confidence == "FH") team2FH.push(entry)
+				else team2.push(entry)
+			}
+		}
+
+		team1.sort(function (a, b) {
+			return parseInt(b.prediction.confidence) - parseInt(a.prediction.confidence)
+		})
+
+		team2.sort(function (a, b) {
+			return parseInt(a.prediction.confidence) - parseInt(b.prediction.confidence)
+		})
+
+		const predictionsOrdered = team1FH.concat(team1).concat(team2).concat(team2FH)
+
+		const returnData = {
+			gameNumber: game.gameNumber,
+			teamsPlaying: [teamObj[game.team1] ? teamObj[game.team1].fullName : '', teamObj[game.team2] ? teamObj[game.team2].fullName : ''],
+			startTime: game.startTime,
+			predictions: predictionsOrdered,
+		}
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(returnData)
+	} catch (error) {
+		console.log(`Error while getting scheduled game ${error}`)
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message)
+	}
+}
