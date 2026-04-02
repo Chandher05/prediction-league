@@ -108,7 +108,7 @@ exports.getLeaderboard = async (req, res) => {
         leaderboardData.push({
           position: null,
           username: obj.username,
-          score: obj.totalScore,
+		  score: Number(obj.totalScore || 0).toFixed(7),
           freeHitsRemaining: null,
           leavesRemaining: null,
           impactRemaining: null,
@@ -118,7 +118,7 @@ exports.getLeaderboard = async (req, res) => {
         leaderboardData.push({
           position: playerPosition,
           username: obj.username,
-          score: obj.totalScore,
+		  score: Number(obj.totalScore || 0).toFixed(7),
           freeHitsRemaining: obj.freeHitsRemaining,
           leavesRemaining: obj.leavesRemaining,
           impactRemaining: obj.impactRemaining,
