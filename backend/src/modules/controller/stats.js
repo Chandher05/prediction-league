@@ -127,10 +127,35 @@ exports.getLeaderboard = async (req, res) => {
         playerPosition += 1;
       }
     }
+			
+	const allTeams = await Team.find()
+
+	const teamObj = {}
+	for (const team of allTeams) {
+		teamObj[team._id] = team
+	}
+
+	const now = new Date()
+	// Find the most recent completed game (startTime < now) with a winner
+	const lastCompleted = await Game.findOne({
+		startTime: { $lt: now },
+		winner: { $exists: true, $ne: null }
+	}).sort({ startTime: -1 })
+
+	let lastCompletedGame = {}
+	if (lastCompleted) {
+		lastCompletedGame = {
+			gameNumber: lastCompleted.gameNumber,
+			teamsPlaying: [
+				teamObj[lastCompleted.team1] ? teamObj[lastCompleted.team1].fullName : '',
+				teamObj[lastCompleted.team2] ? teamObj[lastCompleted.team2].fullName : ''
+			]
+		}
+	}
 
     return res
       .status(constants.STATUS_CODE.ACCEPTED_STATUS)
-      .send(leaderboardData);
+      .send({leaderboardData: leaderboardData, lastCompletedGame: lastCompletedGame});
   } catch (error) {
     console.log(`Error game/startGame ${error}`);
     return res
