@@ -147,37 +147,37 @@ exports.getLeaderboard = async (req, res) => {
 exports.scheduledGames = async (req, res) => {
 	try {
 
-		let allTeams
-		allTeams = await Team.find()
+		const allTeams = await Team.find()
 
-		let teamObj = {}
-		for (var team of allTeams) {
+		const teamObj = {}
+		for (const team of allTeams) {
 			teamObj[team._id] = team
 		}
 
-		// Return games starting within the next two hours
-		const now = new Date();
-		const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+		// Find the next game scheduled to start (startTime > now)
+		const now = new Date()
+		const nextGame = await Game.findOne({
+			startTime: { $gt: now }
+		}).sort('startTime')
 
-		const games = await Game.find({
-			startTime: {
-				$gt: now,
-				$lte: twoHoursLater,
-			}
-		}).sort('startTime');
+		if (!nextGame) {
+			return res
+				.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+				.send({})
+		}
 
-		const gameData = games.map((game) => ({
-			gameId: game._id,
-			gameNumber: game.gameNumber,
-			team1: teamObj[game.team1],
-			team2: teamObj[game.team2],
-			startTime: game.startTime,
-		}));
-
+		const gameData = {
+			gameId: nextGame._id,
+			gameNumber: nextGame.gameNumber,
+			team1: teamObj[nextGame.team1] || null,
+			team2: teamObj[nextGame.team2] || null,
+			startTime: nextGame.startTime,
+		}
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send(gameData)
+
 	} catch (error) {
 		console.log(`Error while getting scheduled game ${error}`)
 		return res
