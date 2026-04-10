@@ -82,7 +82,7 @@ function Predictions() {
         } else {
           totalConfidenceWhenCorrect += Number(game.confidence);
         }
-      } else {
+      } else if (game.winner?.shortName) {
         if (game.confidence === "FH") {
           totalConfidenceWhenWrong += 50;
         } else if (game.confidence !== "L" && game.confidence !== "-") {
@@ -118,6 +118,13 @@ function Predictions() {
     if ((predictedGames - correct) > 0) {
       avgConfidenceWhenWrong = (totalConfidenceWhenWrong / (predictedGames - correct)).toFixed(2);
     }
+    console.log({
+      "predictedGames": predictedGames,
+      "correct": correct,
+      "totalConfidenceWhenCorrect": totalConfidenceWhenCorrect,
+      "totalConfidenceWhenWrong": totalConfidenceWhenWrong,
+      "totalOverallConfidence": totalOverallConfidence
+    })
     return { total, leavesRemaining, pending, predictedGames, predictionAccuracy, correct, avgConfidenceWhenCorrect, avgConfidenceWhenWrong, avgOverallConfidence, freehitRemaining };
   }, [games]);
 
