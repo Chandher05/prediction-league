@@ -321,8 +321,8 @@ exports.currentGamePredictions = async (req, res) => {
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send({
-				sendMessage: false,
-				message: ""
+				sendMessage: true,
+				message: "Test message\nNew line test"
 			})
 	} catch (error) {
 		console.log(`Error while adding user ${error}`)
