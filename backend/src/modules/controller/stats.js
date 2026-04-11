@@ -321,17 +321,8 @@ exports.currentGamePredictions = async (req, res) => {
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send({
-				sendMessage: true,
-				message: "🏏 LAST COMPLETED GAME\
-📍 Kolkata Knight Riders vs Lucknow Super Giants\
-🎮 Match #15\
-\
-📊 PREDICTION LEAGUE - LEADERBOARD\
-\
-🏆 Top 5:\
-1. Sravanth KM — 0.1975071\
-   🎯FH:2 💤L:5 ⚡IMP:1\
-2. Abhishek Gupta — 0.2334929"
+				sendMessage: false,
+				message: ""
 			})
 	} catch (error) {
 		console.log(`Error while adding user ${error}`)
