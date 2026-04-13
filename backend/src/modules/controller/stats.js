@@ -442,6 +442,7 @@ exports.getLeaderboardMessage = async () => {
  */
 exports.getUpcomingGameMessage = async () => {
 	const nextGame = await exports.getUpcomingGame();
+	let message = "";
 	if (nextGame && nextGame.gameNumber) {
 		const start = new Date(nextGame.startTime);
 		const startStr = start.toLocaleString('en-GB', {
