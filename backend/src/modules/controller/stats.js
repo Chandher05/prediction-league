@@ -425,7 +425,7 @@ exports.getCurrentGame = async () => {
 exports.getLeaderboardMessage = async () => {
 	
 	const lastCompletedGame = await exports.getLastCompletedGame();
-	let message = `📊 Leaderboard update after game ${lastCompletedGame.gameNumber} - ${lastCompletedGame.teamsPlaying[0]} vs ${lastCompletedGame.teamsPlaying[1]}`
+	let message = `📊 Leaderboard update after Game ${lastCompletedGame.gameNumber} - ${lastCompletedGame.teamsPlaying[0]} vs ${lastCompletedGame.teamsPlaying[1]}`
 	const leaderboardData = await exports.getLeaderboardData();
 
 	for (var player of leaderboardData) {
@@ -446,6 +446,7 @@ exports.getUpcomingGameMessage = async () => {
 	if (nextGame && nextGame.gameNumber) {
 		const start = new Date(nextGame.startTime);
 		const startStr = start.toLocaleString('en-GB', {
+			timeZone: 'Asia/Kolkata',
 			weekday: 'short',
 			day: '2-digit',
 			month: 'short',
