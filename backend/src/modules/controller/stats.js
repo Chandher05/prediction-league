@@ -10,7 +10,7 @@ import constants from '../../utils/constants';
  * @param  {Object} res response object
  */
  exports.getData = async (req, res) => {
-	try {
+ 	try {
 		let allTeams
 		allTeams = await Team.find()
 
@@ -87,46 +87,52 @@ import constants from '../../utils/constants';
 }
 
 /**
- * Get leaderboard.
- * @param  {Object} req request object
- * @param  {Object} res response object
+ * Build leaderboard data array and return it.
+ * @returns {Array} leaderboardData
  */
-exports.getLeaderboard = async (req, res) => {
-  try {
-    let allUsers = await Users.find({
-      isActive: true,
-    });
+exports.getLeaderboardData = async () => {
+  const allUsers = await Users.find({
+    isActive: true,
+  });
 
-    allUsers.sort(function (a, b) {
-      return a.totalScore - b.totalScore;
-    });
+  allUsers.sort(function (a, b) {
+    return a.totalScore - b.totalScore;
+  });
 
-    let leaderboardData = [];
-    let playerPosition = 1;
-    for (var obj of allUsers) {
-      if (obj.isAdmin) {
-        leaderboardData.push({
-          position: null,
-          username: obj.username,
-		  score: Number(obj.totalScore || 0).toFixed(7),
-          freeHitsRemaining: null,
-          leavesRemaining: null,
-          impactRemaining: null,
-          isAdmin: true,
-        });
-      } else {
-        leaderboardData.push({
-          position: playerPosition,
-          username: obj.username,
-		  score: Number(obj.totalScore || 0).toFixed(7),
-          freeHitsRemaining: obj.freeHitsRemaining,
-          leavesRemaining: obj.leavesRemaining,
-          impactRemaining: obj.impactRemaining,
-          isAdmin: false,
-        });
-        playerPosition += 1;
-      }
+  const leaderboardData = [];
+  let playerPosition = 1;
+  for (const obj of allUsers) {
+    if (obj.isAdmin) {
+      leaderboardData.push({
+        position: null,
+        username: obj.username,
+        score: Number(obj.totalScore || 0).toFixed(7),
+        freeHitsRemaining: null,
+        leavesRemaining: null,
+        impactRemaining: null,
+        isAdmin: true,
+      });
+    } else {
+      leaderboardData.push({
+        position: playerPosition,
+        username: obj.username,
+        score: Number(obj.totalScore || 0).toFixed(7),
+        freeHitsRemaining: obj.freeHitsRemaining,
+        leavesRemaining: obj.leavesRemaining,
+        impactRemaining: obj.impactRemaining,
+        isAdmin: false,
+      });
+      playerPosition += 1;
     }
+  }
+  return leaderboardData;
+};
+
+/**
+ * Get last completed Game.
+ * @returns {Object} lastCompletedGame
+ */
+exports.getLastCompletedGame = async () => {
 			
 	const allTeams = await Team.find()
 
@@ -152,6 +158,19 @@ exports.getLeaderboard = async (req, res) => {
 			]
 		}
 	}
+	return lastCompletedGame;
+}
+
+/**
+ * Get leaderboard.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.getLeaderboard = async (req, res) => {
+  try {
+	// Build leaderboard data using the standalone helper
+	const leaderboardData = await exports.getLeaderboardData();
+	const lastCompletedGame = await exports.getLastCompletedGame();
 
     return res
       .status(constants.STATUS_CODE.ACCEPTED_STATUS)
@@ -318,16 +337,75 @@ exports.currentGamePredictions = async (req, res) => {
  */
  exports.getMessage = async (req, res) => {
 	try {
+		const lastCompletedGame = await exports.getLastCompletedGame();
+		let message = `📊 Leaderboard update after game ${lastCompletedGame.gameNumber} - ${lastCompletedGame.teamsPlaying[0]} vs ${lastCompletedGame.teamsPlaying[1]}`
+		const leaderboardData = await exports.getLeaderboardData();
+
+		for (var player of leaderboardData) {
+			message += `\n${player.position}. ${player.username} - ${player.score} (FH ${player.freeHitsRemaining} IMP ${player.impactRemaining} L ${player.leavesRemaining})`
+		}
+
+		const nextGame = await exports.getUpcomingGame();
+		if (nextGame && nextGame.gameNumber) {
+			const start = new Date(nextGame.startTime);
+			const startStr = start.toLocaleString('en-GB', {
+				weekday: 'short',
+				day: '2-digit',
+				month: 'short',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: true,
+			});
+
+			message += `\n\n📅 UPCOMING GAME`;
+			message += `\n📍 ${nextGame.teamsPlaying[0]} vs ${nextGame.teamsPlaying[1]}`;
+			message += `\n🕐 ${startStr} IST`;
+			message += `\n🎮 Match #${nextGame.gameNumber}`;
+			message += `\n\nMake your prediction: http://prediction-league.netlify.app/predict`;
+		}
+
+
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
 			.send({
 				sendMessage: true,
-				message: "Test message\nNew line test"
+				message: message
 			})
 	} catch (error) {
 		console.log(`Error while adding user ${error}`)
 		return res
 			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
 			.send(error.message)
+	}
+}
+
+/**
+ * Get upcoming (next) Game.
+ * @returns {Object} upcomingGame
+ */
+exports.getUpcomingGame = async () => {
+	const allTeams = await Team.find()
+
+	const teamObj = {}
+	for (const team of allTeams) {
+		teamObj[team._id] = team
+	}
+
+	const now = new Date()
+	const nextGame = await Game.findOne({
+		startTime: { $gt: now }
+	}).sort({ startTime: 1 })
+
+	if (!nextGame) return {}
+
+	return {
+		gameId: nextGame._id,
+		gameNumber: nextGame.gameNumber,
+		teamsPlaying: [
+			teamObj[nextGame.team1] ? teamObj[nextGame.team1].fullName : '',
+			teamObj[nextGame.team2] ? teamObj[nextGame.team2].fullName : ''
+		],
+		startTime: nextGame.startTime,
 	}
 }
