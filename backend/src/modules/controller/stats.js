@@ -337,34 +337,10 @@ exports.currentGamePredictions = async (req, res) => {
  */
  exports.getMessage = async (req, res) => {
 	try {
-		const lastCompletedGame = await exports.getLastCompletedGame();
-		let message = `📊 Leaderboard update after game ${lastCompletedGame.gameNumber} - ${lastCompletedGame.teamsPlaying[0]} vs ${lastCompletedGame.teamsPlaying[1]}`
-		const leaderboardData = await exports.getLeaderboardData();
 
-		for (var player of leaderboardData) {
-			message += `\n${player.position}. ${player.username} - ${player.score} (FH ${player.freeHitsRemaining} IMP ${player.impactRemaining} L ${player.leavesRemaining})`
-		}
-
-		const nextGame = await exports.getUpcomingGame();
-		if (nextGame && nextGame.gameNumber) {
-			const start = new Date(nextGame.startTime);
-			const startStr = start.toLocaleString('en-GB', {
-				weekday: 'short',
-				day: '2-digit',
-				month: 'short',
-				year: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit',
-				hour12: true,
-			});
-
-			message += `\n\n📅 UPCOMING GAME`;
-			message += `\n📍 ${nextGame.teamsPlaying[0]} vs ${nextGame.teamsPlaying[1]}`;
-			message += `\n🕐 ${startStr} IST`;
-			message += `\n🎮 Match #${nextGame.gameNumber}`;
-			message += `\n\nMake your prediction: http://prediction-league.netlify.app/predict`;
-		}
-
+		let upcomingGame = await exports.getUpcomingGame();
+		let currentGame = await exports.getCurrentGame();
+		let message = await exports.getLeaderboardMessage();
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
@@ -408,4 +384,81 @@ exports.getUpcomingGame = async () => {
 		],
 		startTime: nextGame.startTime,
 	}
+}
+
+/**
+ * Get current (ongoing/recent) Game within last two hours.
+ * @returns {Object} currentGame
+ */
+exports.getCurrentGame = async () => {
+	const allTeams = await Team.find()
+
+	const teamObj = {}
+	for (const team of allTeams) {
+		teamObj[team._id] = team
+	}
+
+	const now = new Date()
+	const twoHoursAgo = new Date(now.getTime() - 2 * 60 * 60 * 1000)
+
+	const game = await Game.findOne({
+		startTime: { $gte: twoHoursAgo, $lte: now }
+	}).sort({ startTime: -1 })
+
+	if (!game) return {}
+
+	return {
+		gameId: game._id,
+		gameNumber: game.gameNumber,
+		teamsPlaying: [
+			teamObj[game.team1] ? teamObj[game.team1].fullName : '',
+			teamObj[game.team2] ? teamObj[game.team2].fullName : ''
+		],
+		startTime: game.startTime,
+	}
+}
+
+/**
+ * Get leaderboard message.
+ * @returns {String} message
+ */
+exports.getLeaderboardMessage = async () => {
+	
+	const lastCompletedGame = await exports.getLastCompletedGame();
+	let message = `📊 Leaderboard update after game ${lastCompletedGame.gameNumber} - ${lastCompletedGame.teamsPlaying[0]} vs ${lastCompletedGame.teamsPlaying[1]}`
+	const leaderboardData = await exports.getLeaderboardData();
+
+	for (var player of leaderboardData) {
+		message += `\n${player.position}. ${player.username} - ${player.score}`;
+		message += `\n   🎯FH:${player.freeHitsRemaining} 💤L:${player.impactRemaining} ⚡IMP:${player.leavesRemaining}`
+	}
+	message += `\n\n ${await exports.getUpcomingGameMessage()}`;
+	return message;
+}
+
+/**
+ * Get upcoming game message.
+ * @returns {String} message
+ */
+exports.getUpcomingGameMessage = async () => {
+	const nextGame = await exports.getUpcomingGame();
+	if (nextGame && nextGame.gameNumber) {
+		const start = new Date(nextGame.startTime);
+		const startStr = start.toLocaleString('en-GB', {
+			weekday: 'short',
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: true,
+		});
+
+		message += `📅 UPCOMING GAME`;
+		message += `\n📍 ${nextGame.teamsPlaying[0]} vs ${nextGame.teamsPlaying[1]}`;
+		message += `\n🕐 ${startStr} IST`;
+		message += `\n🎮 Match #${nextGame.gameNumber}`;
+		message += `\n\nMake your prediction: http://prediction-league.netlify.app/predict`;
+	}
+	return message;
 }
