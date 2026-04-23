@@ -74,7 +74,16 @@ async function buildPredictionsImage(predictions, gameLabel) {
 
   ctx.fillStyle = "#64748b";
   ctx.font = "24px Arial";
-  ctx.fillText(`Generated on ${new Date().toLocaleString()}`, 56, 172);
+  const istDate = new Intl.DateTimeFormat("en-IN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
+  ctx.fillText(`Generated on ${istDate} IST`, 56, 172);
 
   const tableX = 0;
   const tableY = 206;
