@@ -42,3 +42,47 @@ exports.addRsvp = async (req, res) => {
 			.send(error.message);
 	}
 };
+
+
+/**
+ * Update rsvp.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.updateRsvp = async (req, res) => {
+	try {
+		const rsvpId = req.params.id;
+		const updatedRsvp = await rsvp.findByIdAndUpdate(rsvpId, req.body);
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(updatedRsvp);
+	} catch (error) {
+		console.log(`Error while adding rsvp ${error}`);
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message);
+	}
+};
+
+
+/**
+ * Delete rsvp.
+ * @param  {Object} req request object
+ * @param  {Object} res response object
+ */
+exports.deleteRsvp = async (req, res) => {
+	try {
+		const rsvpId = req.params.id;
+		const deletedRsvp = await rsvp.findByIdAndDelete(rsvpId);
+
+		return res
+			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
+			.send(deletedRsvp);
+	} catch (error) {
+		console.log(`Error while adding rsvp ${error}`);
+		return res
+			.status(constants.STATUS_CODE.INTERNAL_SERVER_ERROR_STATUS)
+			.send(error.message);
+	}
+};
