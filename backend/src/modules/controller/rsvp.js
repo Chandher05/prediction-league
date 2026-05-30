@@ -52,11 +52,16 @@ exports.addRsvp = async (req, res) => {
 exports.updateRsvp = async (req, res) => {
 	try {
 		const rsvpId = req.params.id;
-		const updatedRsvp = await rsvp.findByIdAndUpdate(rsvpId, req.body);
+		const deletedRsvp = await rsvp.findByIdAndUpdate(rsvpId,
+			{ isDeleted: true }
+		);
+		
+		const newRsvp = new rsvp(req.body);
+		await newRsvp.save();
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)
-			.send(updatedRsvp);
+			.send(newRsvp);
 	} catch (error) {
 		console.log(`Error while adding rsvp ${error}`);
 		return res
@@ -74,7 +79,9 @@ exports.updateRsvp = async (req, res) => {
 exports.deleteRsvp = async (req, res) => {
 	try {
 		const rsvpId = req.params.id;
-		const deletedRsvp = await rsvp.findByIdAndDelete(rsvpId);
+		const deletedRsvp = await rsvp.findByIdAndUpdate(rsvpId,
+			{ isDeleted: true }
+		);
 
 		return res
 			.status(constants.STATUS_CODE.CREATED_SUCCESSFULLY_STATUS)

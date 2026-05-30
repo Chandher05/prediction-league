@@ -21,7 +21,11 @@ const RSVP = new mongoose.Schema({
     rsvpDate : {
         type : Date,
         default : Date.now,
-    }
+    },
+	isDeleted: {
+		type: Boolean,
+		default: false,
+	}
 }, { versionKey: false })
 
 export default mongoose.model('rsvp', RSVP)
