@@ -14,6 +14,7 @@ const predictionRouter = require("../src/modules/router/prediction");
 const teamsRouter = require("../src/modules/router/teams");
 const statsRouter = require("../src/modules/router/stats");
 const cricapiRouter = require("../src/modules/router/cricapi");
+const rsvpRouter = require("../src/modules/router/rsvp");
 
 // database connections
 require("../src/models/mongoDB/index");
@@ -92,6 +93,7 @@ var checkAuth = async (req, res, next) => {
 
 // base routes for modules
 app.use("/stats", statsRouter);
+app.use("/rsvp", rsvpRouter);
 app.use("/", checkAuth);
 app.use("/users", usersRouter);
 app.use("/game", gameRouter);
