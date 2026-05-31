@@ -22,6 +22,11 @@ function HallOfFame() {
   const mutedText = useColorModeValue("gray.600", "gray.300");
   const getWinners = [
     {
+      winners: ["🥇Rhea Miranda", "🥈Abhishek Gupta", "🥉Jayasurya Pinaki"],
+      year: "2026",
+      event: "IPL",
+    },
+    {
       winners: ["🥇Gurumoorthy Baskar", "🥈Abhishek Gupta", "🥉Barath C"],
       year: "2026",
       event: "T20 World Cup",
